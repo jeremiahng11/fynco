@@ -2119,6 +2119,36 @@
     color: var(--muted);
     transition: all 0.2s;
   }
+
+  /* Primary "no cards yet" tile shown in empty state */
+  .card-slide-apply {
+    flex: 0 0 calc(100% - 48px);
+    scroll-snap-align: center;
+    border-radius: 14px;
+    aspect-ratio: 1.586;
+    background:
+      linear-gradient(135deg, #1a2a44 0%, #0a1628 60%, #0a1628 100%);
+    color: var(--paper);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 12px 32px rgba(10, 22, 40, 0.18), inset 0 1px 0 rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    transition: transform 0.15s;
+    margin: 6px 24px 14px;
+  }
+  .card-slide-apply::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(201, 169, 97, 0.18), transparent 60%);
+    pointer-events: none;
+  }
+  .card-slide-apply:active { transform: scale(0.99); }
   .card-slide-add:hover { border-color: var(--ink); color: var(--ink); }
   .card-slide-add-icon {
     width: 40px; height: 40px;
@@ -4652,7 +4682,8 @@ function updateResideLabel() {
 function pickAccountType(el) {
   document.querySelectorAll('#screen-1 .choice').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
-  state.accountType = el.dataset.val;
+  // Canonical account type label: 'personal' or 'business'
+  state.accountType = el.dataset.val === 'consumer' ? 'personal' : el.dataset.val;
   updateActions();
 }
 
@@ -5367,12 +5398,9 @@ function initDashboard() {
     ];
   }
 
-  // Set up the first card if none exist
-  if (state.cards.length === 0) {
-    const initialCard = makeCard('standard');
-    state.cards.push(initialCard);
-    state.defaultCardId = initialCard.id;
-  }
+  // Cards are intentionally not auto-created here.
+  // The user may have skipped the card application from the Approved screen.
+  // The dashboard carousel will show an Apply prompt if state.cards is empty.
 
   // Cache the now-populated profile under its slot
   ensureProfilesInit();
@@ -5437,14 +5465,38 @@ function renderDashCardCarousel() {
   const track = document.getElementById('dashCardTrack');
   const dots = document.getElementById('dashCardDots');
   const cards = state.cards;
+
+  // Lazily init the per-card dashboard reveal map
+  if (!state.dashCardReveal) state.dashCardReveal = {};
+
+  // Empty state: no cards yet → show a single, primary-styled apply tile
+  if (!cards || cards.length === 0) {
+    track.innerHTML = `
+      <div class="card-slide-apply" onclick="openSheet('apply-card')">
+        <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0;">
+          <div style="width:48px;height:48px;border-radius:50%;background:rgba(201,169,97,0.18);color:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><line x1="2" y1="11" x2="22" y2="11"/></svg>
+          </div>
+          <div style="min-width:0;">
+            <div style="font-family:var(--serif);font-size:18px;font-weight:500;letter-spacing:-0.01em;color:var(--paper);line-height:1.15;">Apply for your <em style="color:var(--gold);font-style:italic;font-weight:400;">Fynco Visa</em></div>
+            <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.05em;color:rgba(247,244,237,0.6);margin-top:6px;">Virtual instantly · physical 5–7 days</div>
+          </div>
+        </div>
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </div>
+    `;
+    dots.innerHTML = '';
+    track.onscroll = null;
+    return;
+  }
+
   // Order: default first
   const ordered = [
     ...cards.filter(c => c.id === state.defaultCardId),
     ...cards.filter(c => c.id !== state.defaultCardId),
   ];
-
-  // Lazily init the per-card dashboard reveal map
-  if (!state.dashCardReveal) state.dashCardReveal = {};
 
   track.innerHTML = ordered.map(c => {
     const isDefault = c.id === state.defaultCardId;
@@ -5547,8 +5599,18 @@ function renderDashboard() {
   document.getElementById('dashCcySymbol').textContent = ccy;
   document.getElementById('dashCardBalance').textContent = formatMoney(state.cardBalance[ccy] || 0);
   const def = getDefaultCard();
+  const dashCaptionEl = document.getElementById('dashCardCaption');
+  const balanceLabelEl = document.querySelector('.dash-balance-label');
   if (def) {
-    document.getElementById('dashCardCaption').textContent = `Default · Fynco ${tierLabel(def.tier)} · •••• ${def.last4}`;
+    dashCaptionEl.textContent = `Default · Fynco ${tierLabel(def.tier)} · •••• ${def.last4}`;
+    if (balanceLabelEl) balanceLabelEl.textContent = 'Card balance';
+  } else {
+    // No card yet — orient the user toward applying
+    dashCaptionEl.innerHTML = `<span style="color:var(--gold);">No card yet · tap the tile below to apply</span>`;
+    if (balanceLabelEl) balanceLabelEl.textContent = 'Account balance';
+    // When there's no card, show the wallet's primary balance instead
+    const w = state.wallets[ccy];
+    document.getElementById('dashCardBalance').textContent = formatMoney(w?.balance || 0);
   }
 
   // Wallets
@@ -5610,10 +5672,8 @@ function updateBotNav(step) {
 
 // ============ CARDS SCREEN ============
 function initCards() {
-  if (state.cards.length === 0) {
-    state.cards.push(makeCard('standard'));
-    state.defaultCardId = state.cards[0].id;
-  }
+  // Do NOT auto-create a card. If state.cards is empty, render the empty state
+  // with an Apply prompt so the user can opt into a card on their own terms.
   state.visibleCardId = state.visibleCardId || state.defaultCardId;
   state.cardSensitiveVisible = false;
   renderCardsScreen();
@@ -5623,6 +5683,48 @@ function initCards() {
 function renderCardsScreen() {
   const pager = document.getElementById('cardsPager');
   const dots = document.getElementById('cardDetailDots');
+
+  // Empty state — no cards yet
+  if (!state.cards || state.cards.length === 0) {
+    pager.innerHTML = `
+      <div style="padding:0 24px;">
+        <div class="card-slide-apply" style="margin:6px 0 16px;" onclick="openSheet('apply-card')">
+          <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0;">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(201,169,97,0.18);color:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><line x1="2" y1="11" x2="22" y2="11"/></svg>
+            </div>
+            <div style="min-width:0;">
+              <div style="font-family:var(--serif);font-size:18px;font-weight:500;letter-spacing:-0.01em;color:var(--paper);line-height:1.15;">Apply for your <em style="color:var(--gold);font-style:italic;font-weight:400;">Fynco Visa</em></div>
+              <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.05em;color:rgba(247,244,237,0.6);margin-top:6px;">Virtual instantly · physical 5–7 days</div>
+            </div>
+          </div>
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </div>
+        </div>
+        <div style="text-align:center;padding:8px 16px 0;font-size:12px;color:var(--muted);line-height:1.5;">No cards yet. Apply above to get a virtual card in 60 seconds; manage Apple Pay, freeze, limits, and more from this screen once you have one.</div>
+      </div>
+    `;
+    dots.innerHTML = '';
+    pager.onscroll = null;
+    // Hide the balance + action grid that depend on a card
+    const balanceBlock = document.querySelector('.card-balance-block');
+    const actionsGrid = document.querySelector('.card-actions-grid');
+    const listSection = document.querySelector('.card-list-section');
+    if (balanceBlock) balanceBlock.style.display = 'none';
+    if (actionsGrid) actionsGrid.style.display = 'none';
+    if (listSection) listSection.style.display = 'none';
+    return;
+  }
+
+  // Restore visibility for non-empty state
+  const balanceBlock = document.querySelector('.card-balance-block');
+  const actionsGrid = document.querySelector('.card-actions-grid');
+  const listSection = document.querySelector('.card-list-section');
+  if (balanceBlock) balanceBlock.style.display = '';
+  if (actionsGrid) actionsGrid.style.display = '';
+  if (listSection) listSection.style.display = '';
+
   // Order with default first
   const ordered = [
     ...state.cards.filter(c => c.id === state.defaultCardId),
@@ -5796,13 +5898,30 @@ let activeAccountCcy = null;
 // and swap in the saved snapshot when switching back.
 const PROFILE_FIELDS = ['wallets', 'cards', 'defaultCardId', 'visibleCardId', 'cardSensitiveVisible', 'cardFrozen', 'cardBalance', 'activeCcy', 'txns', 'esimHistory', 'dashCardReveal'];
 
+// Normalise legacy 'consumer' label (used in onboarding pickers) to 'personal'.
+// This way the profile system, switcher pill, and apply flow all share one vocabulary.
+function normalizeAccountType(t) {
+  if (t === 'consumer') return 'personal';
+  if (t === 'business') return 'business';
+  return 'personal';
+}
+
 function ensureProfilesInit() {
   if (!state.profiles) state.profiles = {};
+  // Canonicalise the account type so the profile keys are stable.
+  if (state.accountType === 'consumer') state.accountType = 'personal';
+  if (!state.accountType) state.accountType = 'personal';
   // Capture the current onboarding-derived account into the appropriate slot
-  if (state.accountType && !state.profiles[state.accountType]) {
+  if (!state.profiles[state.accountType]) {
     state.profiles[state.accountType] = snapshotProfile();
   }
-  if (!state.activeProfile) state.activeProfile = state.accountType || 'personal';
+  if (!state.activeProfile) state.activeProfile = state.accountType;
+  // Defensive: heal any legacy 'consumer' profile slot
+  if (state.profiles.consumer && !state.profiles.personal) {
+    state.profiles.personal = state.profiles.consumer;
+    delete state.profiles.consumer;
+  }
+  if (state.activeProfile === 'consumer') state.activeProfile = 'personal';
 }
 
 function snapshotProfile() {
@@ -6899,7 +7018,7 @@ function confirmApplyCard() {
     state.wallets[ccy].balance -= fee;
     state.txns.unshift({
       merchant: `${tierLabel(applyCardTier)} card · monthly fee`,
-      meta: `Wallet · just now`,
+      meta: `Account · just now`,
       amt: fee, ccy, dir: 'out', ts: Date.now(), cat: 'card'
     });
   }
@@ -6909,6 +7028,11 @@ function confirmApplyCard() {
   document.getElementById('applyResultRef').textContent = 'CRD-' + Math.floor(100000 + Math.random() * 900000);
 
   applyCardTier = null;
+  // Refresh dashboard so the empty-state tile flips to the real card if the user goes back
+  if (state.step === 15) {
+    renderDashboard();
+    renderDashCardCarousel();
+  }
   document.getElementById('sheet-apply-card').classList.remove('open');
   setTimeout(() => document.getElementById('sheet-apply-card-result').classList.add('open'), 150);
 }

@@ -1,5 +1,5 @@
 // Fynco service worker — bump CACHE on content change to force refresh
-const CACHE = 'fynco-v13';
+const CACHE = 'fynco-v14';
 const ASSETS = [
   '/',
   '/index.html',
