@@ -4,7 +4,7 @@
   "description": "Fynco — virtual account & Visa card onboarding simulation",
   "private": true,
   "scripts": {
-    "start": "serve -s . -l $PORT --no-clipboard"
+    "start": "serve -s . -l tcp://0.0.0.0:${PORT:-3000} --no-clipboard"
   },
   "dependencies": {
     "serve": "^14.2.4"
