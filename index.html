@@ -3357,7 +3357,7 @@
           </div>
           <span class="qa-label">eSIM</span>
         </button>
-        <button class="qa-btn" onclick="openSheet('send')">
+        <button class="qa-btn" onclick="openSheet('send-choose')">
           <div class="qa-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </div>
@@ -3824,47 +3824,65 @@
       </button>
     </div>
     <div class="sheet-body">
-      <!-- Region picker -->
-      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Region</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;" id="esimRegionTabs"></div>
-
-      <!-- Day selector -->
-      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Days</div>
-      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:14px;" id="esimDayTabs">
-        <button class="day-pill" data-d="1" onclick="setEsimDays(1)">1</button>
-        <button class="day-pill" data-d="3" onclick="setEsimDays(3)">3</button>
-        <button class="day-pill" data-d="7" onclick="setEsimDays(7)">7</button>
-        <button class="day-pill" data-d="14" onclick="setEsimDays(14)">14</button>
-        <button class="day-pill" data-d="30" onclick="setEsimDays(30)">30</button>
-        <button class="day-pill" data-d="custom" onclick="setEsimCustomDays()">···</button>
+      <!-- Tabs -->
+      <div class="source-pick" style="margin-bottom:14px;">
+        <button class="source-tab active" data-tab="buy" onclick="switchEsimTab('buy')">Buy</button>
+        <button class="source-tab" data-tab="history" onclick="switchEsimTab('history')">History</button>
       </div>
 
-      <!-- Custom day input (hidden until "···" tapped) -->
-      <div id="esimCustomDayWrap" style="display:none;margin-bottom:14px;">
-        <input type="number" min="1" max="365" class="input" id="esimCustomDayInput" placeholder="Enter number of days (1–365)" oninput="onEsimCustomDayInput()">
-      </div>
+      <!-- BUY TAB -->
+      <div id="esimBuyTab">
+        <!-- Country/region search -->
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Country or region</div>
+        <div id="esimSelectedRegion" style="display:none;margin-bottom:10px;"></div>
+        <div class="country-search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="input" id="esimRegionSearch" placeholder="Singapore, Asia, Japan…" oninput="filterEsimRegions()">
+        </div>
+        <div class="country-list" id="esimRegionList" style="display:none;max-height:200px;"></div>
 
-      <!-- Price card -->
-      <div style="background:var(--ink);color:var(--paper);padding:18px 20px;border-radius:var(--radius);position:relative;overflow:hidden;margin-bottom:14px;">
-        <div style="position:absolute;top:-30%;right:-15%;width:70%;height:140%;background:radial-gradient(circle,rgba(201,169,97,0.15) 0%,transparent 60%);pointer-events:none;"></div>
-        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;position:relative;">
-          <div style="flex:1;min-width:0;">
-            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;opacity:0.6;margin-bottom:4px;">Total</div>
-            <div style="font-family:var(--serif);font-size:30px;font-weight:300;letter-spacing:-0.02em;line-height:1;font-variant-numeric:tabular-nums;">
-              <span style="font-size:14px;color:var(--gold);font-style:italic;margin-right:6px;" id="esimTotalCcy">SGD</span><span id="esimTotalAmt">0.00</span>
+        <!-- Day selector -->
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px;">Days</div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:14px;" id="esimDayTabs">
+          <button class="day-pill" data-d="1" onclick="setEsimDays(1)">1</button>
+          <button class="day-pill" data-d="3" onclick="setEsimDays(3)">3</button>
+          <button class="day-pill" data-d="7" onclick="setEsimDays(7)">7</button>
+          <button class="day-pill" data-d="14" onclick="setEsimDays(14)">14</button>
+          <button class="day-pill" data-d="30" onclick="setEsimDays(30)">30</button>
+          <button class="day-pill" data-d="custom" onclick="setEsimCustomDays()">···</button>
+        </div>
+
+        <div id="esimCustomDayWrap" style="display:none;margin-bottom:14px;">
+          <input type="number" min="1" max="365" class="input" id="esimCustomDayInput" placeholder="Enter number of days (1–365)" oninput="onEsimCustomDayInput()">
+        </div>
+
+        <!-- Price card -->
+        <div style="background:var(--ink);color:var(--paper);padding:18px 20px;border-radius:var(--radius);position:relative;overflow:hidden;margin-bottom:14px;">
+          <div style="position:absolute;top:-30%;right:-15%;width:70%;height:140%;background:radial-gradient(circle,rgba(201,169,97,0.15) 0%,transparent 60%);pointer-events:none;"></div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;position:relative;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;opacity:0.6;margin-bottom:4px;">Total</div>
+              <div style="font-family:var(--serif);font-size:30px;font-weight:300;letter-spacing:-0.02em;line-height:1;font-variant-numeric:tabular-nums;">
+                <span style="font-size:14px;color:var(--gold);font-style:italic;margin-right:6px;" id="esimTotalCcy">SGD</span><span id="esimTotalAmt">0.00</span>
+              </div>
+              <div style="font-size:11px;opacity:0.7;margin-top:6px;font-family:var(--mono);letter-spacing:0.05em;" id="esimRateNote">SGD 0.99 / day · unlimited data</div>
             </div>
-            <div style="font-size:11px;opacity:0.7;margin-top:6px;font-family:var(--mono);letter-spacing:0.05em;" id="esimRateNote">SGD 0.99 / day · unlimited data</div>
-          </div>
-          <div style="text-align:right;">
-            <div id="esimDaysLabel" style="font-family:var(--serif);font-size:24px;font-weight:300;font-style:italic;color:var(--gold);line-height:1;">7</div>
-            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;opacity:0.6;margin-top:4px;">days</div>
+            <div style="text-align:right;">
+              <div id="esimDaysLabel" style="font-family:var(--serif);font-size:24px;font-weight:300;font-style:italic;color:var(--gold);line-height:1;">7</div>
+              <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;opacity:0.6;margin-top:4px;">days</div>
+            </div>
           </div>
         </div>
+
+        <div style="font-size:11px;color:var(--muted);line-height:1.5;text-align:center;" id="esimPayFromLine">Charges to your primary account</div>
       </div>
 
-      <div style="font-size:11px;color:var(--muted);line-height:1.5;text-align:center;" id="esimPayFromLine">Charges to your primary account</div>
+      <!-- HISTORY TAB -->
+      <div id="esimHistoryTab" style="display:none;">
+        <div id="esimHistoryList"></div>
+      </div>
     </div>
-    <div class="sheet-foot">
+    <div class="sheet-foot" id="esimFooter">
       <button class="btn btn-primary" id="esimBuyBtn" onclick="confirmEsim()">Buy eSIM</button>
     </div>
   </div>
@@ -3895,7 +3913,8 @@
   </div>
 
   <!-- SEND placeholder -->
-  <div class="sheet" id="sheet-send">
+  <!-- SEND CHOOSER -->
+  <div class="sheet" id="sheet-send-choose">
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <div class="sheet-title">Send <em>money</em></div>
@@ -3904,10 +3923,124 @@
       </button>
     </div>
     <div class="sheet-body">
-      <div style="text-align:center;padding:40px 0;">
-        <div style="font-family:var(--serif);font-size:18px;color:var(--muted);font-style:italic;">Beyond the scope of this demo.</div>
-        <div style="font-size:13px;color:var(--muted);margin-top:8px;">Recipient picker, FX, and P2P wired in production.</div>
+      <button class="card-action" style="margin-bottom:10px;" onclick="closeSheet();openSheet('send-local');">
+        <div class="ca-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l4-4 4 4"/><path d="M7 5v9a4 4 0 004 4h6"/><path d="M21 18l-4 4-4-4"/></svg></div>
+        <div class="ca-text">
+          <div class="ca-title">Local transfer</div>
+          <div class="ca-sub">Domestic · free · seconds</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="color:var(--muted);"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      <button class="card-action" onclick="closeSheet();openSheet('send-overseas');">
+        <div class="ca-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg></div>
+        <div class="ca-text">
+          <div class="ca-title">International transfer</div>
+          <div class="ca-sub">SWIFT · live FX · 1-2 business days</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="color:var(--muted);"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- SEND LOCAL -->
+  <div class="sheet" id="sheet-send-local">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div class="sheet-title">Send <em>local</em></div>
+      <button class="sheet-close" onclick="closeSheet()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">From account</div>
+      <div class="source-detail" id="sendLocalSource">
+        <div class="source-mark" id="sendLocalSrcMark">SGD</div>
+        <div class="source-info">
+          <div class="source-name" id="sendLocalSrcName">Singapore Dollar account</div>
+          <div class="source-bal" id="sendLocalSrcBal">Available: SGD 0.00</div>
+        </div>
       </div>
+
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px;">Recipient</div>
+      <div class="field"><input class="input" id="sendLocalName" placeholder="Recipient full name" oninput="refreshSendLocalBtn()"></div>
+      <div class="field"><input class="input" id="sendLocalAccount" placeholder="Account number / PayNow ID" inputmode="numeric" oninput="refreshSendLocalBtn()"></div>
+      <div class="field"><input class="input" id="sendLocalRef" placeholder="Reference (optional)"></div>
+
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px;">Amount</div>
+      <div class="input-prefix">
+        <span class="prefix" id="sendLocalCcyPrefix">SGD</span>
+        <input class="input" id="sendLocalAmt" type="number" placeholder="0.00" inputmode="decimal" oninput="refreshSendLocalBtn()">
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:center;">Free for local transfers · arrives in seconds</div>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-primary" id="sendLocalBtn" onclick="confirmSendLocal()" disabled>Enter amount</button>
+    </div>
+  </div>
+
+  <!-- SEND OVERSEAS -->
+  <div class="sheet" id="sheet-send-overseas">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div class="sheet-title">Send <em>overseas</em></div>
+      <button class="sheet-close" onclick="closeSheet()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">From account</div>
+      <div class="source-detail" id="sendOverseasSource">
+        <div class="source-mark" id="sendOverseasSrcMark">SGD</div>
+        <div class="source-info">
+          <div class="source-name" id="sendOverseasSrcName">Singapore Dollar account</div>
+          <div class="source-bal" id="sendOverseasSrcBal">Available: SGD 0.00</div>
+        </div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px;">Recipient country</div>
+      <div class="country-search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="input" id="sendOverseasCountrySearch" placeholder="Search country…" oninput="filterSendOverseasCountries()">
+      </div>
+      <div id="sendOverseasSelectedCountry" style="display:none;margin-bottom:12px;"></div>
+      <div class="country-list" id="sendOverseasCountryList" style="display:none;"></div>
+
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:6px 0 6px;">Recipient</div>
+      <div class="field"><input class="input" id="sendOverseasName" placeholder="Recipient full name" oninput="refreshSendOverseasBtn()"></div>
+      <div class="field"><input class="input" id="sendOverseasIBAN" placeholder="IBAN / account number" oninput="refreshSendOverseasBtn()"></div>
+      <div class="field"><input class="input" id="sendOverseasSwift" placeholder="SWIFT / BIC code" oninput="refreshSendOverseasBtn()"></div>
+
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px;">Amount</div>
+      <div class="input-prefix">
+        <span class="prefix" id="sendOverseasCcyPrefix">SGD</span>
+        <input class="input" id="sendOverseasAmt" type="number" placeholder="0.00" inputmode="decimal" oninput="refreshSendOverseasBtn()">
+      </div>
+      <div id="sendOverseasFx" style="font-size:11px;color:var(--muted);margin-top:8px;text-align:center;">Select recipient country to see FX rate</div>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-primary" id="sendOverseasBtn" onclick="confirmSendOverseas()" disabled>Select country</button>
+    </div>
+  </div>
+
+  <!-- SEND RESULT -->
+  <div class="sheet" id="sheet-send-result">
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <div class="sheet-result">
+        <div class="result-tick">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="result-title">Transfer <em>sent</em></div>
+        <div class="result-sub" id="sendResultSub">Recipient will be notified.</div>
+        <div class="result-detail-card">
+          <div class="result-detail-row"><span class="result-detail-key">To</span><span class="result-detail-val" id="sendResultName">—</span></div>
+          <div class="result-detail-row"><span class="result-detail-key">Amount</span><span class="result-detail-val" id="sendResultAmt">—</span></div>
+          <div class="result-detail-row"><span class="result-detail-key">Reference</span><span class="result-detail-val" id="sendResultRef">—</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-primary" onclick="closeSheet()">Done</button>
     </div>
   </div>
 
@@ -4003,13 +4136,23 @@
 
       <!-- Account details -->
       <div style="border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);">
-          <span style="font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:0.05em;text-transform:uppercase;">Account number</span>
-          <span style="font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.05em;" id="acctDetailNumber">SG-FYN-0000-0000-0000</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);gap:8px;">
+          <span style="font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:0.05em;text-transform:uppercase;flex-shrink:0;">Account number</span>
+          <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+            <span style="font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.05em;text-align:right;" id="acctDetailNumber">SG-FYN-0000-0000-0000</span>
+            <button onclick="copyText('acctDetailNumber','Account number copied')" style="border:none;background:transparent;padding:4px;cursor:pointer;color:var(--muted);display:flex;align-items:center;flex-shrink:0;" aria-label="Copy account number">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            </button>
+          </div>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);">
-          <span style="font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:0.05em;text-transform:uppercase;">Swift / BIC</span>
-          <span style="font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.05em;" id="acctDetailSwift">FYNCSGSG</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);gap:8px;">
+          <span style="font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:0.05em;text-transform:uppercase;flex-shrink:0;">Swift / BIC</span>
+          <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+            <span style="font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.05em;text-align:right;" id="acctDetailSwift">FYNCSGSG</span>
+            <button onclick="copyText('acctDetailSwift','SWIFT code copied')" style="border:none;background:transparent;padding:4px;cursor:pointer;color:var(--muted);display:flex;align-items:center;flex-shrink:0;" aria-label="Copy SWIFT">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            </button>
+          </div>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);">
           <span style="font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:0.05em;text-transform:uppercase;">Currency</span>
@@ -4021,19 +4164,21 @@
         </div>
       </div>
 
-      <!-- Quick actions -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px;">
-        <button class="qa-btn" style="background:var(--paper);border:1px solid var(--line);" onclick="closeSheet();openSheet('topup');">
-          <div class="qa-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
-          <span class="qa-label">Top up</span>
+      <!-- Quick actions: Send local + Send overseas (no top-up — this is a bank account) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;">
+        <button class="qa-btn" style="background:var(--paper);border:1px solid var(--line);flex-direction:row;justify-content:flex-start;padding:14px 14px;gap:12px;" onclick="closeSheet();openSheet('send-local');">
+          <div class="qa-icon" style="width:34px;height:34px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l4-4 4 4"/><path d="M7 5v9a4 4 0 004 4h6"/><path d="M21 18l-4 4-4-4"/></svg></div>
+          <div style="text-align:left;">
+            <div style="font-size:12px;font-weight:500;line-height:1.2;">Send local</div>
+            <div style="font-size:10px;color:var(--muted);font-family:var(--mono);letter-spacing:0.05em;">Domestic</div>
+          </div>
         </button>
-        <button class="qa-btn" style="background:var(--paper);border:1px solid var(--line);" onclick="copyAccountNumber()">
-          <div class="qa-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></div>
-          <span class="qa-label">Copy</span>
-        </button>
-        <button class="qa-btn" style="background:var(--paper);border:1px solid var(--line);" onclick="closeSheet();openSheet('send');">
-          <div class="qa-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
-          <span class="qa-label">Send</span>
+        <button class="qa-btn" style="background:var(--paper);border:1px solid var(--line);flex-direction:row;justify-content:flex-start;padding:14px 14px;gap:12px;" onclick="closeSheet();openSheet('send-overseas');">
+          <div class="qa-icon" style="width:34px;height:34px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg></div>
+          <div style="text-align:left;">
+            <div style="font-size:12px;font-weight:500;line-height:1.2;">Send overseas</div>
+            <div style="font-size:10px;color:var(--muted);font-family:var(--mono);letter-spacing:0.05em;">SWIFT · FX</div>
+          </div>
         </button>
       </div>
 
@@ -4088,6 +4233,7 @@ const state = {
   topup: { source: 'va', amount: '0', sourceCcy: null },
   // eSIM
   esimSelected: null,
+  esimHistory: [],
   // Card detail screen state
   visibleCardId: null, // which card carousel index in detail view
   cardSensitiveVisible: false,
@@ -4814,6 +4960,7 @@ function resetAll() {
     wallets: {}, cardBalance: {}, activeCcy: null, txns: [],
     topup: { source: 'va', amount: '0', sourceCcy: null },
     esimSelected: null,
+    esimHistory: [],
     notifications: { transactions: true, marketing: false, security: true },
     biometric: false,
   });
@@ -5380,12 +5527,18 @@ function generateSwift(ccy) {
   return `FYNC${country}${country.slice(0,2)}`;
 }
 
-function copyAccountNumber() {
-  const num = document.getElementById('acctDetailNumber').textContent;
-  navigator.clipboard?.writeText(num).then(
-    () => { showCopyToast('Account number copied'); },
-    () => { showCopyToast('Tap and hold the number to copy'); }
+function copyText(elementId, toastMsg) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const text = el.textContent;
+  navigator.clipboard?.writeText(text).then(
+    () => { showCopyToast(toastMsg || 'Copied'); },
+    () => { showCopyToast('Tap and hold to copy'); }
   );
+}
+
+function copyAccountNumber() {
+  copyText('acctDetailNumber', 'Account number copied');
 }
 
 function showCopyToast(msg) {
@@ -5400,6 +5553,192 @@ function showCopyToast(msg) {
   t.style.opacity = '1';
   clearTimeout(t._timer);
   t._timer = setTimeout(() => { t.style.opacity = '0'; }, 1800);
+}
+
+// ============ SEND LOCAL ============
+function initSendLocal() {
+  // Use the currently-active account ccy as source
+  const ccy = activeAccountCcy || state.activeCcy || 'SGD';
+  const w = state.wallets[ccy];
+  document.getElementById('sendLocalSrcMark').textContent = ccy;
+  document.getElementById('sendLocalSrcName').textContent = `${getCurrencyName(ccy)} account`;
+  document.getElementById('sendLocalSrcBal').textContent = `Available: ${ccy} ${formatMoney(w?.balance || 0)}`;
+  document.getElementById('sendLocalCcyPrefix').textContent = ccy;
+  document.getElementById('sendLocalName').value = '';
+  document.getElementById('sendLocalAccount').value = '';
+  document.getElementById('sendLocalRef').value = '';
+  document.getElementById('sendLocalAmt').value = '';
+  refreshSendLocalBtn();
+}
+
+function refreshSendLocalBtn() {
+  const name = document.getElementById('sendLocalName').value.trim();
+  const acc = document.getElementById('sendLocalAccount').value.trim();
+  const amt = parseFloat(document.getElementById('sendLocalAmt').value) || 0;
+  const btn = document.getElementById('sendLocalBtn');
+  const ccy = activeAccountCcy || state.activeCcy || 'SGD';
+  if (amt <= 0) {
+    btn.disabled = true; btn.textContent = 'Enter amount'; return;
+  }
+  if (!name || !acc) {
+    btn.disabled = true; btn.textContent = 'Enter recipient'; return;
+  }
+  btn.disabled = false;
+  btn.textContent = `Send ${ccy} ${formatMoney(amt)}`;
+}
+
+function confirmSendLocal() {
+  const ccy = activeAccountCcy || state.activeCcy || 'SGD';
+  const amt = parseFloat(document.getElementById('sendLocalAmt').value) || 0;
+  const name = document.getElementById('sendLocalName').value.trim();
+  const acc = document.getElementById('sendLocalAccount').value.trim();
+  const ref = document.getElementById('sendLocalRef').value.trim();
+  const w = state.wallets[ccy];
+  if (!w || w.balance < amt) {
+    alert(`Insufficient balance.\n\nAvailable: ${ccy} ${formatMoney(w?.balance || 0)}\nNeeded: ${ccy} ${formatMoney(amt)}`);
+    return;
+  }
+  w.balance -= amt;
+  const refNum = 'TRF-' + Math.floor(100000 + Math.random() * 900000);
+  state.txns.unshift({
+    merchant: name,
+    meta: `Local · ${acc}${ref ? ' · ' + ref : ''} · just now`,
+    amt, ccy, dir: 'out', ts: Date.now(), cat: 'transfer'
+  });
+  document.getElementById('sendResultName').textContent = name;
+  document.getElementById('sendResultAmt').textContent = `${ccy} ${formatMoney(amt)}`;
+  document.getElementById('sendResultRef').textContent = refNum;
+  document.getElementById('sendResultSub').textContent = 'Local transfer · arrives in seconds.';
+  renderDashboard();
+  document.getElementById('sheet-send-local').classList.remove('open');
+  setTimeout(() => document.getElementById('sheet-send-result').classList.add('open'), 150);
+}
+
+// ============ SEND OVERSEAS ============
+let sendOverseasCountry = null;
+
+function initSendOverseas() {
+  const ccy = activeAccountCcy || state.activeCcy || 'SGD';
+  const w = state.wallets[ccy];
+  document.getElementById('sendOverseasSrcMark').textContent = ccy;
+  document.getElementById('sendOverseasSrcName').textContent = `${getCurrencyName(ccy)} account`;
+  document.getElementById('sendOverseasSrcBal').textContent = `Available: ${ccy} ${formatMoney(w?.balance || 0)}`;
+  document.getElementById('sendOverseasCcyPrefix').textContent = ccy;
+  ['sendOverseasName', 'sendOverseasIBAN', 'sendOverseasSwift', 'sendOverseasAmt', 'sendOverseasCountrySearch'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  sendOverseasCountry = null;
+  document.getElementById('sendOverseasSelectedCountry').style.display = 'none';
+  document.getElementById('sendOverseasCountryList').style.display = 'none';
+  document.getElementById('sendOverseasFx').textContent = 'Select recipient country to see FX rate';
+  refreshSendOverseasBtn();
+}
+
+function filterSendOverseasCountries() {
+  const q = document.getElementById('sendOverseasCountrySearch').value.toLowerCase().trim();
+  const list = document.getElementById('sendOverseasCountryList');
+  if (!q) { list.style.display = 'none'; list.innerHTML = ''; return; }
+  const filtered = countries.filter(c => c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q));
+  if (filtered.length === 0) {
+    list.style.display = 'block';
+    list.innerHTML = `<div style="padding:18px 14px;text-align:center;font-size:13px;color:var(--muted);font-style:italic;">No matches for "${q}"</div>`;
+    return;
+  }
+  list.style.display = 'block';
+  list.innerHTML = filtered.slice(0, 8).map(c => `
+    <div class="country-item" onclick="pickSendOverseasCountry('${c.code}')">
+      <span class="country-flag">${c.flag}</span>
+      <span class="country-name">${c.name}</span>
+      <span class="country-currency">${c.currency} · ${c.dial}</span>
+    </div>
+  `).join('');
+}
+
+function pickSendOverseasCountry(code) {
+  sendOverseasCountry = countries.find(c => c.code === code);
+  const slot = document.getElementById('sendOverseasSelectedCountry');
+  slot.style.display = 'block';
+  slot.innerHTML = `
+    <div class="country-item selected" style="border-radius:var(--radius);border:1px solid var(--ink);" onclick="clearSendOverseasCountry()">
+      <span class="country-flag">${sendOverseasCountry.flag}</span>
+      <span class="country-name">${sendOverseasCountry.name}</span>
+      <span class="country-currency">${sendOverseasCountry.currency}</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-left:8px;opacity:0.6;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>`;
+  document.getElementById('sendOverseasCountrySearch').value = '';
+  document.getElementById('sendOverseasCountryList').style.display = 'none';
+  document.getElementById('sendOverseasCountryList').innerHTML = '';
+  refreshSendOverseasBtn();
+  updateSendOverseasFx();
+}
+
+function clearSendOverseasCountry() {
+  sendOverseasCountry = null;
+  document.getElementById('sendOverseasSelectedCountry').style.display = 'none';
+  document.getElementById('sendOverseasFx').textContent = 'Select recipient country to see FX rate';
+  refreshSendOverseasBtn();
+}
+
+function updateSendOverseasFx() {
+  const ccy = activeAccountCcy || state.activeCcy || 'SGD';
+  const amt = parseFloat(document.getElementById('sendOverseasAmt').value) || 0;
+  if (!sendOverseasCountry) return;
+  const targetCcy = sendOverseasCountry.currency;
+  // FX: source -> SGD -> target
+  const sourceToSgd = 1 / (FX_FROM_SGD[ccy] || 1);
+  const sgdToTarget = FX_FROM_SGD[targetCcy] || 1;
+  const rate = sourceToSgd * sgdToTarget;
+  const recipientGets = amt * rate;
+  const fxFee = amt * 0.0035; // 0.35%
+  if (amt > 0) {
+    document.getElementById('sendOverseasFx').innerHTML = `Recipient gets <strong>${targetCcy} ${formatMoney(recipientGets)}</strong> · FX rate ${rate.toFixed(4)} · fee ${ccy} ${formatMoney(fxFee)}`;
+  } else {
+    document.getElementById('sendOverseasFx').innerHTML = `1 ${ccy} = ${rate.toFixed(4)} ${targetCcy} · FX fee 0.35%`;
+  }
+}
+
+function refreshSendOverseasBtn() {
+  const name = document.getElementById('sendOverseasName').value.trim();
+  const iban = document.getElementById('sendOverseasIBAN').value.trim();
+  const swift = document.getElementById('sendOverseasSwift').value.trim();
+  const amt = parseFloat(document.getElementById('sendOverseasAmt').value) || 0;
+  const btn = document.getElementById('sendOverseasBtn');
+  const ccy = activeAccountCcy || state.activeCcy || 'SGD';
+  updateSendOverseasFx();
+  if (!sendOverseasCountry) { btn.disabled = true; btn.textContent = 'Select country'; return; }
+  if (amt <= 0) { btn.disabled = true; btn.textContent = 'Enter amount'; return; }
+  if (!name || !iban || !swift) { btn.disabled = true; btn.textContent = 'Enter recipient'; return; }
+  btn.disabled = false;
+  btn.textContent = `Send ${ccy} ${formatMoney(amt)}`;
+}
+
+function confirmSendOverseas() {
+  const ccy = activeAccountCcy || state.activeCcy || 'SGD';
+  const amt = parseFloat(document.getElementById('sendOverseasAmt').value) || 0;
+  const fxFee = amt * 0.0035;
+  const totalDeduct = amt + fxFee;
+  const name = document.getElementById('sendOverseasName').value.trim();
+  const iban = document.getElementById('sendOverseasIBAN').value.trim();
+  const w = state.wallets[ccy];
+  if (!w || w.balance < totalDeduct) {
+    alert(`Insufficient balance.\n\nNeeded: ${ccy} ${formatMoney(totalDeduct)} (incl. ${ccy} ${formatMoney(fxFee)} fee)\nAvailable: ${ccy} ${formatMoney(w?.balance || 0)}`);
+    return;
+  }
+  w.balance -= totalDeduct;
+  const refNum = 'INT-' + Math.floor(100000 + Math.random() * 900000);
+  state.txns.unshift({
+    merchant: name,
+    meta: `${sendOverseasCountry.flag} ${sendOverseasCountry.name} · ${iban.slice(-6)} · just now`,
+    amt: totalDeduct, ccy, dir: 'out', ts: Date.now(), cat: 'transfer'
+  });
+  document.getElementById('sendResultName').textContent = `${name} · ${sendOverseasCountry.flag} ${sendOverseasCountry.name}`;
+  document.getElementById('sendResultAmt').textContent = `${ccy} ${formatMoney(totalDeduct)}`;
+  document.getElementById('sendResultRef').textContent = refNum;
+  document.getElementById('sendResultSub').textContent = 'International transfer · arrives in 1-2 business days.';
+  renderDashboard();
+  document.getElementById('sheet-send-overseas').classList.remove('open');
+  setTimeout(() => document.getElementById('sheet-send-result').classList.add('open'), 150);
 }
 
 // ============ APPLY CARD ============
@@ -5557,6 +5896,8 @@ function openSheet(name) {
   if (name === 'topup') resetTopup();
   if (name === 'scan') resetScanner();
   if (name === 'esim') initEsim();
+  if (name === 'send-local') initSendLocal();
+  if (name === 'send-overseas') initSendOverseas();
 }
 function closeSheet(silent) {
   document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open'));
@@ -5831,28 +6172,60 @@ const FX_FROM_SGD = {
 const ESIM_DAILY_RATE_SGD = 0.99; // SGD 0.99/day unlimited data
 
 const esimRegions = [
-  { id: 'sg', flag: '🇸🇬', name: 'Singapore' },
-  { id: 'asia', flag: '🌏', name: 'Asia (13 countries)' },
-  { id: 'global', flag: '🌐', name: 'Global (100+)' },
-  { id: 'jp', flag: '🇯🇵', name: 'Japan' },
-  { id: 'eu', flag: '🇪🇺', name: 'Europe (30)' },
-  { id: 'us', flag: '🇺🇸', name: 'USA' },
+  // Asia
+  { id: 'sg', flag: '🇸🇬', name: 'Singapore', mult: 1.0 },
+  { id: 'my', flag: '🇲🇾', name: 'Malaysia', mult: 1.1 },
+  { id: 'id', flag: '🇮🇩', name: 'Indonesia', mult: 1.2 },
+  { id: 'ph', flag: '🇵🇭', name: 'Philippines', mult: 1.2 },
+  { id: 'th', flag: '🇹🇭', name: 'Thailand', mult: 1.1 },
+  { id: 'vn', flag: '🇻🇳', name: 'Vietnam', mult: 1.2 },
+  { id: 'jp', flag: '🇯🇵', name: 'Japan', mult: 1.6 },
+  { id: 'kr', flag: '🇰🇷', name: 'South Korea', mult: 1.5 },
+  { id: 'hk', flag: '🇭🇰', name: 'Hong Kong', mult: 1.3 },
+  { id: 'tw', flag: '🇹🇼', name: 'Taiwan', mult: 1.4 },
+  { id: 'in', flag: '🇮🇳', name: 'India', mult: 1.3 },
+  { id: 'cn', flag: '🇨🇳', name: 'China', mult: 1.5 },
+  // Pacific
+  { id: 'au', flag: '🇦🇺', name: 'Australia', mult: 1.6 },
+  { id: 'nz', flag: '🇳🇿', name: 'New Zealand', mult: 1.6 },
+  // Americas
+  { id: 'us', flag: '🇺🇸', name: 'USA', mult: 1.7 },
+  { id: 'ca', flag: '🇨🇦', name: 'Canada', mult: 1.7 },
+  { id: 'mx', flag: '🇲🇽', name: 'Mexico', mult: 1.5 },
+  { id: 'br', flag: '🇧🇷', name: 'Brazil', mult: 1.6 },
+  // Europe
+  { id: 'gb', flag: '🇬🇧', name: 'United Kingdom', mult: 1.7 },
+  { id: 'de', flag: '🇩🇪', name: 'Germany', mult: 1.7 },
+  { id: 'fr', flag: '🇫🇷', name: 'France', mult: 1.7 },
+  { id: 'it', flag: '🇮🇹', name: 'Italy', mult: 1.7 },
+  { id: 'es', flag: '🇪🇸', name: 'Spain', mult: 1.7 },
+  { id: 'nl', flag: '🇳🇱', name: 'Netherlands', mult: 1.7 },
+  { id: 'ch', flag: '🇨🇭', name: 'Switzerland', mult: 1.9 },
+  // Middle East
+  { id: 'ae', flag: '🇦🇪', name: 'UAE', mult: 1.7 },
+  { id: 'sa', flag: '🇸🇦', name: 'Saudi Arabia', mult: 1.7 },
+  { id: 'tr', flag: '🇹🇷', name: 'Türkiye', mult: 1.5 },
+  // Regional bundles
+  { id: 'asia', flag: '🌏', name: 'Asia (13 countries)', mult: 1.4 },
+  { id: 'eu', flag: '🇪🇺', name: 'Europe (30 countries)', mult: 1.8 },
+  { id: 'mena', flag: '🌍', name: 'Middle East & North Africa', mult: 1.7 },
+  { id: 'latam', flag: '🌎', name: 'Latin America', mult: 1.6 },
+  { id: 'global', flag: '🌐', name: 'Global (100+ countries)', mult: 2.2 },
 ];
 
-// Region multipliers — global/premium regions cost more per day
-const ESIM_REGION_MULTIPLIER = {
-  sg: 1.0, asia: 1.4, global: 2.2, jp: 1.6, eu: 1.8, us: 1.7
-};
+function getEsimRegionById(id) {
+  return esimRegions.find(r => r.id === id);
+}
 
 function initEsim() {
   state.esimSelected = state.esimSelected || { region: 'sg', days: 7, custom: false };
-
-  // Render region tabs
-  const tabsEl = document.getElementById('esimRegionTabs');
-  tabsEl.innerHTML = esimRegions.map(r => {
-    const active = r.id === state.esimSelected.region ? 'active' : '';
-    return `<button class="ccy-tab ccy-tab-light ${active}" onclick="setEsimRegion('${r.id}')">${r.flag} ${r.name}</button>`;
-  }).join('');
+  // Reset to Buy tab
+  switchEsimTab('buy');
+  // Render selected region pill
+  renderEsimSelectedRegion();
+  // Clear search
+  document.getElementById('esimRegionSearch').value = '';
+  document.getElementById('esimRegionList').style.display = 'none';
 
   // Reset day pills active state
   document.querySelectorAll('.day-pill').forEach(p => p.classList.remove('active'));
@@ -5868,11 +6241,125 @@ function initEsim() {
   refreshEsimTotal();
 }
 
+function switchEsimTab(tab) {
+  document.querySelectorAll('#sheet-esim .source-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tab);
+  });
+  document.getElementById('esimBuyTab').style.display = tab === 'buy' ? 'block' : 'none';
+  document.getElementById('esimHistoryTab').style.display = tab === 'history' ? 'block' : 'none';
+  // Hide footer (buy button) on history tab
+  document.getElementById('esimFooter').style.display = tab === 'buy' ? 'block' : 'none';
+  if (tab === 'history') renderEsimHistory();
+}
+
+function renderEsimSelectedRegion() {
+  const r = getEsimRegionById(state.esimSelected.region);
+  const slot = document.getElementById('esimSelectedRegion');
+  if (!r) { slot.style.display = 'none'; slot.innerHTML = ''; return; }
+  slot.style.display = 'block';
+  slot.innerHTML = `
+    <div class="country-item selected" style="border-radius:var(--radius);border:1px solid var(--ink);">
+      <span class="country-flag">${r.flag}</span>
+      <span class="country-name">${r.name}</span>
+      <span class="country-currency">×${r.mult.toFixed(1)} rate</span>
+    </div>`;
+}
+
+function filterEsimRegions() {
+  const q = document.getElementById('esimRegionSearch').value.toLowerCase().trim();
+  const list = document.getElementById('esimRegionList');
+  if (!q) { list.style.display = 'none'; list.innerHTML = ''; return; }
+  const filtered = esimRegions.filter(r => r.name.toLowerCase().includes(q));
+  if (filtered.length === 0) {
+    list.style.display = 'block';
+    list.innerHTML = `<div style="padding:18px 14px;text-align:center;font-size:13px;color:var(--muted);font-style:italic;">No matches for "${q}"</div>`;
+    return;
+  }
+  list.style.display = 'block';
+  list.innerHTML = filtered.slice(0, 8).map(r => `
+    <div class="country-item" onclick="setEsimRegion('${r.id}')">
+      <span class="country-flag">${r.flag}</span>
+      <span class="country-name">${r.name}</span>
+      <span class="country-currency">×${r.mult.toFixed(1)}</span>
+    </div>
+  `).join('');
+}
+
 function setEsimRegion(id) {
   state.esimSelected.region = id;
-  document.querySelectorAll('#esimRegionTabs .ccy-tab').forEach(t => t.classList.remove('active'));
-  event?.currentTarget?.classList?.add('active');
+  document.getElementById('esimRegionSearch').value = '';
+  document.getElementById('esimRegionList').style.display = 'none';
+  document.getElementById('esimRegionList').innerHTML = '';
+  renderEsimSelectedRegion();
   refreshEsimTotal();
+}
+
+function renderEsimHistory() {
+  const list = document.getElementById('esimHistoryList');
+  const purchases = (state.esimHistory || []).slice().reverse();
+  if (purchases.length === 0) {
+    list.innerHTML = `
+      <div style="text-align:center;padding:40px 16px;">
+        <div style="width:48px;height:48px;border-radius:50%;background:var(--paper-2);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;color:var(--muted);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div style="font-family:var(--serif);font-size:16px;color:var(--muted);font-style:italic;">No eSIM purchases yet</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px;">Your previous data plans will appear here.</div>
+      </div>`;
+    return;
+  }
+  list.innerHTML = purchases.map(p => {
+    const expired = Date.now() > p.expiresAt;
+    const r = getEsimRegionById(p.region);
+    const flag = r ? r.flag : '🌐';
+    const name = r ? r.name : 'Region';
+    const remainingMs = p.expiresAt - Date.now();
+    const remainingDays = Math.max(0, Math.ceil(remainingMs / 86400000));
+    return `
+      <div style="border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:10px;">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <div style="font-size:26px;line-height:1;">${flag}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px;">
+              <div style="font-family:var(--serif);font-size:15px;font-weight:500;">${name}</div>
+              ${expired
+                ? `<span class="badge" style="font-size:9px;padding:3px 7px;color:var(--muted);">Expired</span>`
+                : `<span class="badge gold" style="font-size:9px;padding:3px 7px;">Active</span>`}
+            </div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">${p.days} day${p.days > 1 ? 's' : ''} · unlimited data</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.05em;">
+                ${expired ? 'Ended ' + formatRelativeTs(p.expiresAt) : remainingDays + ' day' + (remainingDays !== 1 ? 's' : '') + ' left'}
+              </div>
+              <div style="font-family:var(--mono);font-size:11px;font-weight:500;">${p.payCcy} ${formatMoney(p.amount)}</div>
+            </div>
+            ${!expired ? `<button onclick="reshowEsimQR('${p.ref}')" style="margin-top:8px;background:transparent;border:1px solid var(--line-strong);padding:6px 10px;border-radius:var(--radius);font-family:var(--mono);font-size:10px;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;color:var(--ink);">View QR</button>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function formatRelativeTs(ts) {
+  const diff = Date.now() - ts;
+  const days = Math.abs(Math.floor(diff / 86400000));
+  if (days === 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 7) return `${days} days ago`;
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function reshowEsimQR(ref) {
+  const p = (state.esimHistory || []).find(x => x.ref === ref);
+  if (!p) return;
+  const r = getEsimRegionById(p.region);
+  document.getElementById('esimResultPlan').textContent = `${r ? r.flag + ' ' + r.name : 'Region'} · ${p.days} days unlimited`;
+  document.getElementById('esimResultAmt').textContent = `${p.payCcy} ${formatMoney(p.amount)}`;
+  document.getElementById('esimResultRef').textContent = p.ref;
+  generateQR(p.ref);
+  document.getElementById('sheet-esim').classList.remove('open');
+  setTimeout(() => document.getElementById('sheet-esim-result').classList.add('open'), 150);
 }
 
 function setEsimDays(d) {
@@ -5906,7 +6393,8 @@ function onEsimCustomDayInput() {
 function refreshEsimTotal() {
   const days = state.esimSelected.days || 1;
   const region = state.esimSelected.region || 'sg';
-  const multiplier = ESIM_REGION_MULTIPLIER[region] || 1;
+  const r = getEsimRegionById(region);
+  const multiplier = r ? r.mult : 1;
   const sgdTotal = ESIM_DAILY_RATE_SGD * multiplier * days;
 
   // Display in primary account currency
@@ -5937,22 +6425,18 @@ function refreshEsimTotal() {
 }
 
 function getPrimaryCcy() {
-  // Find the primary wallet (the one flagged primary)
   for (const [ccy, w] of Object.entries(state.wallets)) {
     if (w.primary) return ccy;
   }
   return state.activeCcy || 'SGD';
 }
 
-function getEsimRegionName(id) {
-  const r = esimRegions.find(x => x.id === id);
-  return r ? `${r.flag} ${r.name}` : 'Region';
-}
-
 function confirmEsim() {
   const days = state.esimSelected.days;
   const region = state.esimSelected.region;
-  const multiplier = ESIM_REGION_MULTIPLIER[region] || 1;
+  const r = getEsimRegionById(region);
+  if (!r) return;
+  const multiplier = r.mult;
   const sgdTotal = ESIM_DAILY_RATE_SGD * multiplier * days;
   const primaryCcy = getPrimaryCcy();
   const fx = FX_FROM_SGD[primaryCcy] || 1;
@@ -5964,12 +6448,28 @@ function confirmEsim() {
   }
   state.wallets[primaryCcy].balance -= localTotal;
   const ref = 'ESM-' + Math.floor(100000 + Math.random() * 900000);
-  const regionName = getEsimRegionName(region);
+  const regionName = `${r.flag} ${r.name}`;
+  const now = Date.now();
+  const expiresAt = now + days * 86400000;
+
   state.txns.unshift({
     merchant: `eSIM · ${regionName}`,
     meta: `${days} day${days > 1 ? 's' : ''} unlimited · just now`,
-    amt: localTotal, ccy: primaryCcy, dir: 'out', ts: Date.now(), cat: 'esim'
+    amt: localTotal, ccy: primaryCcy, dir: 'out', ts: now, cat: 'esim'
   });
+
+  // Push to eSIM purchase history
+  if (!state.esimHistory) state.esimHistory = [];
+  state.esimHistory.push({
+    ref,
+    region,
+    days,
+    amount: localTotal,
+    payCcy: primaryCcy,
+    purchasedAt: now,
+    expiresAt,
+  });
+
   document.getElementById('esimResultPlan').textContent = `${regionName} · ${days} days unlimited`;
   document.getElementById('esimResultAmt').textContent = `${primaryCcy} ${formatMoney(localTotal)}`;
   document.getElementById('esimResultRef').textContent = ref;
