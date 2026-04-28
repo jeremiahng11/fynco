@@ -90,7 +90,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 24px 12px;
+    padding: 12px 24px 8px;
     background: var(--paper);
     z-index: 10;
     border-bottom: 1px solid transparent;
@@ -140,7 +140,7 @@
 
   /* ============ PROGRESS ============ */
   .progress {
-    padding: 0 24px 16px;
+    padding: 0 24px 10px;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -170,17 +170,32 @@
   /* ============ MAIN ============ */
   main {
     flex: 1;
-    padding: 8px 24px 120px;
+    padding: 4px 24px 110px;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    scroll-behavior: smooth;
+    position: relative;
   }
   /* Hide scrollbar to feel app-like */
   main::-webkit-scrollbar { width: 0; height: 0; display: none; }
   main { scrollbar-width: none; }
   /* Dashboard variant has no padding so it can do full-bleed cards */
   main.dashboard-mode { padding: 0 0 96px; }
+  /* Subtle bottom shadow on app shell to hint scroll edge */
+  .scroll-hint {
+    position: absolute;
+    bottom: 90px;
+    left: 0; right: 0;
+    height: 24px;
+    background: linear-gradient(to top, var(--paper), transparent);
+    pointer-events: none;
+    z-index: 19;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .scroll-hint.show { opacity: 1; }
 
   .screen {
     display: none;
@@ -195,28 +210,28 @@
   /* ============ TYPOGRAPHY ============ */
   .eyebrow {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     color: var(--muted);
-    margin-bottom: 16px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     gap: 8px;
   }
   .eyebrow::before {
     content: '';
-    width: 16px; height: 1px;
+    width: 14px; height: 1px;
     background: var(--ink);
   }
 
   h1.display {
     font-family: var(--serif);
-    font-size: 36px;
+    font-size: 30px;
     font-weight: 400;
     line-height: 1.05;
     letter-spacing: -0.025em;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
   h1.display em {
     font-style: italic;
@@ -226,19 +241,19 @@
 
   h2.title {
     font-family: var(--serif);
-    font-size: 26px;
+    font-size: 23px;
     font-weight: 400;
     line-height: 1.15;
     letter-spacing: -0.02em;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
   h2.title em { font-style: italic; color: var(--gold-2); font-weight: 300; }
 
   .lede {
-    font-size: 15px;
+    font-size: 14px;
     color: var(--muted);
-    line-height: 1.55;
-    margin-bottom: 28px;
+    line-height: 1.5;
+    margin-bottom: 20px;
     max-width: 36ch;
   }
 
@@ -254,8 +269,8 @@
 
   /* ============ HERO (welcome) ============ */
   .hero-art {
-    margin: 8px -24px 28px;
-    height: 240px;
+    margin: 4px -24px 18px;
+    height: 160px;
     position: relative;
     overflow: hidden;
     background: var(--ink);
@@ -295,7 +310,7 @@
     justify-content: center;
     gap: 8px;
     width: 100%;
-    padding: 16px 20px;
+    padding: 14px 20px;
     border: none;
     border-radius: var(--radius);
     font-family: var(--sans);
@@ -336,20 +351,20 @@
   .choice-grid {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-bottom: 24px;
+    gap: 10px;
+    margin-bottom: 16px;
   }
   .choice {
     border: 1px solid var(--line);
     background: var(--paper);
-    padding: 20px;
+    padding: 16px;
     border-radius: var(--radius);
     cursor: pointer;
     transition: all 0.2s;
     text-align: left;
     display: flex;
     align-items: flex-start;
-    gap: 16px;
+    gap: 14px;
     position: relative;
   }
   .choice:hover {
@@ -413,16 +428,16 @@
 
   /* ============ FORM FIELDS ============ */
   .field {
-    margin-bottom: 18px;
+    margin-bottom: 14px;
   }
   .field-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 10px;
   }
   .input, .select {
     width: 100%;
-    padding: 14px 14px;
+    padding: 12px 14px;
     border: 1px solid var(--line-strong);
     border-radius: var(--radius);
     background: var(--paper);
@@ -491,11 +506,14 @@
   .country-list {
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    max-height: 280px;
+    max-height: calc(100vh - 360px);
+    min-height: 200px;
     overflow-y: auto;
     background: var(--paper);
-    margin-bottom: 24px;
+    margin-bottom: 12px;
   }
+  .country-list::-webkit-scrollbar { width: 0; display: none; }
+  .country-list { scrollbar-width: none; }
   .country-item {
     padding: 14px 16px;
     border-bottom: 1px solid var(--line);
@@ -530,8 +548,8 @@
   .account-preview {
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 16px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
     background: var(--paper);
     transition: all 0.2s;
   }
@@ -539,8 +557,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 14px;
-    padding-bottom: 14px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
     border-bottom: 1px solid var(--line);
   }
   .account-preview-title {
@@ -565,7 +583,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 0;
+    padding: 8px 0;
     border-bottom: 1px solid var(--line);
   }
   .account-row:last-child { border-bottom: none; }
@@ -599,11 +617,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px;
+    padding: 12px 14px;
     border: 1px solid var(--line);
     border-radius: var(--radius);
     background: var(--paper);
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     cursor: pointer;
     transition: all 0.2s;
   }
@@ -642,16 +660,18 @@
   }
   .toggle-row.on .switch { background: var(--ink); }
   .toggle-row.on .switch::after { transform: translateX(18px); }
+  .switch.switch-on { background: var(--ink); }
+  .switch.switch-on::after { transform: translateX(18px); }
 
   /* ============ KYC ============ */
   .kyc-step {
     border: 1px solid var(--line);
-    padding: 16px;
+    padding: 12px 14px;
     border-radius: var(--radius);
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     transition: all 0.2s;
   }
   .kyc-step.done { background: var(--paper-2); border-color: var(--line-strong); }
@@ -688,12 +708,16 @@
   .upload-zone {
     border: 1.5px dashed var(--line-strong);
     border-radius: var(--radius);
-    padding: 32px 20px;
+    padding: 18px 16px;
     text-align: center;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     cursor: pointer;
     transition: all 0.2s;
     background: var(--paper);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
   }
   .upload-zone:hover {
     border-color: var(--ink);
@@ -705,29 +729,31 @@
     background: rgba(45, 106, 79, 0.04);
   }
   .upload-icon {
-    width: 48px; height: 48px;
-    margin: 0 auto 12px;
+    width: 38px; height: 38px;
+    margin: 0;
     border-radius: 50%;
     background: var(--paper-2);
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--ink);
+    flex-shrink: 0;
   }
   .upload-zone.uploaded .upload-icon {
     background: var(--success);
     color: var(--paper);
   }
-  .upload-title { font-weight: 500; font-size: 14px; margin-bottom: 4px; }
-  .upload-sub { font-size: 12px; color: var(--muted); }
+  .upload-title { font-weight: 500; font-size: 14px; margin-bottom: 2px; }
+  .upload-sub { font-size: 11px; color: var(--muted); }
 
   /* ============ SELFIE / CAMERA SIM ============ */
   .selfie-frame {
     aspect-ratio: 1;
     border-radius: 50%;
     background: var(--ink);
-    margin: 16px auto 24px;
-    max-width: 240px;
+    margin: 8px auto 16px;
+    max-width: 200px;
+    width: 55vw;
     position: relative;
     overflow: hidden;
     display: flex;
@@ -762,14 +788,14 @@
   .review-section {
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     overflow: hidden;
   }
   .review-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 16px;
+    padding: 10px 14px;
     background: var(--paper-2);
     border-bottom: 1px solid var(--line);
   }
@@ -792,11 +818,11 @@
     border: none;
     padding: 0;
   }
-  .review-body { padding: 12px 16px; }
+  .review-body { padding: 8px 14px; }
   .review-row {
     display: flex;
     justify-content: space-between;
-    padding: 6px 0;
+    padding: 4px 0;
     font-size: 13px;
   }
   .review-key { color: var(--muted); }
@@ -804,8 +830,8 @@
 
   /* ============ APPROVED ============ */
   .approved-art {
-    margin: 24px -24px;
-    height: 280px;
+    margin: 8px -24px 14px;
+    height: 180px;
     background: var(--ink);
     color: var(--paper);
     position: relative;
@@ -843,7 +869,7 @@
   /* ============ CARD VISUAL ============ */
   .card-3d {
     perspective: 1000px;
-    margin: 16px -8px 24px;
+    margin: 8px -8px 16px;
   }
   .card-face {
     aspect-ratio: 1.586;
@@ -952,12 +978,14 @@
     margin-bottom: 2px;
   }
   .card-visa {
-    font-family: var(--serif);
+    font-family: 'Times New Roman', Georgia, serif;
     font-style: italic;
-    font-weight: 700;
+    font-weight: 900;
     font-size: 22px;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.04em;
     color: var(--gold);
+    line-height: 1;
+    text-transform: uppercase;
   }
 
   /* ============ BOTTOM ACTION BAR ============ */
@@ -967,12 +995,12 @@
     left: 0;
     right: 0;
     width: 100%;
-    padding: 16px 24px 24px;
-    background: linear-gradient(to top, var(--paper) 70%, rgba(247, 244, 237, 0));
+    padding: 12px 24px 18px;
+    background: linear-gradient(to top, var(--paper) 60%, rgba(247, 244, 237, 0));
     z-index: 20;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
   }
   .actions-meta {
     text-align: center;
@@ -992,7 +1020,7 @@
     display: flex;
     gap: 12px;
     align-items: flex-start;
-    padding: 14px 0;
+    padding: 10px 0;
     cursor: pointer;
   }
   .checkbox {
@@ -1109,9 +1137,9 @@
   /* ============ BIZ ENTITY FORM ============ */
   .director-card {
     border: 1px solid var(--line);
-    padding: 16px;
+    padding: 12px 14px;
     border-radius: var(--radius);
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -1151,18 +1179,29 @@
 
   /* mobile tweaks */
   @media (max-width: 380px) {
-    h1.display { font-size: 32px; }
-    h2.title { font-size: 22px; }
-    main { padding: 8px 20px 120px; }
-    main.dashboard-mode { padding: 0 0 96px; }
-    .topbar, .progress, .actions { padding-left: 20px; padding-right: 20px; }
+    h1.display { font-size: 26px; }
+    h2.title { font-size: 21px; }
+    .lede { font-size: 13px; margin-bottom: 16px; }
+    main { padding: 4px 18px 100px; }
+    main.dashboard-mode { padding: 0 0 90px; }
+    .topbar, .progress, .actions { padding-left: 18px; padding-right: 18px; }
+    .hero-art { height: 130px; margin-bottom: 14px; }
+    .approved-art { height: 150px; }
+  }
+  @media (max-height: 700px) {
+    .hero-art { height: 130px; margin-bottom: 12px; }
+    h1.display { font-size: 24px; margin-bottom: 8px; }
+    h2.title { font-size: 20px; }
+    .lede { font-size: 13px; margin-bottom: 14px; }
+    .selfie-frame { max-width: 160px; }
+    .approved-art { height: 130px; margin-bottom: 10px; }
   }
 
   /* ============ DASHBOARD ============ */
   .dash-hero {
     background: var(--ink);
     color: var(--paper);
-    padding: 16px 24px 28px;
+    padding: 20px 24px 18px;
     position: relative;
     overflow: hidden;
   }
@@ -1188,7 +1227,7 @@
     font-size: 22px;
     font-weight: 400;
     letter-spacing: -0.01em;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     position: relative;
   }
   .dash-name em { font-style: italic; color: var(--gold); font-weight: 300; }
@@ -1196,14 +1235,14 @@
   .dash-currency-tabs {
     display: flex;
     gap: 6px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     position: relative;
   }
   .ccy-tab {
     background: rgba(247, 244, 237, 0.1);
     color: var(--paper);
     border: 1px solid rgba(247, 244, 237, 0.15);
-    padding: 6px 12px;
+    padding: 5px 11px;
     border-radius: 999px;
     font-family: var(--mono);
     font-size: 10px;
@@ -1219,16 +1258,16 @@
 
   .dash-balance-label {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 9px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     opacity: 0.6;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     position: relative;
   }
   .dash-balance {
     font-family: var(--serif);
-    font-size: 38px;
+    font-size: 32px;
     font-weight: 300;
     letter-spacing: -0.02em;
     line-height: 1;
@@ -1237,16 +1276,16 @@
     font-variant-numeric: tabular-nums;
   }
   .dash-balance .ccy {
-    font-size: 18px;
+    font-size: 16px;
     color: var(--gold);
     margin-right: 6px;
     font-style: italic;
   }
   .dash-card-num {
     font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    opacity: 0.5;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    opacity: 0.55;
     position: relative;
   }
 
@@ -1256,7 +1295,7 @@
     grid-template-columns: repeat(4, 1fr);
     gap: 0;
     padding: 0 16px;
-    margin-top: -20px;
+    margin-top: 4px;
     position: relative;
     z-index: 2;
   }
@@ -1815,6 +1854,622 @@
     gap: 10px;
     margin-bottom: 14px;
   }
+
+  /* ============ CARD CAROUSEL (DASHBOARD) ============ */
+  .card-carousel {
+    margin: 16px -8px 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .card-track {
+    display: flex;
+    gap: 14px;
+    padding: 6px 8px 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .card-track::-webkit-scrollbar { display: none; }
+  .card-slide {
+    flex: 0 0 calc(100% - 16px);
+    scroll-snap-align: center;
+    border-radius: 14px;
+    aspect-ratio: 1.586;
+    background: linear-gradient(135deg, #14223a 0%, #0a1628 60%, #1e2f4d 100%);
+    color: var(--paper);
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 12px 32px rgba(10, 22, 40, 0.18), inset 0 1px 0 rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .card-slide.gold {
+    background: linear-gradient(135deg, #2a2418 0%, #1a1610 50%, #3d342a 100%);
+  }
+  .card-slide.white {
+    background: linear-gradient(135deg, #f5f1e8 0%, #e8e0cf 100%);
+    color: var(--ink);
+  }
+  .card-slide.white .card-slide-tier { color: var(--gold-2); }
+  .card-slide.white .card-num-display { color: var(--ink); }
+  .card-slide.white .card-name-display { color: var(--ink); }
+  .card-slide.white .card-meta-label-mini { color: var(--muted); }
+  .card-slide:active { transform: scale(0.99); }
+  .card-slide::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(201, 169, 97, 0.18), transparent 60%);
+    pointer-events: none;
+  }
+  .card-slide-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1;
+  }
+  .card-slide-tier {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .card-slide-frozen {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 22, 40, 0.7);
+    backdrop-filter: blur(2px);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    z-index: 2;
+  }
+  .card-slide-default-tag {
+    background: var(--gold);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 2px;
+    font-weight: 600;
+  }
+  .card-num-display {
+    font-family: var(--mono);
+    font-size: 15px;
+    letter-spacing: 0.1em;
+    margin: 0 0 6px;
+    position: relative;
+    z-index: 1;
+  }
+  .card-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    position: relative;
+    z-index: 1;
+  }
+  .card-name-display {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+    color: var(--paper);
+  }
+  .card-meta-label-mini {
+    font-family: var(--mono);
+    font-size: 8px;
+    opacity: 0.5;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1px;
+  }
+  /* Real Visa logo */
+  .visa-logo {
+    font-family: 'Times New Roman', serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: 19px;
+    letter-spacing: -0.04em;
+    color: var(--paper);
+    line-height: 1;
+  }
+  .visa-logo.gold { color: var(--gold); }
+  .visa-logo.ink { color: var(--ink); }
+
+  /* Dashboard card add tile */
+  .card-slide-add {
+    flex: 0 0 calc(100% - 16px);
+    scroll-snap-align: center;
+    aspect-ratio: 1.586;
+    border: 1.5px dashed var(--line-strong);
+    border-radius: 14px;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .card-slide-add:hover { border-color: var(--ink); color: var(--ink); }
+  .card-slide-add-icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--paper-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Carousel dots */
+  .card-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: -8px;
+    padding: 0 8px 8px;
+  }
+  .card-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--line-strong);
+    transition: all 0.2s;
+  }
+  .card-dot.active { background: var(--ink); width: 16px; border-radius: 3px; }
+
+  /* Dashboard balance container needs to update */
+  .dash-balance-context {
+    position: relative;
+    margin-top: 6px;
+  }
+
+  /* ============ CARDS DETAIL SCREEN ============ */
+  .cards-screen {
+    padding: 0 0 24px;
+  }
+  .cards-screen-head {
+    padding: 18px 24px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--paper);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  .cards-screen-title {
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  .cards-screen-title em { font-style: italic; color: var(--gold-2); font-weight: 300; }
+  .add-card-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--gold);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .card-detail-card {
+    margin: 8px 24px 16px;
+    aspect-ratio: 1.586;
+    background: linear-gradient(135deg, #14223a 0%, #0a1628 60%, #1e2f4d 100%);
+    color: var(--paper);
+    border-radius: 14px;
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 16px 40px rgba(10, 22, 40, 0.22), inset 0 1px 0 rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .card-detail-card.gold {
+    background: linear-gradient(135deg, #2a2418 0%, #1a1610 50%, #3d342a 100%);
+  }
+  .card-detail-card.white {
+    background: linear-gradient(135deg, #f5f1e8 0%, #e8e0cf 100%);
+    color: var(--ink);
+  }
+  .card-detail-card.frozen::after {
+    content: 'FROZEN';
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 22, 40, 0.7);
+    backdrop-filter: blur(3px);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.2em;
+  }
+  .card-detail-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(201, 169, 97, 0.18), transparent 60%);
+    pointer-events: none;
+  }
+  .card-detail-card .card-chip {
+    width: 36px; height: 28px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #d4af6a 0%, #a37f44 100%);
+    position: relative;
+  }
+  .card-detail-card .card-chip::before, .card-detail-card .card-chip::after {
+    content: '';
+    position: absolute;
+    background: rgba(0,0,0,0.15);
+  }
+  .card-detail-card .card-chip::before {
+    inset: 4px 0;
+    border-top: 1px solid rgba(0,0,0,0.2);
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+  }
+  .card-detail-card .card-chip::after {
+    inset: 0 12px;
+    border-left: 1px solid rgba(0,0,0,0.2);
+    border-right: 1px solid rgba(0,0,0,0.2);
+  }
+  .card-detail-num {
+    font-family: var(--mono);
+    font-size: 18px;
+    letter-spacing: 0.1em;
+    position: relative;
+    z-index: 1;
+    user-select: all;
+  }
+  .card-detail-meta-row {
+    display: flex;
+    gap: 22px;
+    margin: 10px 0 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .card-detail-meta-cell {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.55;
+  }
+  .card-detail-meta-val {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+    opacity: 1;
+    text-transform: none;
+  }
+
+  /* Carousel pages indicator on cards screen */
+  .cards-pager {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 0;
+    scrollbar-width: none;
+    padding: 0;
+  }
+  .cards-pager::-webkit-scrollbar { display: none; }
+  .cards-pager > * {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+  }
+
+  /* Card balance below detail */
+  .card-balance-block {
+    margin: 8px 24px 16px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-balance-label-detail {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .card-balance-amt-detail {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .card-balance-amt-detail .ccy { font-size: 14px; color: var(--gold-2); margin-right: 4px; font-style: italic; }
+
+  /* Action grid for cards screen */
+  .card-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 0 24px;
+    margin-bottom: 18px;
+  }
+  .card-action {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--paper);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+    color: var(--ink);
+  }
+  .card-action:hover { background: var(--paper-2); border-color: var(--line-strong); }
+  .card-action.active { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+  .card-action.active .ca-icon { background: var(--gold); color: var(--ink); }
+  .ca-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--paper-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .ca-text { flex: 1; min-width: 0; }
+  .ca-title { font-size: 13px; font-weight: 500; }
+  .ca-sub { font-size: 10px; color: var(--muted); font-family: var(--mono); letter-spacing: 0.03em; text-transform: uppercase; }
+  .card-action.active .ca-sub { color: rgba(247, 244, 237, 0.6); }
+
+  /* List rows for card detail */
+  .card-list-section {
+    padding: 0 24px;
+    margin-bottom: 16px;
+  }
+  .card-list-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .card-list-row:last-child { border-bottom: none; }
+  .card-list-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--paper-2);
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .card-list-icon.danger { background: rgba(179, 38, 30, 0.08); color: var(--error); }
+  .card-list-text { flex: 1; min-width: 0; }
+  .card-list-title { font-size: 14px; font-weight: 500; }
+  .card-list-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .card-list-arrow { color: var(--muted); flex-shrink: 0; }
+
+  /* Eye toggle masking effect */
+  .masked { letter-spacing: 0.4em !important; font-size: 16px !important; }
+
+  /* ============ ACTIVITY SCREEN ============ */
+  .activity-head {
+    padding: 18px 24px 12px;
+    background: var(--paper);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  .activity-title {
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .activity-title em { font-style: italic; color: var(--gold-2); font-weight: 300; }
+  .activity-filter-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .activity-filter-tabs::-webkit-scrollbar { display: none; }
+  .activity-filter {
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .activity-filter.active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .activity-section {
+    padding: 14px 24px 4px;
+  }
+  .activity-section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    padding-top: 8px;
+  }
+
+  /* ============ SETTINGS SCREEN ============ */
+  .settings-head {
+    padding: 18px 24px 8px;
+  }
+  .settings-title {
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  .settings-title em { font-style: italic; color: var(--gold-2); font-weight: 300; }
+  .settings-profile {
+    margin: 16px 24px 16px;
+    padding: 16px;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .settings-profile::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 90% 30%, rgba(201, 169, 97, 0.15), transparent 60%);
+    pointer-events: none;
+  }
+  .profile-avatar {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 22px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+  .profile-info { flex: 1; min-width: 0; position: relative; z-index: 1; }
+  .profile-name {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 500;
+  }
+  .profile-meta {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+    margin-top: 2px;
+  }
+  .settings-group {
+    padding: 0 24px;
+    margin-bottom: 22px;
+  }
+  .settings-group-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    padding-left: 4px;
+  }
+  .settings-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--line);
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    color: var(--ink);
+  }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-row-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--paper-2);
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .settings-row-text { flex: 1; min-width: 0; }
+  .settings-row-title { font-size: 14px; font-weight: 500; }
+  .settings-row-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .settings-row-end { flex-shrink: 0; color: var(--muted); }
+
+  /* Sign out in settings */
+  .settings-signout {
+    padding: 0 24px 24px;
+  }
+  .signout-btn {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: var(--error);
+    border: 1px solid rgba(179, 38, 30, 0.3);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .signout-btn:hover {
+    background: rgba(179, 38, 30, 0.06);
+    border-color: var(--error);
+  }
+  .build-info {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--muted-2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 12px;
+  }
 </style>
 </head>
 <body>
@@ -1840,6 +2495,9 @@
   <button onclick="goTo(13)">→ Card application</button>
   <button onclick="goTo(14)">→ Card issued</button>
   <button onclick="goTo(15)">→ Dashboard</button>
+  <button onclick="goTo(17)">→ Cards</button>
+  <button onclick="goTo(16)">→ Activity</button>
+  <button onclick="goTo(18)">→ Settings</button>
   <button onclick="resetAll()" style="background:var(--rust);margin-top:6px;">↺ Reset</button>
 </div>
 
@@ -1915,33 +2573,24 @@
 
       <div class="eyebrow">A new chapter</div>
       <h1 class="display">Banking, written in <em>your</em> currency.</h1>
-      <p class="lede">Open a virtual account in your country, hold SGD and USD beside it, and carry a Visa card built for the way you actually move.</p>
+      <p class="lede">Multi-currency virtual accounts, instant Visa cards, KYC in minutes.</p>
 
-      <div style="display:flex;flex-direction:column;gap:10px;margin-top:32px;">
-        <div style="display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-top:1px solid var(--line);">
-          <span class="currency-mark" style="background:var(--ink);color:var(--gold);">01</span>
-          <div>
-            <div style="font-weight:500;font-size:14px;margin-bottom:2px;">Multi-currency by default</div>
-            <div style="font-size:12px;color:var(--muted);">Local · SGD · USD on demand. One account, three currencies.</div>
-          </div>
+      <div style="display:flex;flex-direction:column;margin-top:8px;">
+        <div style="display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line);">
+          <span class="currency-mark" style="background:var(--ink);color:var(--gold);width:28px;height:28px;font-size:9px;">01</span>
+          <div style="font-size:13px;font-weight:500;">Multi-currency by default</div>
         </div>
-        <div style="display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-top:1px solid var(--line);">
-          <span class="currency-mark" style="background:var(--ink);color:var(--gold);">02</span>
-          <div>
-            <div style="font-weight:500;font-size:14px;margin-bottom:2px;">Visa card, fully virtual</div>
-            <div style="font-size:12px;color:var(--muted);">Issue instantly after KYC. Physical card optional.</div>
-          </div>
+        <div style="display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line);">
+          <span class="currency-mark" style="background:var(--ink);color:var(--gold);width:28px;height:28px;font-size:9px;">02</span>
+          <div style="font-size:13px;font-weight:500;">Visa card, instant issue</div>
         </div>
-        <div style="display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
-          <span class="currency-mark" style="background:var(--ink);color:var(--gold);">03</span>
-          <div>
-            <div style="font-weight:500;font-size:14px;margin-bottom:2px;">KYC in under 6 minutes</div>
-            <div style="font-size:12px;color:var(--muted);">Most accounts approved the same day.</div>
-          </div>
+        <div style="display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+          <span class="currency-mark" style="background:var(--ink);color:var(--gold);width:28px;height:28px;font-size:9px;">03</span>
+          <div style="font-size:13px;font-weight:500;">KYC in under 6 minutes</div>
         </div>
       </div>
 
-      <button id="installBtn" onclick="triggerInstall()" style="display:none;margin-top:24px;width:100%;padding:14px 18px;border:1px solid var(--line-strong);background:transparent;border-radius:var(--radius);font-family:var(--sans);font-size:13px;color:var(--ink);cursor:pointer;display:none;align-items:center;justify-content:center;gap:10px;transition:all 0.2s;">
+      <button id="installBtn" onclick="triggerInstall()" style="display:none;margin-top:14px;width:100%;padding:12px 18px;border:1px solid var(--line-strong);background:transparent;border-radius:var(--radius);font-family:var(--sans);font-size:13px;color:var(--ink);cursor:pointer;display:none;align-items:center;justify-content:center;gap:10px;transition:all 0.2s;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         <span>Install Fynco on this device</span>
       </button>
@@ -2186,8 +2835,8 @@
         <div class="switch"></div>
       </div>
 
-      <div style="font-size:12px;color:var(--muted);padding:14px 0;line-height:1.5;border-top:1px solid var(--line);margin-top:8px;">
-        Account opening is free. Maintenance fees waived for the first 12 months. FX conversion uses interbank mid-rate + 0.35%.
+      <div style="font-size:11px;color:var(--muted);padding:8px 2px 0;line-height:1.4;">
+        Free to open. FX uses interbank mid-rate + 0.35%.
       </div>
     </section>
 
@@ -2232,9 +2881,9 @@
         </div>
       </div>
 
-      <div style="margin-top:24px;padding:14px;background:var(--paper-2);border-radius:var(--radius);font-size:12px;color:var(--muted);line-height:1.5;display:flex;gap:10px;align-items:flex-start;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;color:var(--ink);"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-        Your documents are encrypted end-to-end and never stored after verification. Read our <a href="#" style="color:var(--ink);">data policy</a>.
+      <div style="margin-top:14px;padding:10px 12px;background:var(--paper-2);border-radius:var(--radius);font-size:11px;color:var(--muted);line-height:1.45;display:flex;gap:8px;align-items:center;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--ink);"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Documents encrypted end-to-end. Not stored after verification.
       </div>
     </section>
 
@@ -2255,18 +2904,22 @@
 
       <div class="upload-zone" id="idFront" onclick="simulateUpload(this, 'idFrontDone')">
         <div class="upload-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="9" cy="13" r="2"/><path d="M15 11h3M15 14h3"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="9" cy="13" r="2"/><path d="M15 11h3M15 14h3"/></svg>
         </div>
-        <div class="upload-title" id="idFrontTitle">Front of document</div>
-        <div class="upload-sub" id="idFrontSub">Tap to take a photo or upload</div>
+        <div style="flex:1;min-width:0;">
+          <div class="upload-title" id="idFrontTitle">Front of document</div>
+          <div class="upload-sub" id="idFrontSub">Tap to take a photo or upload</div>
+        </div>
       </div>
 
       <div class="upload-zone" id="idBack" onclick="simulateUpload(this, 'idBackDone')">
         <div class="upload-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><line x1="6" y1="11" x2="18" y2="11"/><line x1="6" y1="14" x2="14" y2="14"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><line x1="6" y1="11" x2="18" y2="11"/><line x1="6" y1="14" x2="14" y2="14"/></svg>
         </div>
-        <div class="upload-title" id="idBackTitle">Back of document</div>
-        <div class="upload-sub" id="idBackSub">Tap to take a photo or upload</div>
+        <div style="flex:1;min-width:0;">
+          <div class="upload-title" id="idBackTitle">Back of document</div>
+          <div class="upload-sub" id="idBackSub">Tap to take a photo or upload</div>
+        </div>
       </div>
     </section>
 
@@ -2330,10 +2983,12 @@
 
       <div class="upload-zone" id="addrDoc" onclick="simulateUpload(this, 'addrDocDone')">
         <div class="upload-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         </div>
-        <div class="upload-title" id="addrDocTitle">Upload document</div>
-        <div class="upload-sub" id="addrDocSub">PDF, JPG, or PNG · Max 10MB</div>
+        <div style="flex:1;min-width:0;">
+          <div class="upload-title" id="addrDocTitle">Upload document</div>
+          <div class="upload-sub" id="addrDocSub">PDF, JPG, or PNG · Max 10MB</div>
+        </div>
       </div>
     </section>
 
@@ -2436,31 +3091,31 @@
       </div>
 
       <h2 class="title" style="text-align:center;">Welcome to <em>Fynco</em>.</h2>
-      <p class="lede" style="text-align:center;margin:0 auto 20px;">Your account is live. We've sent a confirmation to your email and verified your phone.</p>
+      <p class="lede" style="text-align:center;margin:0 auto 12px;">Your account is live. Confirmation sent to email.</p>
       <div class="reference">REFERENCE · <span id="refNum">FYN-2026-0000000</span></div>
 
-      <div style="border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0;margin-bottom:24px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0;margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <div>
             <div class="label" style="margin-bottom:2px;">Primary account</div>
-            <div style="font-family:var(--serif);font-size:18px;" id="approvedLocal">SGD Singapore Dollar</div>
+            <div style="font-family:var(--serif);font-size:16px;" id="approvedLocal">SGD Singapore Dollar</div>
           </div>
           <span class="badge gold">Active</span>
         </div>
-        <div style="font-family:var(--mono);font-size:13px;letter-spacing:0.05em;" id="approvedIBAN">SG-FYN-2847-1936-2810</div>
+        <div style="font-family:var(--mono);font-size:12px;letter-spacing:0.05em;" id="approvedIBAN">SG-FYN-2847-1936-2810</div>
       </div>
 
-      <div style="background:var(--ink);color:var(--paper);padding:24px;border-radius:var(--radius);margin-bottom:8px;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+      <div style="background:var(--ink);color:var(--paper);padding:16px;border-radius:var(--radius);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
           <div>
-            <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;opacity:0.6;margin-bottom:6px;">Next step · Optional</div>
-            <div style="font-family:var(--serif);font-size:20px;">Apply for your Visa.</div>
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;opacity:0.6;margin-bottom:4px;">Next step · Optional</div>
+            <div style="font-family:var(--serif);font-size:17px;">Apply for your Visa.</div>
           </div>
-          <svg width="40" height="26" viewBox="0 0 40 26" fill="none" style="flex-shrink:0;">
+          <svg width="36" height="22" viewBox="0 0 40 26" fill="none" style="flex-shrink:0;">
             <text x="0" y="20" font-family="serif" font-style="italic" font-weight="700" font-size="22" fill="#c9a961" letter-spacing="-0.5">VISA</text>
           </svg>
         </div>
-        <div style="font-size:13px;opacity:0.8;line-height:1.5;margin-bottom:16px;">Virtual card issued instantly. Add to Apple Pay or Google Wallet in under a minute. Physical card ships in 5–7 business days.</div>
+        <div style="font-size:12px;opacity:0.8;line-height:1.45;">Virtual card issued instantly. Physical card ships in 5–7 days.</div>
       </div>
     </section>
 
@@ -2556,30 +3211,18 @@
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;">
-        <button class="btn btn-ghost" style="font-size:13px;padding:14px;" onclick="alert('Apple Wallet — would launch native add-card flow.')">
+        <button class="btn btn-ghost" style="font-size:13px;padding:12px;" onclick="alert('Apple Wallet — would launch native add-card flow.')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
           Apple Wallet
         </button>
-        <button class="btn btn-ghost" style="font-size:13px;padding:14px;" onclick="alert('Google Wallet — would launch native add-card flow.')">
+        <button class="btn btn-ghost" style="font-size:13px;padding:12px;" onclick="alert('Google Wallet — would launch native add-card flow.')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="12" cy="13" r="2"/></svg>
           Google Wallet
         </button>
       </div>
 
-      <div style="border-top:1px solid var(--line);padding-top:20px;">
-        <div style="font-family:var(--serif);font-size:18px;margin-bottom:14px;">A few things to know</div>
-        <div style="display:flex;gap:14px;align-items:flex-start;padding:10px 0;">
-          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);width:18px;flex-shrink:0;">01</span>
-          <div style="font-size:13px;line-height:1.5;">Daily online spend limit is SGD 5,000. Tap to raise it after 30 days.</div>
-        </div>
-        <div style="display:flex;gap:14px;align-items:flex-start;padding:10px 0;">
-          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);width:18px;flex-shrink:0;">02</span>
-          <div style="font-size:13px;line-height:1.5;">Auto-FX: spend in any currency, we'll pull from the matching wallet first.</div>
-        </div>
-        <div style="display:flex;gap:14px;align-items:flex-start;padding:10px 0;">
-          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);width:18px;flex-shrink:0;">03</span>
-          <div style="font-size:13px;line-height:1.5;">Lost your card? Freeze it instantly from the app.</div>
-        </div>
+      <div style="border-top:1px solid var(--line);padding-top:14px;font-size:12px;color:var(--muted);line-height:1.5;">
+        Daily limit SGD 5,000 · Auto-FX · Freeze instantly in app
       </div>
     </section>
 
@@ -2591,12 +3234,20 @@
 
         <div class="dash-currency-tabs" id="dashCcyTabs"></div>
 
-        <div class="dash-balance-label">Card balance</div>
-        <div class="dash-balance">
-          <span class="ccy" id="dashCcySymbol">SGD</span><span id="dashCardBalance">0.00</span>
+        <div class="dash-balance-context">
+          <div class="dash-balance-label">Card balance</div>
+          <div class="dash-balance">
+            <span class="ccy" id="dashCcySymbol">SGD</span><span id="dashCardBalance">0.00</span>
+          </div>
+          <div class="dash-card-num" id="dashCardCaption">Default card</div>
         </div>
-        <div class="dash-card-num">VISA •••• <span id="dashCardLast4">2810</span></div>
       </div>
+
+      <!-- Swipeable card carousel -->
+      <div class="card-carousel">
+        <div class="card-track" id="dashCardTrack"></div>
+      </div>
+      <div class="card-dots" id="dashCardDots"></div>
 
       <div class="actions-grid">
         <button class="qa-btn" onclick="openSheet('topup')">
@@ -2628,7 +3279,7 @@
       <div class="dash-section">
         <div class="dash-section-head">
           <div class="dash-section-title">Wallets</div>
-          <button class="dash-section-link">Manage</button>
+          <button class="dash-section-link" onclick="goTo(18)">Manage</button>
         </div>
         <div id="walletList"></div>
       </div>
@@ -2636,9 +3287,275 @@
       <div class="dash-section">
         <div class="dash-section-head">
           <div class="dash-section-title">Recent activity</div>
-          <button class="dash-section-link">See all</button>
+          <button class="dash-section-link" onclick="goTo(16)">See all</button>
         </div>
         <div id="txnList"></div>
+      </div>
+    </section>
+
+    <!-- ============ 16. ACTIVITY ============ -->
+    <section class="screen" id="screen-16">
+      <div class="activity-head">
+        <div class="activity-title"><em>Activity</em></div>
+        <div class="activity-filter-tabs" id="activityFilters">
+          <button class="activity-filter active" data-f="all" onclick="setActivityFilter(this)">All</button>
+          <button class="activity-filter" data-f="in" onclick="setActivityFilter(this)">Income</button>
+          <button class="activity-filter" data-f="out" onclick="setActivityFilter(this)">Spending</button>
+          <button class="activity-filter" data-f="card" onclick="setActivityFilter(this)">Card</button>
+          <button class="activity-filter" data-f="esim" onclick="setActivityFilter(this)">eSIM</button>
+        </div>
+      </div>
+      <div id="activityList"></div>
+    </section>
+
+    <!-- ============ 17. CARDS ============ -->
+    <section class="screen" id="screen-17">
+      <div class="cards-screen-head">
+        <div class="cards-screen-title">My <em>cards</em></div>
+        <button class="add-card-btn" onclick="openSheet('apply-card')" aria-label="Apply for new card">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+      <div class="cards-pager" id="cardsPager"></div>
+      <div class="card-dots" id="cardDetailDots"></div>
+
+      <div class="card-balance-block">
+        <div>
+          <div class="card-balance-label-detail">Card balance</div>
+          <div class="card-balance-amt-detail">
+            <span class="ccy" id="cardDetailCcy">SGD</span><span id="cardDetailBal">0.00</span>
+          </div>
+        </div>
+        <button class="qa-btn" style="border:1px solid var(--ink);background:var(--ink);color:var(--paper);padding:10px 14px;width:auto;flex-direction:row;gap:6px;border-radius:var(--radius);" onclick="openSheet('topup')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span style="font-family:var(--mono);font-size:10px;letter-spacing:0.05em;text-transform:uppercase;color:var(--gold);">Top up</span>
+        </button>
+      </div>
+
+      <div class="card-actions-grid">
+        <button class="card-action" id="cardActionDefault" onclick="setDefaultCard()">
+          <div class="ca-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div class="ca-text">
+            <div class="ca-title">Set as default</div>
+            <div class="ca-sub" id="cardActionDefaultSub">For dashboard</div>
+          </div>
+        </button>
+        <button class="card-action" onclick="toggleCardSensitive()">
+          <div class="ca-icon" id="cardEyeIcon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div class="ca-text">
+            <div class="ca-title" id="cardEyeTitle">Show details</div>
+            <div class="ca-sub">Number, CVV</div>
+          </div>
+        </button>
+        <button class="card-action" onclick="addCardToWallet('apple')">
+          <div class="ca-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+          </div>
+          <div class="ca-text">
+            <div class="ca-title">Apple Pay</div>
+            <div class="ca-sub">Add to Wallet</div>
+          </div>
+        </button>
+        <button class="card-action" onclick="addCardToWallet('google')">
+          <div class="ca-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="12" cy="13" r="2"/></svg>
+          </div>
+          <div class="ca-text">
+            <div class="ca-title">Google Pay</div>
+            <div class="ca-sub">Add to Wallet</div>
+          </div>
+        </button>
+      </div>
+
+      <div class="card-list-section">
+        <div class="card-list-row" onclick="toggleFreezeCard()">
+          <div class="card-list-icon" id="freezeIcon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="2" y2="22"/><line x1="2" y1="2" x2="22" y2="22"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+          </div>
+          <div class="card-list-text">
+            <div class="card-list-title" id="freezeTitle">Freeze card</div>
+            <div class="card-list-sub" id="freezeSub">Temporarily block all transactions</div>
+          </div>
+          <svg class="card-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="card-list-row" onclick="alert('Spending limits — would open limit controls in production.')">
+          <div class="card-list-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <div class="card-list-text">
+            <div class="card-list-title">Spending limits</div>
+            <div class="card-list-sub">Daily SGD 5,000 · Online enabled</div>
+          </div>
+          <svg class="card-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="card-list-row" onclick="openSheet('apply-card')">
+          <div class="card-list-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div class="card-list-text">
+            <div class="card-list-title">Apply for another card</div>
+            <div class="card-list-sub">Virtual or physical · multi-currency</div>
+          </div>
+          <svg class="card-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="card-list-row danger" onclick="reportCardLost()">
+          <div class="card-list-icon danger">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="card-list-text">
+            <div class="card-list-title" style="color:var(--error);">Report lost or stolen</div>
+            <div class="card-list-sub">Block this card and request a replacement</div>
+          </div>
+          <svg class="card-list-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 18. SETTINGS ============ -->
+    <section class="screen" id="screen-18">
+      <div class="settings-head">
+        <div class="settings-title"><em>Settings</em></div>
+      </div>
+
+      <div class="settings-profile">
+        <div class="profile-avatar" id="profileAvatar">JN</div>
+        <div class="profile-info">
+          <div class="profile-name" id="profileName">Jeremiah Ng</div>
+          <div class="profile-meta" id="profileMeta">FYN-2026-XXXX · Verified</div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-label">Account</div>
+        <button class="settings-row" onclick="alert('Personal information — would open profile editor.')">
+          <div class="settings-row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1"/></svg></div>
+          <div class="settings-row-text">
+            <div class="settings-row-title">Personal information</div>
+            <div class="settings-row-sub">Name, address, contact</div>
+          </div>
+          <svg class="settings-row-end" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <button class="settings-row" onclick="alert('Identity & verification — KYC documents and re-verification.')">
+          <div class="settings-row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+          <div class="settings-row-text">
+            <div class="settings-row-title">Identity &amp; verification</div>
+            <div class="settings-row-sub">KYC complete</div>
+          </div>
+          <span class="badge gold" style="font-size:8px;padding:2px 6px;">Verified</span>
+        </button>
+        <button class="settings-row" onclick="alert('Linked accounts and external bank connections.')">
+          <div class="settings-row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
+          <div class="settings-row-text">
+            <div class="settings-row-title">Linked accounts</div>
+            <div class="settings-row-sub">External banks &amp; cards</div>
+          </div>
+          <svg class="settings-row-end" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-label">Security</div>
+        <div class="settings-row" onclick="toggleSetting('biometric')" style="cursor:pointer;">
+          <div class="settings-row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13c0-5.5 3-10 7-10s7 4.5 7 10"/><path d="M5 17c0-5 3-9 7-9s7 4 7 9"/><path d="M9 21c.75-3.5 1.5-7 3-9s2.25 5.5 3 9"/></svg></div>
+          <div class="settings-row-text">
+            <div class="settings-row-title">Biometric login</div>
+            <div class="settings-row-sub">Face ID or fingerprint</div>
+          </div>
+          <div class="switch" id="biometricSwitch"></div>
+        </div>
+        <button class="settings-row" onclick="alert('Change PIN — secure flow opens here.')">
+          <div class="settings-row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+          <div class="settings-row-text">
+            <div class="settings-row-title">Change PIN</div>
+            <div class="settings-row-sub">Card &amp; app PIN</div>
+          </div>
+          <svg class="settings-row-end" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <button class="settings-row" onclick="alert('Trusted devices — manage where you can sign in.')">
+          <div class="settings-row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+          <div class="settings-row-text">
+            <div class="settings-row-title">Trusted devices</div>
+            <div class="settings-row-sub">2 devices active</div>
+          </div>
+          <svg class="settings-row-end" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-label">Notifications</div>
+        <div class="settings-row" onclick="toggleNotif('transactions')" style="cursor:pointer;">
+          <div class="settings-row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+          <div class="settings-row-text">
+            <div class="settings-row-title">Transactions</div>
+            <div class="settings-row-sub">Push for every payment</div>
+          </div>
+          <div class="switch" id="notifTransactions"></div>
+        </div>
+        <div class="settings-row" onclick="toggleNotif('security')" style="cursor:pointer;">
+          <div class="settings-row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="settings-row-text">
+            <div class="settings-row-title">Security alerts</div>
+            <div class="settings-row-sub">New device, password changes</div>
+          </div>
+          <div class="switch" id="notifSecurity"></div>
+        </div>
+        <div class="settings-row" onclick="toggleNotif('marketing')" style="cursor:pointer;">
+          <div class="settings-row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 11-5.8-1.6"/></svg></div>
+          <div class="settings-row-text">
+            <div class="settings-row-title">Offers &amp; news</div>
+            <div class="settings-row-sub">Marketing updates</div>
+          </div>
+          <div class="switch" id="notifMarketing"></div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-label">Preferences</div>
+        <button class="settings-row" onclick="alert('Language picker — would open language selector.')">
+          <div class="settings-row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg></div>
+          <div class="settings-row-text">
+            <div class="settings-row-title">Language</div>
+            <div class="settings-row-sub">English (Singapore)</div>
+          </div>
+          <svg class="settings-row-end" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <button class="settings-row" onclick="alert('Display currency for net worth views.')">
+          <div class="settings-row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 100 4h4a2 2 0 110 4H8"/><path d="M12 18v-2M12 8V6"/></svg></div>
+          <div class="settings-row-text">
+            <div class="settings-row-title">Display currency</div>
+            <div class="settings-row-sub" id="settingsDisplayCcy">SGD</div>
+          </div>
+          <svg class="settings-row-end" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-label">Support</div>
+        <button class="settings-row" onclick="alert('Live chat — 24/7 in-app support team.')">
+          <div class="settings-row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+          <div class="settings-row-text">
+            <div class="settings-row-title">Help &amp; live chat</div>
+            <div class="settings-row-sub">Available 24/7</div>
+          </div>
+          <svg class="settings-row-end" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <button class="settings-row" onclick="alert('Legal documents and disclosures.')">
+          <div class="settings-row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg></div>
+          <div class="settings-row-text">
+            <div class="settings-row-title">Legal &amp; agreements</div>
+            <div class="settings-row-sub">Terms, privacy, cardholder agreement</div>
+          </div>
+          <svg class="settings-row-end" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+
+      <div class="settings-signout">
+        <button class="signout-btn" onclick="if(confirm('Sign out of Fynco?')) resetAll();">Sign out</button>
+        <div class="build-info">Fynco · v1.0.0 · build 2026.04</div>
       </div>
     </section>
 
@@ -2646,29 +3563,29 @@
 
   <!-- ============ BOTTOM NAV (dashboard only) ============ -->
   <div class="botnav" id="botnav" style="display:none;">
-    <button class="botnav-item active">
+    <button class="botnav-item" data-nav="15" onclick="goTo(15)">
       <div class="botnav-icon">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
       </div>
       <span class="botnav-label">Home</span>
     </button>
-    <button class="botnav-item" onclick="alert('Cards view — coming soon in this demo.')">
+    <button class="botnav-item" data-nav="17" onclick="goTo(17)">
       <div class="botnav-icon">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><line x1="2" y1="11" x2="22" y2="11"/></svg>
       </div>
       <span class="botnav-label">Cards</span>
     </button>
-    <button class="botnav-item" onclick="alert('Transactions view — coming soon in this demo.')">
+    <button class="botnav-item" data-nav="16" onclick="goTo(16)">
       <div class="botnav-icon">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
       </div>
       <span class="botnav-label">Activity</span>
     </button>
-    <button class="botnav-item" onclick="alert('Settings — coming soon in this demo.')">
+    <button class="botnav-item" data-nav="18" onclick="goTo(18)">
       <div class="botnav-icon">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       </div>
-      <span class="botnav-label">More</span>
+      <span class="botnav-label">Settings</span>
     </button>
   </div>
 
@@ -2883,6 +3800,71 @@
     </div>
   </div>
 
+  <!-- APPLY CARD SHEET -->
+  <div class="sheet" id="sheet-apply-card">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div class="sheet-title">Apply for a <em>card</em></div>
+      <button class="sheet-close" onclick="closeSheet()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5;">Choose a card tier. All cards are Visa, accepted in 200+ countries.</p>
+      <div id="applyCardList">
+        <button class="card-action" data-tier="standard" onclick="pickApplyTier(this)" style="padding:18px;margin-bottom:10px;border-radius:var(--radius);border:1px solid var(--line);width:100%;text-align:left;display:flex;align-items:center;gap:14px;">
+          <div style="width:48px;height:32px;border-radius:4px;background:linear-gradient(135deg,#14223a,#0a1628);flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;padding:4px;"><span class="visa-logo" style="font-size:11px;">VISA</span></div>
+          <div style="flex:1;">
+            <div style="font-family:var(--serif);font-size:16px;font-weight:500;">Fynco Standard</div>
+            <div style="font-size:12px;color:var(--muted);">Free · multi-currency · virtual + physical</div>
+          </div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">SGD 0</div>
+        </button>
+        <button class="card-action" data-tier="gold" onclick="pickApplyTier(this)" style="padding:18px;margin-bottom:10px;border-radius:var(--radius);border:1px solid var(--line);width:100%;text-align:left;display:flex;align-items:center;gap:14px;">
+          <div style="width:48px;height:32px;border-radius:4px;background:linear-gradient(135deg,#2a2418,#3d342a);flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;padding:4px;"><span class="visa-logo gold" style="font-size:11px;">VISA</span></div>
+          <div style="flex:1;">
+            <div style="font-family:var(--serif);font-size:16px;font-weight:500;">Fynco Gold</div>
+            <div style="font-size:12px;color:var(--muted);">Lounge access · 1.5% cashback · concierge</div>
+          </div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">SGD 18/mo</div>
+        </button>
+        <button class="card-action" data-tier="white" onclick="pickApplyTier(this)" style="padding:18px;margin-bottom:10px;border-radius:var(--radius);border:1px solid var(--line);width:100%;text-align:left;display:flex;align-items:center;gap:14px;">
+          <div style="width:48px;height:32px;border-radius:4px;background:linear-gradient(135deg,#f5f1e8,#e8e0cf);flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;padding:4px;border:1px solid var(--line);"><span class="visa-logo ink" style="font-size:11px;">VISA</span></div>
+          <div style="flex:1;">
+            <div style="font-family:var(--serif);font-size:16px;font-weight:500;">Fynco Reserve</div>
+            <div style="font-size:12px;color:var(--muted);">Metal · Priority Pass · 24/7 concierge</div>
+          </div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">SGD 48/mo</div>
+        </button>
+      </div>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-primary" id="applyCardBtn" onclick="confirmApplyCard()" disabled>Select a tier</button>
+    </div>
+  </div>
+
+  <!-- APPLY CARD RESULT -->
+  <div class="sheet" id="sheet-apply-card-result">
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <div class="sheet-result">
+        <div class="result-tick">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="result-title">Card <em>issued</em></div>
+        <div class="result-sub">Your virtual card is ready to use.</div>
+        <div class="result-detail-card">
+          <div class="result-detail-row"><span class="result-detail-key">Tier</span><span class="result-detail-val" id="applyResultTier">—</span></div>
+          <div class="result-detail-row"><span class="result-detail-key">Card</span><span class="result-detail-val" id="applyResultLast4">VISA •••• ****</span></div>
+          <div class="result-detail-row"><span class="result-detail-key">Reference</span><span class="result-detail-val" id="applyResultRef">—</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-primary" onclick="closeSheet(); goTo(17);">View card</button>
+    </div>
+  </div>
+
   <!-- ============ ACTIONS ============ -->
   <div class="actions" id="actions">
     <button class="btn btn-primary btn-arrow" id="primaryBtn" onclick="goNext()">
@@ -2912,20 +3894,29 @@ const state = {
   lastName: '',
   email: '',
   phone: '',
+  // ===== Cards =====
+  cards: [], // array of card objects
+  defaultCardId: null,
   // ===== Dashboard state =====
-  cardLast4: '2810',
   // wallets keyed by ccy code
   wallets: {}, // populated when entering dashboard
-  cardBalance: {}, // per-currency card balance
+  cardBalance: {}, // per-currency card balance (across default card)
   activeCcy: null, // current dashboard view ccy
   txns: [], // [{ icon, merchant, meta, amt, ccy, dir, ts }]
   // Top-up sheet temp state
   topup: { source: 'va', amount: '0', sourceCcy: null },
   // eSIM
   esimSelected: null,
+  // Card detail screen state
+  visibleCardId: null, // which card carousel index in detail view
+  cardSensitiveVisible: false,
+  // Settings
+  notifications: { transactions: true, marketing: false, security: true },
+  biometric: false,
+  cardFrozen: {},
 };
 
-const TOTAL_STEPS = 15;
+const TOTAL_STEPS = 18;
 const SHOW_PROGRESS_FROM = 1;
 const SHOW_PROGRESS_TO = 10;
 
@@ -3070,15 +4061,21 @@ function goTo(step) {
   const main = document.getElementById('main');
   const botnav = document.getElementById('botnav');
   const actions = document.getElementById('actions');
-  if (step === 15) {
+  const topbar = document.getElementById('topbar');
+  if (step === 15 || step === 16 || step === 17 || step === 18) {
     main.classList.add('dashboard-mode');
     botnav.style.display = 'flex';
     actions.style.display = 'none';
-    initDashboard();
+    topbar.style.display = 'none';
+    if (step === 15) initDashboard();
+    if (step === 16) initActivity();
+    if (step === 17) initCards();
+    if (step === 18) initSettings();
   } else {
     main.classList.remove('dashboard-mode');
     botnav.style.display = 'none';
     actions.style.display = 'flex';
+    topbar.style.display = 'flex';
   }
 
   // Special handling on step entry
@@ -3115,6 +4112,13 @@ function goTo(step) {
   // Reset main scroll to top when changing screens
   if (main) main.scrollTop = 0;
   document.getElementById('devStep').textContent = `Step ${step}/${TOTAL_STEPS}`;
+  // Hide dev bar on dashboard for clean app feel
+  const devBar = document.getElementById('devBar');
+  if (step === 15) {
+    devBar.style.display = 'none';
+  } else {
+    devBar.style.display = 'flex';
+  }
 }
 
 function goNext() {
@@ -3488,9 +4492,15 @@ function populateCardIssued() {
   const labelText = state.accountType === 'business' ? 'Business · Multi-currency' : 'Personal · Multi-currency';
   document.getElementById('cardName2').textContent = name;
   document.getElementById('cardTypeLabel2').textContent = labelText;
-  // randomize last 4 each time
-  const last4 = String(Math.floor(1000 + Math.random() * 9000));
-  document.getElementById('cardNumberFull').textContent = `4716 8294 1736 ${last4}`;
+
+  // Create the user's first real card (only once per session)
+  if (state.cards.length === 0) {
+    const c = makeCard('standard');
+    state.cards.push(c);
+    state.defaultCardId = c.id;
+  }
+  const card = state.cards[0];
+  document.getElementById('cardNumberFull').textContent = card.number;
 }
 
 // ============ DEV BAR ============
@@ -3507,9 +4517,12 @@ function resetAll() {
     resideHere: true,
     usdEnabled: false, cardOption: 'virtual',
     idFrontDone: false, idBackDone: false, selfieDone: false, addrDocDone: false,
+    cards: [], defaultCardId: null, visibleCardId: null, cardSensitiveVisible: false, cardFrozen: {},
     wallets: {}, cardBalance: {}, activeCcy: null, txns: [],
     topup: { source: 'va', amount: '0', sourceCcy: null },
     esimSelected: null,
+    notifications: { transactions: true, marketing: false, security: true },
+    biometric: false,
   });
   // reset uploads visually
   ['idFront','idBack','addrDoc'].forEach(id => {
@@ -3625,32 +4638,131 @@ function initDashboard() {
     if (state.usdEnabled) {
       state.wallets['USD'] = { name: 'US Dollar', balance: 320.50, primary: false };
     }
-    // Card balances per ccy
     state.cardBalance = { [localCcy]: 250.00 };
     if (localCcy !== 'SGD') state.cardBalance['SGD'] = 80.00;
     if (state.usdEnabled) state.cardBalance['USD'] = 50.00;
     state.activeCcy = localCcy;
-    // Seed a couple of transactions
     state.txns = [
-      { merchant: 'Welcome bonus', meta: 'Card · today', amt: 250.00, ccy: localCcy, dir: 'in', ts: Date.now() },
+      { merchant: 'Welcome bonus', meta: 'Card · today', amt: 250.00, ccy: localCcy, dir: 'in', ts: Date.now(), cat: 'card' },
     ];
   }
 
-  // Update name
+  // Set up the first card if none exist
+  if (state.cards.length === 0) {
+    const initialCard = makeCard('standard');
+    state.cards.push(initialCard);
+    state.defaultCardId = initialCard.id;
+  }
+
   const fn = document.getElementById('firstName').value || 'Jeremiah';
   const bizName = document.getElementById('bizName').value;
   const dashName = state.accountType === 'business' && bizName ? bizName.split(' ')[0] : fn;
   document.getElementById('dashName').textContent = dashName;
-  document.getElementById('dashCardLast4').textContent = state.cardLast4;
-  document.getElementById('scanCardLast4').textContent = state.cardLast4;
 
-  // Build currency tabs
   const tabs = document.getElementById('dashCcyTabs');
   tabs.innerHTML = Object.keys(state.wallets).map(ccy =>
     `<button class="ccy-tab ${ccy === state.activeCcy ? 'active' : ''}" onclick="setActiveCcy('${ccy}')">${ccy}</button>`
   ).join('');
 
   renderDashboard();
+  renderDashCardCarousel();
+  updateBotNav(15);
+}
+
+function getCardholderName() {
+  const fn = (document.getElementById('firstName').value || 'Jeremiah').toUpperCase();
+  const ln = (document.getElementById('lastName').value || 'Ng').toUpperCase();
+  const bizName = (document.getElementById('bizName').value || '').toUpperCase();
+  return state.accountType === 'business' && bizName ? bizName : `${fn} ${ln}`;
+}
+
+function makeCard(tier) {
+  const id = 'c-' + Math.random().toString(36).slice(2, 9);
+  const num = ['4716', String(Math.floor(1000 + Math.random()*9000)), String(Math.floor(1000 + Math.random()*9000)), String(Math.floor(1000 + Math.random()*9000))];
+  const yr = (new Date().getFullYear() + 4) % 100;
+  const mo = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+  return {
+    id,
+    tier, // 'standard' | 'gold' | 'white'
+    number: num.join(' '),
+    last4: num[3],
+    expMonth: mo,
+    expYear: String(yr).padStart(2, '0'),
+    cvv: String(Math.floor(100 + Math.random() * 900)),
+    issuedAt: Date.now(),
+    holder: getCardholderName(),
+  };
+}
+
+function getDefaultCard() {
+  return state.cards.find(c => c.id === state.defaultCardId) || state.cards[0];
+}
+
+function tierLabel(t) {
+  return t === 'gold' ? 'Gold' : t === 'white' ? 'Reserve' : 'Standard';
+}
+
+function tierClass(t) {
+  return t === 'gold' ? 'gold' : t === 'white' ? 'white' : '';
+}
+
+function renderDashCardCarousel() {
+  const track = document.getElementById('dashCardTrack');
+  const dots = document.getElementById('dashCardDots');
+  const cards = state.cards;
+  // Order: default first
+  const ordered = [
+    ...cards.filter(c => c.id === state.defaultCardId),
+    ...cards.filter(c => c.id !== state.defaultCardId),
+  ];
+
+  track.innerHTML = ordered.map(c => {
+    const isDefault = c.id === state.defaultCardId;
+    const frozen = state.cardFrozen[c.id];
+    const cls = tierClass(c.tier);
+    return `
+      <div class="card-slide ${cls}" onclick="goTo(17); setTimeout(()=>scrollToCardOnDetail('${c.id}'), 50);">
+        ${frozen ? `<div class="card-slide-frozen">Frozen</div>` : ''}
+        <div class="card-slide-top">
+          <div>
+            <div class="card-slide-tier">Fynco · ${tierLabel(c.tier)}</div>
+          </div>
+          ${isDefault ? `<span class="card-slide-default-tag">Default</span>` : ''}
+        </div>
+        <div>
+          <div class="card-num-display">•••• •••• •••• ${c.last4}</div>
+          <div class="card-bottom-row">
+            <div>
+              <div class="card-meta-label-mini">${c.holder}</div>
+              <div class="card-meta-label-mini" style="opacity:0.7;">EXP ${c.expMonth}/${c.expYear}</div>
+            </div>
+            <span class="visa-logo ${cls === 'white' ? 'ink' : 'gold'}">VISA</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('') + `
+    <div class="card-slide-add" onclick="openSheet('apply-card')">
+      <div class="card-slide-add-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </div>
+      <div style="font-size:13px;font-weight:500;">Apply for a card</div>
+      <div style="font-size:11px;color:var(--muted);">Virtual or physical · Visa</div>
+    </div>
+  `;
+
+  // Dots — total = cards + add tile
+  const total = ordered.length + 1;
+  dots.innerHTML = Array.from({ length: total }, (_, i) =>
+    `<div class="card-dot ${i === 0 ? 'active' : ''}" data-i="${i}"></div>`
+  ).join('');
+
+  // Wire scroll → dot
+  track.onscroll = () => {
+    const slideW = track.children[0]?.getBoundingClientRect().width || 1;
+    const idx = Math.round(track.scrollLeft / (slideW + 14));
+    dots.querySelectorAll('.card-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+  };
 }
 
 function setActiveCcy(ccy) {
@@ -3665,6 +4777,10 @@ function renderDashboard() {
   const ccy = state.activeCcy;
   document.getElementById('dashCcySymbol').textContent = ccy;
   document.getElementById('dashCardBalance').textContent = formatMoney(state.cardBalance[ccy] || 0);
+  const def = getDefaultCard();
+  if (def) {
+    document.getElementById('dashCardCaption').textContent = `Default · Fynco ${tierLabel(def.tier)} · •••• ${def.last4}`;
+  }
 
   // Wallets
   document.getElementById('walletList').innerHTML = Object.entries(state.wallets).map(([code, w]) => `
@@ -3683,34 +4799,377 @@ function renderDashboard() {
     </div>
   `).join('');
 
-  // Transactions (filter by active ccy)
   const filtered = state.txns.filter(t => t.ccy === ccy);
   const list = document.getElementById('txnList');
   if (filtered.length === 0) {
     list.innerHTML = `<div style="text-align:center;padding:24px 0;font-size:13px;color:var(--muted);font-style:italic;">No activity in ${ccy} yet</div>`;
   } else {
-    list.innerHTML = filtered.slice(0, 8).map(t => {
-      const sign = t.dir === 'in' ? '+' : '−';
-      const icon = t.dir === 'in'
-        ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`
-        : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>`;
-      return `<div class="txn-row">
-        <div class="txn-icon ${t.dir}">${icon}</div>
-        <div class="txn-body">
-          <div class="txn-merchant">${t.merchant}</div>
-          <div class="txn-meta">${t.meta}</div>
-        </div>
-        <div class="txn-amt ${t.dir === 'in' ? 'in' : ''}">${sign}${formatMoney(t.amt)}</div>
-      </div>`;
-    }).join('');
+    list.innerHTML = filtered.slice(0, 5).map(renderTxnRow).join('');
   }
 
-  // Update scan-pay sheet's available
-  document.getElementById('scanAvail').textContent = `${ccy} ${formatMoney(state.cardBalance[ccy] || 0)}`;
+  // Update scan-pay sheet's available + last4
+  if (def) {
+    document.getElementById('scanAvail').textContent = `${ccy} ${formatMoney(state.cardBalance[ccy] || 0)}`;
+    document.getElementById('scanCardLast4').textContent = def.last4;
+  }
+}
+
+function renderTxnRow(t) {
+  const sign = t.dir === 'in' ? '+' : '−';
+  const icon = t.dir === 'in'
+    ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`
+    : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>`;
+  return `<div class="txn-row">
+    <div class="txn-icon ${t.dir}">${icon}</div>
+    <div class="txn-body">
+      <div class="txn-merchant">${t.merchant}</div>
+      <div class="txn-meta">${t.meta}</div>
+    </div>
+    <div class="txn-amt ${t.dir === 'in' ? 'in' : ''}">${sign}${t.ccy} ${formatMoney(t.amt)}</div>
+  </div>`;
 }
 
 function formatMoney(n) {
   return Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function updateBotNav(step) {
+  document.querySelectorAll('.botnav-item').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.nav) === step);
+  });
+}
+
+// ============ CARDS SCREEN ============
+function initCards() {
+  if (state.cards.length === 0) {
+    state.cards.push(makeCard('standard'));
+    state.defaultCardId = state.cards[0].id;
+  }
+  state.visibleCardId = state.visibleCardId || state.defaultCardId;
+  state.cardSensitiveVisible = false;
+  renderCardsScreen();
+  updateBotNav(17);
+}
+
+function renderCardsScreen() {
+  const pager = document.getElementById('cardsPager');
+  const dots = document.getElementById('cardDetailDots');
+  // Order with default first
+  const ordered = [
+    ...state.cards.filter(c => c.id === state.defaultCardId),
+    ...state.cards.filter(c => c.id !== state.defaultCardId),
+  ];
+
+  pager.innerHTML = ordered.map(c => {
+    const cls = tierClass(c.tier);
+    const frozen = state.cardFrozen[c.id];
+    const showSensitive = state.cardSensitiveVisible && state.visibleCardId === c.id;
+    const num = showSensitive ? c.number : `•••• •••• •••• ${c.last4}`;
+    const cvv = showSensitive ? c.cvv : '•••';
+    return `
+      <div data-card-id="${c.id}">
+        <div class="card-detail-card ${cls} ${frozen ? 'frozen' : ''}">
+          <div class="card-slide-top">
+            <div>
+              <div class="card-slide-tier">Fynco · ${tierLabel(c.tier)}</div>
+            </div>
+            <div class="card-chip"></div>
+          </div>
+          <div>
+            <div class="card-detail-num">${num}</div>
+            <div class="card-detail-meta-row">
+              <div>
+                <div class="card-detail-meta-cell">Cardholder</div>
+                <div class="card-detail-meta-val">${c.holder}</div>
+              </div>
+              <div>
+                <div class="card-detail-meta-cell">Expires</div>
+                <div class="card-detail-meta-val">${c.expMonth}/${c.expYear}</div>
+              </div>
+              <div>
+                <div class="card-detail-meta-cell">CVV</div>
+                <div class="card-detail-meta-val">${cvv}</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+              <span class="visa-logo ${cls === 'white' ? 'ink' : 'gold'}" style="font-size:24px;">VISA</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  dots.innerHTML = ordered.map((c, i) =>
+    `<div class="card-dot ${c.id === state.visibleCardId ? 'active' : ''}" data-i="${i}"></div>`
+  ).join('');
+
+  // Wire pager scroll → update visibleCardId
+  pager.onscroll = () => {
+    const w = pager.getBoundingClientRect().width;
+    const idx = Math.round(pager.scrollLeft / w);
+    const card = ordered[idx];
+    if (card && card.id !== state.visibleCardId) {
+      state.visibleCardId = card.id;
+      // Reset sensitive view when switching cards
+      state.cardSensitiveVisible = false;
+      // Re-render to update sensitive masking and balance/freeze states
+      renderCardsScreen();
+    } else {
+      // Just update dots
+      dots.querySelectorAll('.card-dot').forEach((d, i2) => d.classList.toggle('active', i2 === idx));
+    }
+    updateCardDetailMeta();
+  };
+
+  updateCardDetailMeta();
+}
+
+function updateCardDetailMeta() {
+  const c = state.cards.find(c => c.id === state.visibleCardId) || state.cards[0];
+  if (!c) return;
+  const ccy = state.activeCcy || 'SGD';
+  document.getElementById('cardDetailCcy').textContent = ccy;
+  document.getElementById('cardDetailBal').textContent = formatMoney(state.cardBalance[ccy] || 0);
+
+  // Default button state
+  const defaultBtn = document.getElementById('cardActionDefault');
+  const defaultSub = document.getElementById('cardActionDefaultSub');
+  if (c.id === state.defaultCardId) {
+    defaultBtn.classList.add('active');
+    defaultSub.textContent = 'Currently default';
+  } else {
+    defaultBtn.classList.remove('active');
+    defaultSub.textContent = 'Tap to make default';
+  }
+
+  // Eye state
+  const eyeTitle = document.getElementById('cardEyeTitle');
+  const eyeIcon = document.getElementById('cardEyeIcon');
+  if (state.cardSensitiveVisible) {
+    eyeTitle.textContent = 'Hide details';
+    eyeIcon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+  } else {
+    eyeTitle.textContent = 'Show details';
+    eyeIcon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  }
+
+  // Freeze state
+  const frozen = state.cardFrozen[c.id];
+  const freezeTitle = document.getElementById('freezeTitle');
+  const freezeSub = document.getElementById('freezeSub');
+  const freezeIcon = document.getElementById('freezeIcon');
+  if (frozen) {
+    freezeTitle.textContent = 'Unfreeze card';
+    freezeSub.textContent = 'Card is currently frozen';
+    freezeIcon.style.background = 'rgba(45, 106, 79, 0.1)';
+    freezeIcon.style.color = 'var(--success)';
+  } else {
+    freezeTitle.textContent = 'Freeze card';
+    freezeSub.textContent = 'Temporarily block all transactions';
+    freezeIcon.style.background = 'var(--paper-2)';
+    freezeIcon.style.color = 'var(--ink)';
+  }
+}
+
+function scrollToCardOnDetail(id) {
+  state.visibleCardId = id;
+  const pager = document.getElementById('cardsPager');
+  if (!pager) return;
+  const ordered = [
+    ...state.cards.filter(c => c.id === state.defaultCardId),
+    ...state.cards.filter(c => c.id !== state.defaultCardId),
+  ];
+  const idx = ordered.findIndex(c => c.id === id);
+  if (idx >= 0) {
+    pager.scrollTo({ left: idx * pager.getBoundingClientRect().width, behavior: 'instant' });
+  }
+}
+
+function setDefaultCard() {
+  if (!state.visibleCardId) return;
+  state.defaultCardId = state.visibleCardId;
+  // Re-render and provide subtle confirmation
+  renderCardsScreen();
+  // Also update dashboard caption if user goes back
+  if (state.cards.length > 0) {
+    const def = getDefaultCard();
+    if (def) document.getElementById('dashCardCaption').textContent = `Default · Fynco ${tierLabel(def.tier)} · •••• ${def.last4}`;
+  }
+}
+
+function toggleCardSensitive() {
+  state.cardSensitiveVisible = !state.cardSensitiveVisible;
+  renderCardsScreen();
+}
+
+function toggleFreezeCard() {
+  if (!state.visibleCardId) return;
+  state.cardFrozen[state.visibleCardId] = !state.cardFrozen[state.visibleCardId];
+  renderCardsScreen();
+  // Also rerender dashboard if user navigates back
+}
+
+function reportCardLost() {
+  if (!confirm('This will block this card immediately and order a replacement.\n\nContinue?')) return;
+  if (!state.visibleCardId) return;
+  state.cardFrozen[state.visibleCardId] = true;
+  alert('Card blocked. A replacement will arrive in 5–7 business days. The reference number has been sent to your email.');
+  renderCardsScreen();
+}
+
+function addCardToWallet(provider) {
+  const card = state.cards.find(c => c.id === state.visibleCardId) || state.cards[0];
+  if (!card) return;
+  if (provider === 'apple') {
+    alert(`Add to Apple Wallet\n\nCard: Fynco ${tierLabel(card.tier)}\n•••• ${card.last4}\n\nIn production, this opens the native iOS wallet sheet.`);
+  } else {
+    alert(`Add to Google Wallet\n\nCard: Fynco ${tierLabel(card.tier)}\n•••• ${card.last4}\n\nIn production, this opens the Google Pay add-card flow.`);
+  }
+}
+
+// ============ APPLY CARD ============
+let applyCardTier = null;
+function pickApplyTier(el) {
+  applyCardTier = el.dataset.tier;
+  document.querySelectorAll('#sheet-apply-card [data-tier]').forEach(b => {
+    if (b === el) {
+      b.style.borderColor = 'var(--ink)';
+      b.style.background = 'var(--paper-2)';
+    } else {
+      b.style.borderColor = 'var(--line)';
+      b.style.background = 'var(--paper)';
+    }
+  });
+  const btn = document.getElementById('applyCardBtn');
+  btn.disabled = false;
+  btn.textContent = `Issue Fynco ${tierLabel(applyCardTier)}`;
+}
+
+function confirmApplyCard() {
+  if (!applyCardTier) return;
+  const card = makeCard(applyCardTier);
+  state.cards.push(card);
+  // First card auto-becomes default
+  if (!state.defaultCardId) state.defaultCardId = card.id;
+  state.visibleCardId = card.id;
+
+  // Log a transaction for monthly fees if Gold/Reserve
+  const fee = applyCardTier === 'gold' ? 18 : applyCardTier === 'white' ? 48 : 0;
+  if (fee > 0) {
+    const ccy = state.wallets['SGD'] ? 'SGD' : Object.keys(state.wallets)[0];
+    state.wallets[ccy].balance -= fee;
+    state.txns.unshift({
+      merchant: `${tierLabel(applyCardTier)} card · monthly fee`,
+      meta: `Wallet · just now`,
+      amt: fee, ccy, dir: 'out', ts: Date.now(), cat: 'card'
+    });
+  }
+
+  document.getElementById('applyResultTier').textContent = `Fynco ${tierLabel(applyCardTier)}`;
+  document.getElementById('applyResultLast4').textContent = `VISA •••• ${card.last4}`;
+  document.getElementById('applyResultRef').textContent = 'CRD-' + Math.floor(100000 + Math.random() * 900000);
+
+  applyCardTier = null;
+  document.getElementById('sheet-apply-card').classList.remove('open');
+  setTimeout(() => document.getElementById('sheet-apply-card-result').classList.add('open'), 150);
+}
+
+// ============ ACTIVITY ============
+let activityFilter = 'all';
+function initActivity() {
+  activityFilter = 'all';
+  document.querySelectorAll('.activity-filter').forEach(b => b.classList.toggle('active', b.dataset.f === 'all'));
+  renderActivity();
+  updateBotNav(16);
+}
+
+function setActivityFilter(el) {
+  activityFilter = el.dataset.f;
+  document.querySelectorAll('.activity-filter').forEach(b => b.classList.toggle('active', b === el));
+  renderActivity();
+}
+
+function renderActivity() {
+  const list = document.getElementById('activityList');
+  let txns = state.txns.slice();
+  if (activityFilter === 'in') txns = txns.filter(t => t.dir === 'in');
+  else if (activityFilter === 'out') txns = txns.filter(t => t.dir === 'out');
+  else if (activityFilter === 'card') txns = txns.filter(t => t.cat === 'card' || (t.meta && t.meta.toLowerCase().includes('card')));
+  else if (activityFilter === 'esim') txns = txns.filter(t => t.merchant && t.merchant.toLowerCase().includes('esim'));
+
+  if (txns.length === 0) {
+    list.innerHTML = `<div style="text-align:center;padding:60px 24px;font-size:13px;color:var(--muted);font-style:italic;">No transactions match this filter.</div>`;
+    return;
+  }
+
+  // Group by day
+  const groups = {};
+  txns.forEach(t => {
+    const d = new Date(t.ts);
+    const key = sameDay(d, new Date()) ? 'Today'
+      : sameDay(d, new Date(Date.now() - 86400000)) ? 'Yesterday'
+      : d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(t);
+  });
+
+  list.innerHTML = Object.entries(groups).map(([day, items]) => `
+    <div class="activity-section">
+      <div class="activity-section-label">${day}</div>
+      ${items.map(renderTxnRow).join('')}
+    </div>
+  `).join('');
+}
+
+function sameDay(a, b) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+// ============ SETTINGS ============
+function initSettings() {
+  // Profile name
+  const fn = document.getElementById('firstName').value || 'Jeremiah';
+  const ln = document.getElementById('lastName').value || 'Ng';
+  const bizName = document.getElementById('bizName').value;
+  document.getElementById('profileName').textContent = state.accountType === 'business' && bizName ? bizName : `${fn} ${ln}`;
+  document.getElementById('profileAvatar').textContent = (fn[0] + ln[0]).toUpperCase();
+  const ref = document.getElementById('refNum').textContent || 'FYN-2026-0000000';
+  document.getElementById('profileMeta').textContent = `${ref} · Verified`;
+  document.getElementById('settingsDisplayCcy').textContent = state.activeCcy || 'SGD';
+
+  // Toggle states
+  syncSettingSwitch('biometricSwitch', state.biometric);
+  syncSettingSwitch('notifTransactions', state.notifications.transactions);
+  syncSettingSwitch('notifSecurity', state.notifications.security);
+  syncSettingSwitch('notifMarketing', state.notifications.marketing);
+  updateBotNav(18);
+}
+
+function syncSettingSwitch(id, on) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  // We use the same .switch class — wrap it in a parent .toggle-row.on style behavior
+  el.style.background = on ? 'var(--ink)' : 'var(--line-strong)';
+  // The white knob handles itself via ::after; we transform via a class
+  el.dataset.on = on ? '1' : '0';
+  // Update the after-pseudo state by toggling a class on the parent
+  el.parentElement.style.cursor = 'pointer';
+  if (on) el.classList.add('switch-on'); else el.classList.remove('switch-on');
+}
+
+function toggleSetting(key) {
+  if (key === 'biometric') {
+    state.biometric = !state.biometric;
+    syncSettingSwitch('biometricSwitch', state.biometric);
+  }
+}
+
+function toggleNotif(key) {
+  state.notifications[key] = !state.notifications[key];
+  if (key === 'transactions') syncSettingSwitch('notifTransactions', state.notifications[key]);
+  if (key === 'security') syncSettingSwitch('notifSecurity', state.notifications[key]);
+  if (key === 'marketing') syncSettingSwitch('notifMarketing', state.notifications[key]);
 }
 
 // ============ SHEETS ============
