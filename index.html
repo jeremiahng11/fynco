@@ -769,6 +769,43 @@
     animation: spin 20s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes successPop {
+    0% { transform: scale(0.4); opacity: 0; }
+    60% { transform: scale(1.08); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* PIN entry row used in card activation flow */
+  .pin-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .pin-cell {
+    width: 100%;
+    aspect-ratio: 1;
+    max-width: 44px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    background: var(--paper);
+    transition: all 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .pin-cell:focus {
+    outline: none;
+    border-color: var(--ink);
+    background: var(--paper-2);
+    box-shadow: 0 0 0 3px rgba(10, 22, 40, 0.08);
+  }
+  .pin-cell:not(:placeholder-shown), .pin-cell[value]:not([value=""]) {
+    border-color: var(--ink);
+  }
   .selfie-frame.scanning::before {
     border-style: solid;
     animation: pulse 1.5s ease-in-out infinite;
@@ -2008,6 +2045,13 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
     opacity: 0.7;
+  }
+  /* Business marker stamped on the tier line */
+  .card-biz-mark {
+    color: var(--gold);
+    opacity: 1;
+    font-weight: 600;
+    letter-spacing: 0.12em;
   }
   .card-slide-frozen {
     position: absolute;
@@ -4266,6 +4310,22 @@
     </div>
   </div>
 
+  <!-- ACTIVATE CARD SHEET -->
+  <div class="sheet" id="sheet-activate-card">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div class="sheet-title">Activate <em>card</em></div>
+      <button class="sheet-close" onclick="closeSheet()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body" id="activateCardBody"></div>
+    <div class="sheet-foot" style="display:flex;gap:8px;">
+      <button class="btn btn-ghost" id="activateBackBtn" onclick="activateCardBack()" style="flex:1;">Cancel</button>
+      <button class="btn btn-primary" id="activateNextBtn" onclick="activateCardNext()" style="flex:1.5;" disabled>Continue</button>
+    </div>
+  </div>
+
   <!-- APPLY CARD SHEET -->
   <div class="sheet" id="sheet-apply-card">
     <div class="sheet-handle"></div>
@@ -4372,6 +4432,31 @@
     </div>
   </div>
 
+  <!-- APPLY FOR NEW VA CURRENCY ACCOUNT -->
+  <div class="sheet" id="sheet-apply-account-ccy">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div style="flex:1;min-width:0;">
+        <div class="sheet-title">Open an <em id="applyCcyTitle">USD</em> account</div>
+        <div id="applyCcyStepCounter" style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:2px;">Step 1 of 3</div>
+      </div>
+      <button class="sheet-close" onclick="cancelApplyAccountCcy()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div style="height:2px;background:var(--line);margin:0 24px 14px;border-radius:2px;overflow:hidden;">
+      <div id="applyCcyStepProgress" style="height:100%;background:var(--ink);width:33%;transition:width 0.3s;"></div>
+    </div>
+
+    <div class="sheet-body" id="applyCcyStepBody"></div>
+
+    <div class="sheet-foot" style="display:flex;gap:8px;">
+      <button class="btn btn-ghost" id="applyCcyBackBtn" onclick="applyCcyStepBack()" style="flex:1;">Cancel</button>
+      <button class="btn btn-primary" id="applyCcyNextBtn" onclick="applyCcyStepNext()" style="flex:1.5;" disabled>Continue</button>
+    </div>
+  </div>
+
   <!-- MANAGE ACCOUNTS SHEET -->
   <div class="sheet" id="sheet-manage-accounts">
     <div class="sheet-handle"></div>
@@ -4382,7 +4467,7 @@
       </button>
     </div>
     <div class="sheet-body">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;">View, rearrange, and add virtual accounts. Your local currency and SGD are locked as default accounts.</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;">View and manage your virtual accounts. New currency accounts go through a brief application before opening. Your local currency and SGD are locked as defaults.</p>
 
       <!-- Aggregate net worth -->
       <div style="background:var(--ink);color:var(--paper);padding:16px 18px;border-radius:var(--radius);position:relative;overflow:hidden;margin-bottom:18px;">
@@ -5446,6 +5531,9 @@ function makeCard(tier) {
     issuedAt: Date.now(),
     holder: getCardholderName(),
     active: false,
+    // Stamp the profile this card belongs to so the rendered card can
+    // display a Business marker even after profile switches.
+    profileType: state.activeProfile || state.accountType || 'personal',
   };
 }
 
@@ -5516,7 +5604,7 @@ function renderDashCardCarousel() {
         ${inactive ? `<div class="card-slide-frozen" style="background:rgba(10,22,40,0.6);"><div style="text-align:center;"><div style="margin-bottom:6px;">Tap to activate</div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--gold);">INACTIVE</div></div></div>` : ''}
         <div class="card-slide-top">
           <div>
-            <div class="card-slide-tier">Fynco · ${tierLabel(c.tier)}</div>
+            <div class="card-slide-tier">Fynco · ${tierLabel(c.tier)}${c.profileType === 'business' ? ` · <span class="card-biz-mark">Business</span>` : ''}</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
             ${!inactive ? `<button class="dash-eye-btn ${revealed ? 'active' : ''}" onclick="event.stopPropagation();toggleDashCardReveal('${c.id}');" aria-label="${revealed ? 'Hide card number' : 'Show card number'}">${revealed ? eyeClosed : eyeOpen}</button>` : ''}
@@ -5576,14 +5664,269 @@ function toggleDashCardReveal(cardId) {
 }
 
 // Activate inactive card from dashboard tap
+// ============ CARD ACTIVATION ============
+// Multi-step flow: 1) confirm card details, 2) set PIN, 3) success.
+// Triggered by tapping an inactive card on the dashboard.
 function openActivateSheet(cardId) {
   const card = state.cards.find(c => c.id === cardId);
   if (!card || card.active) return;
-  if (!confirm(`Activate Fynco ${tierLabel(card.tier)} ending in ${card.last4}?\n\nYour card will become active immediately.`)) return;
-  card.active = true;
-  renderDashCardCarousel();
-  // Render cards screen too if it's been initialized
-  if (document.getElementById('cardsPager')?.children.length) renderCardsScreen();
+  state._activatingCardId = cardId;
+  state._activateStep = 1;
+  state._activatePin = '';
+  state._activatePinConfirm = '';
+  openSheet('activate-card');
+}
+
+function activateCardBack() {
+  if (!state._activateStep || state._activateStep <= 1) {
+    state._activatingCardId = null;
+    state._activateStep = 1;
+    state._activatePin = '';
+    state._activatePinConfirm = '';
+    closeSheet();
+    return;
+  }
+  state._activateStep -= 1;
+  renderActivateCardStep();
+}
+
+function activateCardNext() {
+  const step = state._activateStep || 1;
+  if (step === 1) {
+    state._activateStep = 2;
+    renderActivateCardStep();
+    return;
+  }
+  if (step === 2) {
+    // Validate PINs match
+    if (state._activatePin.length !== 6 || state._activatePinConfirm.length !== 6) return;
+    if (state._activatePin !== state._activatePinConfirm) {
+      const errEl = document.getElementById('activatePinError');
+      if (errEl) {
+        errEl.textContent = 'PINs do not match. Please re-enter.';
+        errEl.style.display = 'block';
+      }
+      state._activatePinConfirm = '';
+      // Re-render to clear the second input
+      renderActivateCardStep();
+      return;
+    }
+    // Trigger activation
+    submitActivateCard();
+    return;
+  }
+}
+
+function renderActivateCardStep() {
+  const card = state.cards.find(c => c.id === state._activatingCardId);
+  if (!card) { closeSheet(); return; }
+  const step = state._activateStep || 1;
+  const body = document.getElementById('activateCardBody');
+  const backBtn = document.getElementById('activateBackBtn');
+  const nextBtn = document.getElementById('activateNextBtn');
+
+  backBtn.textContent = step === 1 ? 'Cancel' : 'Back';
+  backBtn.disabled = false;
+  nextBtn.disabled = false;
+
+  if (step === 1) {
+    nextBtn.textContent = 'Set PIN & activate';
+    body.innerHTML = renderActivateConfirm(card);
+  } else if (step === 2) {
+    nextBtn.textContent = 'Activate card';
+    body.innerHTML = renderActivatePinEntry(card);
+    // Focus the first PIN input
+    setTimeout(() => {
+      const first = document.querySelector('#activatePinSet .pin-cell');
+      if (first) first.focus();
+    }, 50);
+    validateActivatePins();
+  }
+}
+
+function renderActivateConfirm(card) {
+  const isBusiness = card.profileType === 'business';
+  return `
+    <div style="background:linear-gradient(135deg,#1a2a44,#0a1628);color:var(--paper);padding:18px 20px;border-radius:var(--radius);position:relative;overflow:hidden;margin-bottom:16px;box-shadow:0 12px 32px rgba(10,22,40,0.18);">
+      <div style="position:absolute;top:-30%;right:-15%;width:70%;height:140%;background:radial-gradient(circle,rgba(201,169,97,0.2) 0%,transparent 60%);pointer-events:none;"></div>
+      <div style="position:relative;display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;opacity:0.7;">Fynco · ${tierLabel(card.tier)}${isBusiness ? ` · <span style="color:var(--gold);">Business</span>` : ''}</div>
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);background:rgba(201,169,97,0.15);padding:3px 8px;border-radius:2px;">Inactive</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="card-chip" style="width:34px;height:24px;"></div>
+          <span style="color:var(--gold);opacity:0.85;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a14 14 0 010 8"/><path d="M9.5 6.5a18 18 0 010 11"/><path d="M14 5a22 22 0 010 14"/></svg></span>
+        </div>
+        <div style="font-family:var(--mono);font-size:15px;letter-spacing:0.12em;">•••• •••• •••• ${card.last4}</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+          <div>
+            <div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;opacity:0.55;">Cardholder</div>
+            <div style="font-size:11px;font-weight:500;letter-spacing:0.05em;">${card.holder}</div>
+          </div>
+          <span class="visa-logo gold" style="font-size:18px;">VISA</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:14px;">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Activation will</div>
+      <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.4;margin-bottom:8px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--success);flex-shrink:0;margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Enable contactless payments and online checkout</span>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.4;margin-bottom:8px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--success);flex-shrink:0;margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Make this card available for Apple Pay &amp; Google Wallet</span>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.4;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--success);flex-shrink:0;margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Set a 6-digit PIN for ATM withdrawals and high-value transactions</span>
+      </div>
+    </div>
+
+    <div style="font-size:11px;color:var(--muted);line-height:1.5;text-align:center;">By activating, you confirm you've received the card and accept the cardholder agreement.</div>
+  `;
+}
+
+function renderActivatePinEntry(card) {
+  const pin = state._activatePin || '';
+  const conf = state._activatePinConfirm || '';
+  const cells = (val, idPrefix) => Array.from({length:6}, (_,i) => {
+    const ch = val[i] || '';
+    return `<input class="pin-cell" type="password" inputmode="numeric" maxlength="1" data-i="${i}" id="${idPrefix}-${i}" value="${ch}" oninput="onActivatePinInput(event,'${idPrefix}')" onkeydown="onActivatePinKey(event,'${idPrefix}')" autocomplete="off">`;
+  }).join('');
+  return `
+    <div style="margin-bottom:18px;display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--paper-2);border-radius:var(--radius);">
+      <div class="card-chip" style="width:34px;height:24px;flex-shrink:0;"></div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Activating</div>
+        <div style="font-size:13px;font-weight:500;">Fynco ${tierLabel(card.tier)} · •••• ${card.last4}</div>
+      </div>
+    </div>
+
+    <div class="field" style="margin-bottom:14px;">
+      <label class="label">Set a 6-digit PIN</label>
+      <div class="pin-row" id="activatePinSet">${cells(pin, 'apin')}</div>
+      <div class="field-help">Used for ATM withdrawals and contactless transactions over the floor limit.</div>
+    </div>
+
+    <div class="field">
+      <label class="label">Confirm PIN</label>
+      <div class="pin-row" id="activatePinConfirm">${cells(conf, 'apin2')}</div>
+      <div id="activatePinError" style="display:none;font-size:11px;color:var(--rust);margin-top:6px;"></div>
+    </div>
+
+    <div style="background:var(--paper-2);border-radius:var(--radius);padding:10px 12px;margin-top:14px;font-size:11px;color:var(--muted);line-height:1.5;display:flex;gap:8px;align-items:flex-start;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold);flex-shrink:0;margin-top:1px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      <span>Avoid common PINs (e.g. 123456, 000000). You can change your PIN later under Card &gt; Settings.</span>
+    </div>
+  `;
+}
+
+function onActivatePinInput(e, prefix) {
+  const el = e.target;
+  let val = (el.value || '').replace(/\D/g, '').slice(0,1);
+  el.value = val;
+  // Update state
+  const key = prefix === 'apin' ? '_activatePin' : '_activatePinConfirm';
+  const cur = (state[key] || '').split('');
+  const i = parseInt(el.dataset.i, 10);
+  cur[i] = val;
+  state[key] = cur.join('').padEnd(0).slice(0,6);
+  // Move focus
+  if (val) {
+    const next = document.getElementById(`${prefix}-${i+1}`);
+    if (next) next.focus();
+    else if (prefix === 'apin') {
+      const firstConf = document.getElementById('apin2-0');
+      if (firstConf) firstConf.focus();
+    }
+  }
+  // Hide error if user starts re-entering
+  const errEl = document.getElementById('activatePinError');
+  if (errEl) errEl.style.display = 'none';
+  validateActivatePins();
+}
+
+function onActivatePinKey(e, prefix) {
+  if (e.key === 'Backspace' && !e.target.value) {
+    const i = parseInt(e.target.dataset.i, 10);
+    const prev = document.getElementById(`${prefix}-${i-1}`);
+    if (prev) {
+      prev.focus();
+      // Clear the previous cell value too
+      prev.value = '';
+      const key = prefix === 'apin' ? '_activatePin' : '_activatePinConfirm';
+      const cur = (state[key] || '').split('');
+      cur[i-1] = '';
+      state[key] = cur.join('');
+      validateActivatePins();
+    }
+  }
+}
+
+function validateActivatePins() {
+  const pinFull = (state._activatePin || '').replace(/\s/g,'').length === 6;
+  const confFull = (state._activatePinConfirm || '').replace(/\s/g,'').length === 6;
+  document.getElementById('activateNextBtn').disabled = !(pinFull && confFull);
+}
+
+function submitActivateCard() {
+  const card = state.cards.find(c => c.id === state._activatingCardId);
+  if (!card) { closeSheet(); return; }
+
+  const nextBtn = document.getElementById('activateNextBtn');
+  const backBtn = document.getElementById('activateBackBtn');
+  nextBtn.disabled = true;
+  backBtn.disabled = true;
+
+  document.getElementById('activateCardBody').innerHTML = `
+    <div style="text-align:center;padding:40px 20px;">
+      <div style="width:60px;height:60px;border-radius:50%;background:var(--paper-2);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--gold);">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1.2s linear infinite;"><path d="M21 12a9 9 0 11-6.22-8.56"/></svg>
+      </div>
+      <div style="font-family:var(--serif);font-size:18px;font-weight:500;margin-bottom:6px;letter-spacing:-0.01em;">Activating your card</div>
+      <div style="font-size:12px;color:var(--muted);max-width:280px;margin:0 auto;line-height:1.5;">Setting your PIN and provisioning network access…</div>
+    </div>
+  `;
+
+  setTimeout(() => {
+    card.active = true;
+    card.pin = state._activatePin; // simulated
+    card.activatedAt = Date.now();
+
+    // Approval txn
+    state.txns.unshift({
+      merchant: `Card activated · •••• ${card.last4}`,
+      meta: 'Just now',
+      amt: 0, ccy: state.activeCcy || 'SGD', dir: 'in', ts: Date.now(), cat: 'card'
+    });
+
+    // Success state
+    document.getElementById('activateCardBody').innerHTML = `
+      <div style="text-align:center;padding:40px 20px;">
+        <div style="width:64px;height:64px;border-radius:50%;background:var(--success);color:var(--paper);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;animation:successPop 0.5s cubic-bezier(0.34,1.56,0.64,1);">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div style="font-family:var(--serif);font-size:22px;font-weight:500;margin-bottom:6px;letter-spacing:-0.01em;">Card <em style="color:var(--gold-2);font-style:italic;">activated</em></div>
+        <div style="font-size:13px;color:var(--muted);max-width:280px;margin:0 auto;line-height:1.5;">Fynco ${tierLabel(card.tier)} ending in ${card.last4} is ready to use.</div>
+      </div>
+    `;
+
+    state._activatingCardId = null;
+    state._activateStep = 1;
+    state._activatePin = '';
+    state._activatePinConfirm = '';
+
+    setTimeout(() => {
+      closeSheet();
+      renderDashCardCarousel();
+      // Cards screen if it's been initialized
+      if (document.getElementById('cardsPager')?.children.length) renderCardsScreen();
+      showCopyToast('Card activated');
+    }, 1100);
+  }, 1500);
 }
 
 function setActiveCcy(ccy) {
@@ -5755,7 +6098,7 @@ function renderCardsScreen() {
           </div>
           <div class="card-slide-top">
             <div>
-              <div class="card-slide-tier">Fynco · ${tierLabel(c.tier)}</div>
+              <div class="card-slide-tier">Fynco · ${tierLabel(c.tier)}${c.profileType === 'business' ? ` · <span class="card-biz-mark">Business</span>` : ''}</div>
               ${isDefault ? `<div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--gold);margin-top:2px;">DEFAULT CARD</div>` : ''}
             </div>
           </div>
@@ -6655,10 +6998,10 @@ function initManageAccounts() {
         <div class="currency-mark" style="width:38px;height:38px;font-size:11px;background:var(--paper-2);color:var(--muted);">${ccy}</div>
         <div style="flex:1;min-width:0;">
           <div style="font-family:var(--serif);font-size:14px;font-weight:500;">${getCurrencyName(ccy)}</div>
-          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.05em;margin-top:1px;">No fee · open instantly</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.05em;margin-top:1px;">${getCurrencyRails(ccy)} · no fee</div>
         </div>
         <div class="manage-add-cta">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
       </div>
     `).join('');
@@ -6667,19 +7010,306 @@ function initManageAccounts() {
 
 function addAccountCcy(ccy) {
   if (state.wallets[ccy]) return;
+  // Open the apply sheet for this currency. Provisioning happens after submit.
+  state._pendingCcy = ccy;
+  state._applyCcyStep = 1;
+  state._applyCcyData = {};
+  openSheet('apply-account-ccy');
+}
+
+// Returns a short description of network rails for a currency
+function getCurrencyRails(ccy) {
+  const rails = {
+    USD: 'SWIFT, ACH, Fedwire',
+    EUR: 'SEPA, SEPA Instant, SWIFT',
+    GBP: 'Faster Payments, BACS, SWIFT',
+    AUD: 'PayID, BECS, SWIFT',
+    JPY: 'Zengin, SWIFT',
+    HKD: 'FPS, CHATS, SWIFT',
+    CAD: 'Interac, EFT, SWIFT',
+    NZD: 'BECS, SWIFT',
+    AED: 'IBAN, SWIFT',
+    THB: 'PromptPay, SWIFT',
+  };
+  return rails[ccy] || 'SWIFT';
+}
+
+// ============ APPLY FOR NEW VA CURRENCY ACCOUNT ============
+const APPLY_CCY_TOTAL_STEPS = 3;
+const CCY_USE_PURPOSES = [
+  { id: 'receive_intl', label: 'Receive payments from overseas' },
+  { id: 'travel', label: 'Travel & overseas spending' },
+  { id: 'savings_fx', label: 'Hold currency / FX exposure' },
+  { id: 'business_ops', label: 'Business operations' },
+  { id: 'investment', label: 'Investment funding' },
+];
+const CCY_FUND_SOURCES = [
+  { id: 'salary', label: 'Salary / wages' },
+  { id: 'business', label: 'Business revenue' },
+  { id: 'savings', label: 'Existing savings' },
+  { id: 'investment', label: 'Investment proceeds' },
+  { id: 'remittance', label: 'Remittance from abroad' },
+  { id: 'other', label: 'Other' },
+];
+const CCY_VOLUME_BANDS = [
+  { id: 'lt5k', label: 'Under 5,000' },
+  { id: '5k25k', label: '5,000 – 25,000' },
+  { id: '25k100k', label: '25,000 – 100,000' },
+  { id: 'gt100k', label: 'Over 100,000' },
+];
+
+function initApplyAccountCcy() {
+  if (!state._pendingCcy) { closeSheet(); return; }
+  state._applyCcyStep = 1;
+  state._applyCcyData = state._applyCcyData || {};
+  document.getElementById('applyCcyTitle').textContent = state._pendingCcy;
+  renderApplyCcyStep();
+}
+
+function cancelApplyAccountCcy() {
+  state._applyCcyData = {};
+  state._applyCcyStep = 1;
+  state._pendingCcy = null;
+  closeSheet();
+}
+
+function renderApplyCcyStep() {
+  const ccy = state._pendingCcy;
+  const step = state._applyCcyStep || 1;
+  const data = state._applyCcyData;
+  document.getElementById('applyCcyStepCounter').textContent = `Step ${step} of ${APPLY_CCY_TOTAL_STEPS}`;
+  document.getElementById('applyCcyStepProgress').style.width = `${(step / APPLY_CCY_TOTAL_STEPS) * 100}%`;
+  const backBtn = document.getElementById('applyCcyBackBtn');
+  const nextBtn = document.getElementById('applyCcyNextBtn');
+  backBtn.textContent = step === 1 ? 'Cancel' : 'Back';
+  nextBtn.textContent = step === APPLY_CCY_TOTAL_STEPS ? 'Submit application' : 'Continue';
+
+  const body = document.getElementById('applyCcyStepBody');
+  if (step === 1) {
+    body.innerHTML = renderApplyCcyIntro(ccy);
+  } else if (step === 2) {
+    body.innerHTML = renderApplyCcyDeclaration(ccy, data);
+  } else if (step === 3) {
+    body.innerHTML = renderApplyCcyReview(ccy, data);
+  }
+  validateApplyCcyStep();
+}
+
+function renderApplyCcyIntro(ccy) {
+  const rails = getCurrencyRails(ccy);
+  const profileLabel = state.activeProfile === 'business' ? 'business' : 'personal';
+  return `
+    <div style="background:var(--ink);color:var(--paper);padding:18px 20px;border-radius:var(--radius);position:relative;overflow:hidden;margin-bottom:16px;">
+      <div style="position:absolute;top:-30%;right:-15%;width:70%;height:140%;background:radial-gradient(circle,rgba(201,169,97,0.15) 0%,transparent 60%);pointer-events:none;"></div>
+      <div style="position:relative;display:flex;align-items:center;gap:14px;">
+        <div style="width:48px;height:48px;border-radius:50%;background:rgba(247,244,237,0.1);color:var(--paper);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;letter-spacing:0.05em;flex-shrink:0;">${ccy}</div>
+        <div style="min-width:0;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;opacity:0.6;margin-bottom:4px;">New currency account</div>
+          <div style="font-family:var(--serif);font-size:18px;font-weight:400;letter-spacing:-0.01em;line-height:1.2;">${getCurrencyName(ccy)}</div>
+          <div style="font-size:11px;opacity:0.7;margin-top:2px;">${rails}</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--line);border-radius:var(--radius);padding:6px 14px;margin-bottom:16px;">
+      <div class="kyc-step" style="cursor:default;">
+        <div class="kyc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="kyc-body">
+          <div class="kyc-title">Identity</div>
+          <div class="kyc-meta">Reused from your verified ${profileLabel} profile</div>
+        </div>
+      </div>
+      <div class="kyc-step" style="cursor:default;">
+        <div class="kyc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="kyc-body">
+          <div class="kyc-title">Source of funds</div>
+          <div class="kyc-meta">Brief declaration · 30 seconds</div>
+        </div>
+      </div>
+      <div class="kyc-step" style="cursor:default;">
+        <div class="kyc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="kyc-body">
+          <div class="kyc-title">Sanctions screening</div>
+          <div class="kyc-meta">Automated · normally instant</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--paper-2);border-radius:var(--radius);padding:12px 14px;margin-bottom:6px;">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Account details</div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;"><span style="color:var(--muted);">Currency</span><span style="font-weight:500;">${ccy} · ${getCurrencyName(ccy)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;"><span style="color:var(--muted);">Networks</span><span style="font-weight:500;">${rails}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;"><span style="color:var(--muted);">Opening fee</span><span style="font-weight:500;color:var(--success);">SGD 0</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;"><span style="color:var(--muted);">Monthly fee</span><span style="font-weight:500;color:var(--success);">SGD 0</span></div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.5;text-align:center;">Most ${ccy} accounts are approved within minutes.</div>
+  `;
+}
+
+function renderApplyCcyDeclaration(ccy, data) {
+  return `
+    <h3 style="font-family:var(--serif);font-size:18px;font-weight:500;margin-bottom:6px;letter-spacing:-0.01em;">Source &amp; <em style="color:var(--gold-2);font-style:italic;">purpose</em></h3>
+    <p style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:16px;">Required by your regulator for cross-border currency accounts. Used to set sensible default limits.</p>
+
+    <div class="field">
+      <label class="label">What will you use this account for?</label>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        ${CCY_USE_PURPOSES.map(p => `
+          <button class="apply-row-choice ${data.purpose === p.id ? 'active' : ''}" onclick="setApplyCcyChoice('purpose','${p.id}')">
+            <div class="apply-row-radio"></div>
+            <span>${p.label}</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Source of funds</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${CCY_FUND_SOURCES.map(o => `
+          <button class="apply-pill ${data.source === o.id ? 'active' : ''}" onclick="setApplyCcyChoice('source','${o.id}')">${o.label}</button>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Expected monthly volume (${ccy})</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${CCY_VOLUME_BANDS.map(b => `
+          <button class="apply-pill ${data.volume === b.id ? 'active' : ''}" onclick="setApplyCcyChoice('volume','${b.id}')">${ccy} ${b.label}</button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderApplyCcyReview(ccy, data) {
+  const purposeLabel = CCY_USE_PURPOSES.find(p => p.id === data.purpose)?.label || '—';
+  const sourceLabel = CCY_FUND_SOURCES.find(o => o.id === data.source)?.label || '—';
+  const volumeLabel = CCY_VOLUME_BANDS.find(b => b.id === data.volume)?.label || '—';
+  const profileLabel = state.activeProfile === 'business' ? 'Business' : 'Personal';
+  const rows = [
+    ['Currency', `${ccy} · ${getCurrencyName(ccy)}`],
+    ['Networks', getCurrencyRails(ccy)],
+    ['Profile', profileLabel],
+    ['Primary use', purposeLabel],
+    ['Source of funds', sourceLabel],
+    ['Monthly volume', `${ccy} ${volumeLabel}`],
+    ['Identity', 'Reused from verified profile'],
+  ];
+  return `
+    <h3 style="font-family:var(--serif);font-size:18px;font-weight:500;margin-bottom:6px;letter-spacing:-0.01em;">Review &amp; <em style="color:var(--gold-2);font-style:italic;">submit</em></h3>
+    <p style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:16px;">Make sure everything is correct. Tap <strong>Back</strong> to edit.</p>
+
+    <div style="border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;">
+      ${rows.map(([k, v], i) => `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:11px 14px;${i < rows.length - 1 ? 'border-bottom:1px solid var(--line);' : ''}">
+          <span style="font-family:var(--mono);font-size:10px;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);flex-shrink:0;">${k}</span>
+          <span style="font-size:13px;text-align:right;font-weight:500;">${v}</span>
+        </div>
+      `).join('')}
+    </div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.5;text-align:center;">By submitting, you authorise Fynco to open a ${ccy} account under your verified identity and confirm the declarations above are accurate.</div>
+  `;
+}
+
+function setApplyCcyChoice(key, val) {
+  state._applyCcyData[key] = val;
+  renderApplyCcyStep();
+}
+
+function validateApplyCcyStep() {
+  const step = state._applyCcyStep;
+  const data = state._applyCcyData;
+  let valid = false;
+  if (step === 1) valid = true;
+  else if (step === 2) valid = !!(data.purpose && data.source && data.volume);
+  else if (step === 3) valid = true;
+  document.getElementById('applyCcyNextBtn').disabled = !valid;
+}
+
+function applyCcyStepBack() {
+  if (state._applyCcyStep <= 1) {
+    cancelApplyAccountCcy();
+    return;
+  }
+  state._applyCcyStep -= 1;
+  renderApplyCcyStep();
+}
+
+function applyCcyStepNext() {
+  if (state._applyCcyStep < APPLY_CCY_TOTAL_STEPS) {
+    state._applyCcyStep += 1;
+    renderApplyCcyStep();
+    return;
+  }
+  submitApplyAccountCcy();
+}
+
+function submitApplyAccountCcy() {
+  const ccy = state._pendingCcy;
+  const nextBtn = document.getElementById('applyCcyNextBtn');
+  const backBtn = document.getElementById('applyCcyBackBtn');
+  nextBtn.disabled = true;
+  backBtn.disabled = true;
+
+  // Processing state
+  document.getElementById('applyCcyStepBody').innerHTML = `
+    <div style="text-align:center;padding:40px 20px;">
+      <div style="width:60px;height:60px;border-radius:50%;background:var(--paper-2);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--gold);">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1.2s linear infinite;"><path d="M21 12a9 9 0 11-6.22-8.56"/></svg>
+      </div>
+      <div style="font-family:var(--serif);font-size:18px;font-weight:500;margin-bottom:6px;letter-spacing:-0.01em;">Reviewing your <em style="color:var(--gold-2);font-style:italic;">${ccy}</em> application</div>
+      <div style="font-size:12px;color:var(--muted);max-width:280px;margin:0 auto;line-height:1.5;">Running sanctions checks and verifying your declarations…</div>
+    </div>
+  `;
+
+  setTimeout(() => provisionApplyAccountCcy(), 1800);
+}
+
+function provisionApplyAccountCcy() {
+  const ccy = state._pendingCcy;
+  if (!ccy || state.wallets[ccy]) { cancelApplyAccountCcy(); return; }
+
+  // Add the new VA currency account
   state.wallets[ccy] = { name: getCurrencyName(ccy), balance: 0, primary: false };
   state.cardBalance[ccy] = 0;
-  // Toast and re-render
-  showCopyToast(`${ccy} account opened`);
-  initManageAccounts();
-  renderDashboard();
-  // Re-render dashboard ccy tabs
-  const tabs = document.getElementById('dashCcyTabs');
-  if (tabs) {
-    tabs.innerHTML = Object.keys(state.wallets).map(c =>
-      `<button class="ccy-tab ${c === state.activeCcy ? 'active' : ''}" onclick="setActiveCcy('${c}')">${c}</button>`
-    ).join('');
-  }
+
+  // Approval txn
+  state.txns.unshift({
+    merchant: `${ccy} account opened`,
+    meta: 'Application approved · just now',
+    amt: 0, ccy, dir: 'in', ts: Date.now(), cat: 'transfer'
+  });
+
+  // Show approved state
+  document.getElementById('applyCcyStepBody').innerHTML = `
+    <div style="text-align:center;padding:40px 20px;">
+      <div style="width:60px;height:60px;border-radius:50%;background:var(--success);color:var(--paper);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div style="font-family:var(--serif);font-size:20px;font-weight:500;margin-bottom:6px;letter-spacing:-0.01em;">Approved</div>
+      <div style="font-size:13px;color:var(--muted);max-width:280px;margin:0 auto;line-height:1.5;">Your ${ccy} account is open and ready to receive funds.</div>
+    </div>
+  `;
+
+  state._applyCcyData = {};
+  state._applyCcyStep = 1;
+  state._pendingCcy = null;
+
+  setTimeout(() => {
+    closeSheet();
+    showCopyToast(`${ccy} account opened`);
+    // Reflect across UI
+    if (typeof initManageAccounts === 'function') initManageAccounts();
+    renderDashboard();
+    const tabs = document.getElementById('dashCcyTabs');
+    if (tabs) {
+      tabs.innerHTML = Object.keys(state.wallets).map(c =>
+        `<button class="ccy-tab ${c === state.activeCcy ? 'active' : ''}" onclick="setActiveCcy('${c}')">${c}</button>`
+      ).join('');
+    }
+  }, 1200);
 }
 
 function removeAccountCcy(ccy) {
@@ -7178,7 +7808,9 @@ function openSheet(name) {
   if (name === 'manage-accounts') initManageAccounts();
   if (name === 'switch-account') initSwitchAccount();
   if (name === 'apply-account-type') initApplyAccountType();
+  if (name === 'apply-account-ccy') initApplyAccountCcy();
   if (name === 'apply-card') initApplyCardSheet();
+  if (name === 'activate-card') renderActivateCardStep();
 }
 function closeSheet(silent) {
   document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open'));
