@@ -2381,6 +2381,62 @@
   .manage-acct-row:last-child { border-bottom: none; }
   .manage-acct-row:hover { background: var(--paper-2); }
 
+  /* Account-type apply flow controls */
+  .apply-pill {
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    color: var(--ink);
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-family: var(--sans);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .apply-pill:hover { background: var(--paper-2); }
+  .apply-pill.active {
+    background: var(--ink);
+    color: var(--gold);
+    border-color: var(--ink);
+  }
+  .apply-row-choice {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--paper);
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink);
+    transition: all 0.15s;
+  }
+  .apply-row-choice:hover { background: var(--paper-2); }
+  .apply-row-choice.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .apply-row-radio {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--line-strong);
+    flex-shrink: 0;
+    position: relative;
+    transition: all 0.15s;
+  }
+  .apply-row-choice.active .apply-row-radio {
+    border-color: var(--gold);
+    background: var(--gold);
+  }
+  .apply-row-choice.active .apply-row-radio::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: var(--ink);
+  }
+
   /* Account-type switcher rows */
   .acct-switch-row {
     display: flex;
@@ -4264,50 +4320,25 @@
   <div class="sheet" id="sheet-apply-account-type">
     <div class="sheet-handle"></div>
     <div class="sheet-head">
-      <div class="sheet-title">Apply for a <em id="applyAcctTitle">Business</em> account</div>
-      <button class="sheet-close" onclick="closeSheet()">
+      <div style="flex:1;min-width:0;">
+        <div class="sheet-title">Apply for a <em id="applyAcctTitle">Business</em> account</div>
+        <div id="applyStepCounter" style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:2px;">Step 1 of 4</div>
+      </div>
+      <button class="sheet-close" onclick="cancelApplyAccountType()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <div class="sheet-body">
-      <div style="background:var(--ink);color:var(--paper);padding:18px 20px;border-radius:var(--radius);position:relative;overflow:hidden;margin-bottom:16px;">
-        <div style="position:absolute;top:-30%;right:-15%;width:70%;height:140%;background:radial-gradient(circle,rgba(201,169,97,0.15) 0%,transparent 60%);pointer-events:none;"></div>
-        <div style="position:relative;">
-          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;opacity:0.6;margin-bottom:6px;">New profile</div>
-          <div style="font-family:var(--serif);font-size:20px;font-weight:400;letter-spacing:-0.01em;line-height:1.2;margin-bottom:6px;">A separate <em id="applyAcctTypeName" style="color:var(--gold);font-style:italic;">Business</em> profile</div>
-          <div style="font-size:12px;opacity:0.75;line-height:1.45;" id="applyAcctDesc">Run your company alongside your personal account. Same login, separate balances, cards, and reporting.</div>
-        </div>
-      </div>
 
-      <div style="border:1px solid var(--line);border-radius:var(--radius);padding:6px 14px;margin-bottom:16px;">
-        <div class="kyc-step" style="cursor:default;">
-          <div class="kyc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="kyc-body">
-            <div class="kyc-title" id="applyAcctReq1">Business registration</div>
-            <div class="kyc-meta" id="applyAcctReq1Sub">UEN, Bizfile or equivalent</div>
-          </div>
-        </div>
-        <div class="kyc-step" style="cursor:default;">
-          <div class="kyc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="kyc-body">
-            <div class="kyc-title">Director identity</div>
-            <div class="kyc-meta">We'll re-use your verified personal ID</div>
-          </div>
-        </div>
-        <div class="kyc-step" style="cursor:default;">
-          <div class="kyc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="kyc-body">
-            <div class="kyc-title">Source of funds</div>
-            <div class="kyc-meta">Brief declaration · 1 minute</div>
-          </div>
-        </div>
-      </div>
-
-      <div style="font-size:11px;color:var(--muted);line-height:1.5;text-align:center;margin-bottom:6px;">Most applications are reviewed within 1-2 business days.</div>
+    <!-- Slim progress bar -->
+    <div style="height:2px;background:var(--line);margin:0 24px 14px;border-radius:2px;overflow:hidden;">
+      <div id="applyStepProgress" style="height:100%;background:var(--ink);width:25%;transition:width 0.3s;"></div>
     </div>
+
+    <div class="sheet-body" id="applyStepBody"></div>
+
     <div class="sheet-foot" style="display:flex;gap:8px;">
-      <button class="btn btn-ghost" onclick="closeSheet()" style="flex:1;">Go back</button>
-      <button class="btn btn-primary" onclick="confirmApplyAccountType()" style="flex:1.5;">Start application</button>
+      <button class="btn btn-ghost" id="applyBackBtn" onclick="applyStepBack()" style="flex:1;">Back</button>
+      <button class="btn btn-primary" id="applyNextBtn" onclick="applyStepNext()" style="flex:1.5;" disabled>Continue</button>
     </div>
   </div>
 
@@ -5853,25 +5884,458 @@ function initSwitchAccount() {
 function initApplyAccountType() {
   const type = state._pendingApplyType || (state.activeProfile === 'business' ? 'personal' : 'business');
   state._pendingApplyType = type;
-  const isBusiness = type === 'business';
-  document.getElementById('applyAcctTitle').textContent = isBusiness ? 'Business' : 'Personal';
-  document.getElementById('applyAcctTypeName').textContent = isBusiness ? 'Business' : 'Personal';
-  document.getElementById('applyAcctDesc').textContent = isBusiness
-    ? 'Run your company alongside your personal account. Same login, separate balances, cards, and reporting.'
-    : 'Open a personal profile alongside your business account. Personal spending stays cleanly separated from company books.';
-  document.getElementById('applyAcctReq1').textContent = isBusiness ? 'Business registration' : 'Personal ID re-verification';
-  document.getElementById('applyAcctReq1Sub').textContent = isBusiness ? 'UEN, Bizfile or equivalent' : 'We\'ll re-use your verified ID';
+  state._applyStep = 1;
+  state._applyData = state._applyData || {};
+  // Pre-populate name fields with onboarding values where reasonable
+  const fn = document.getElementById('firstName').value || '';
+  const ln = document.getElementById('lastName').value || '';
+  if (!state._applyData.directorName && type === 'business') {
+    state._applyData.directorName = `${fn} ${ln}`.trim();
+  }
+  if (!state._applyData.fullName && type === 'personal') {
+    state._applyData.fullName = `${fn} ${ln}`.trim();
+  }
+  document.getElementById('applyAcctTitle').textContent = type === 'business' ? 'Business' : 'Personal';
+  renderApplyStep();
 }
 
-function confirmApplyAccountType() {
+function cancelApplyAccountType() {
+  // If they cancel mid-flow, reset working state
+  state._applyData = {};
+  state._applyStep = 1;
+  closeSheet();
+}
+
+const APPLY_TOTAL_STEPS = 4;
+
+function renderApplyStep() {
   const type = state._pendingApplyType;
-  if (!type) { closeSheet(); return; }
-  // Simulate provisioning of a fresh profile with empty starter state
+  const step = state._applyStep || 1;
+  const isBusiness = type === 'business';
+  const data = state._applyData;
+
+  // Header progress
+  document.getElementById('applyStepCounter').textContent = `Step ${step} of ${APPLY_TOTAL_STEPS}`;
+  document.getElementById('applyStepProgress').style.width = `${(step / APPLY_TOTAL_STEPS) * 100}%`;
+
+  // Buttons
+  const backBtn = document.getElementById('applyBackBtn');
+  const nextBtn = document.getElementById('applyNextBtn');
+  backBtn.textContent = step === 1 ? 'Cancel' : 'Back';
+  nextBtn.textContent = step === APPLY_TOTAL_STEPS ? 'Submit application' : 'Continue';
+
+  const body = document.getElementById('applyStepBody');
+  let html = '';
+  if (step === 1) {
+    html = renderApplyIntro(isBusiness);
+  } else if (step === 2) {
+    html = isBusiness ? renderBusinessDetailsStep(data) : renderPersonalDetailsStep(data);
+  } else if (step === 3) {
+    html = isBusiness ? renderBusinessSourceStep(data) : renderPersonalSourceStep(data);
+  } else if (step === 4) {
+    html = renderApplyReview(isBusiness, data);
+  }
+  body.innerHTML = html;
+
+  validateApplyStep();
+}
+
+function renderApplyIntro(isBusiness) {
+  return `
+    <div style="background:var(--ink);color:var(--paper);padding:18px 20px;border-radius:var(--radius);position:relative;overflow:hidden;margin-bottom:16px;">
+      <div style="position:absolute;top:-30%;right:-15%;width:70%;height:140%;background:radial-gradient(circle,rgba(201,169,97,0.15) 0%,transparent 60%);pointer-events:none;"></div>
+      <div style="position:relative;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;opacity:0.6;margin-bottom:6px;">New profile</div>
+        <div style="font-family:var(--serif);font-size:20px;font-weight:400;letter-spacing:-0.01em;line-height:1.2;margin-bottom:6px;">A separate <em style="color:var(--gold);font-style:italic;">${isBusiness ? 'Business' : 'Personal'}</em> profile</div>
+        <div style="font-size:12px;opacity:0.75;line-height:1.45;">${isBusiness
+          ? 'Run your company alongside your personal account. Same login, separate balances, cards, and reporting.'
+          : 'Open a personal profile alongside your business account. Personal spending stays cleanly separated from company books.'}</div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--line);border-radius:var(--radius);padding:6px 14px;margin-bottom:16px;">
+      <div class="kyc-step" style="cursor:default;">
+        <div class="kyc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="kyc-body">
+          <div class="kyc-title">${isBusiness ? 'Business details' : 'Personal details'}</div>
+          <div class="kyc-meta">${isBusiness ? 'Name, registration number, type' : 'Name, occupation, employer'}</div>
+        </div>
+      </div>
+      <div class="kyc-step" style="cursor:default;">
+        <div class="kyc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="kyc-body">
+          <div class="kyc-title">${isBusiness ? 'Source of funds' : 'Source of income'}</div>
+          <div class="kyc-meta">Brief declaration · 1 minute</div>
+        </div>
+      </div>
+      <div class="kyc-step" style="cursor:default;">
+        <div class="kyc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="kyc-body">
+          <div class="kyc-title">Identity</div>
+          <div class="kyc-meta">We'll reuse your verified personal ID — no re-scan</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:11px;color:var(--muted);line-height:1.5;text-align:center;">Most ${isBusiness ? 'business' : 'personal'} applications are approved within minutes.</div>
+  `;
+}
+
+const BUSINESS_TYPES = [
+  { id: 'pte', label: 'Private Limited (Pte Ltd)' },
+  { id: 'llp', label: 'Limited Liability Partnership' },
+  { id: 'sole', label: 'Sole Proprietorship' },
+  { id: 'partnership', label: 'Partnership' },
+  { id: 'other', label: 'Other' },
+];
+
+function renderBusinessDetailsStep(data) {
+  const incCountry = data.incCountry || (state.residence?.code || 'SG');
+  return `
+    <h3 style="font-family:var(--serif);font-size:18px;font-weight:500;margin-bottom:6px;letter-spacing:-0.01em;">Business <em style="color:var(--gold-2);font-style:italic;">details</em></h3>
+    <p style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:16px;">As registered with the relevant authority. Make sure these match your registration documents.</p>
+
+    <div class="field">
+      <label class="label">Registered business name</label>
+      <input class="input" id="apBizName" placeholder="Acme Holdings Pte Ltd" value="${escapeAttr(data.bizName || '')}" oninput="onApplyInput()">
+    </div>
+
+    <div class="field">
+      <label class="label">Registration number (UEN / equivalent)</label>
+      <input class="input" id="apBizUEN" placeholder="202312345A" value="${escapeAttr(data.uen || '')}" oninput="onApplyInput()">
+    </div>
+
+    <div class="field">
+      <label class="label">Business type</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${BUSINESS_TYPES.map(t => `
+          <button class="apply-pill ${data.bizType === t.id ? 'active' : ''}" data-id="${t.id}" onclick="setApplyBizType('${t.id}')">${t.label}</button>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Country of incorporation</label>
+      <button class="input" style="text-align:left;cursor:pointer;display:flex;align-items:center;justify-content:space-between;" onclick="cycleApplyIncCountry()">
+        <span>${(countries.find(c => c.code === incCountry)?.flag || '')} ${(countries.find(c => c.code === incCountry)?.name || incCountry)}</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" style="color:var(--muted);"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      <div class="field-help">Tap to cycle through common jurisdictions.</div>
+    </div>
+
+    <div class="field">
+      <label class="label">Director on file</label>
+      <div class="input" style="background:var(--paper-2);color:var(--ink);display:flex;align-items:center;justify-content:space-between;">
+        <span>${escapeHtml(data.directorName || 'Jeremiah Ng')}</span>
+        <span class="badge gold" style="font-size:8px;padding:3px 7px;">Verified</span>
+      </div>
+      <div class="field-help">We'll reuse your verified personal identity.</div>
+    </div>
+  `;
+}
+
+const SOURCE_OF_FUNDS_OPTIONS = [
+  { id: 'sales', label: 'Operating revenue' },
+  { id: 'investment', label: 'Investment income' },
+  { id: 'capital', label: 'Equity / capital injection' },
+  { id: 'loan', label: 'Borrowed funds' },
+  { id: 'other', label: 'Other' },
+];
+
+const VOLUME_BANDS = [
+  { id: 'lt10k', label: 'Under 10,000' },
+  { id: '10k50k', label: '10,000 – 50,000' },
+  { id: '50k250k', label: '50,000 – 250,000' },
+  { id: 'gt250k', label: 'Over 250,000' },
+];
+
+function renderBusinessSourceStep(data) {
+  const ccy = state.residence?.currency || 'SGD';
+  return `
+    <h3 style="font-family:var(--serif);font-size:18px;font-weight:500;margin-bottom:6px;letter-spacing:-0.01em;">Source of <em style="color:var(--gold-2);font-style:italic;">funds</em></h3>
+    <p style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:16px;">Required by your regulator. We use this to set sensible default limits.</p>
+
+    <div class="field">
+      <label class="label">Primary source of funds</label>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        ${SOURCE_OF_FUNDS_OPTIONS.map(o => `
+          <button class="apply-row-choice ${data.sourceFunds === o.id ? 'active' : ''}" onclick="setApplyChoice('sourceFunds','${o.id}')">
+            <div class="apply-row-radio"></div>
+            <span>${o.label}</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Expected monthly volume (${ccy})</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${VOLUME_BANDS.map(b => `
+          <button class="apply-pill ${data.volume === b.id ? 'active' : ''}" onclick="setApplyChoice('volume','${b.id}')">${ccy} ${b.label}</button>
+        `).join('')}
+      </div>
+    </div>
+
+    <div style="background:var(--paper-2);border-radius:var(--radius);padding:12px 14px;font-size:11px;color:var(--muted);line-height:1.5;margin-top:8px;">
+      You can update these declarations later in Settings → Business profile. Misrepresentation may result in account closure.
+    </div>
+  `;
+}
+
+const OCCUPATIONS = [
+  { id: 'employee', label: 'Employee' },
+  { id: 'self', label: 'Self-employed' },
+  { id: 'student', label: 'Student' },
+  { id: 'retired', label: 'Retired' },
+  { id: 'other', label: 'Other' },
+];
+
+const PURPOSES = [
+  { id: 'daily', label: 'Daily spending' },
+  { id: 'savings', label: 'Savings' },
+  { id: 'travel', label: 'Travel' },
+  { id: 'investing', label: 'Investing' },
+];
+
+function renderPersonalDetailsStep(data) {
+  return `
+    <h3 style="font-family:var(--serif);font-size:18px;font-weight:500;margin-bottom:6px;letter-spacing:-0.01em;">Personal <em style="color:var(--gold-2);font-style:italic;">details</em></h3>
+    <p style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:16px;">Confirm the basics. Identity is reused from your verified profile.</p>
+
+    <div class="field">
+      <label class="label">Full name (as on ID)</label>
+      <input class="input" id="apFullName" placeholder="Your legal name" value="${escapeAttr(data.fullName || '')}" oninput="onApplyInput()">
+    </div>
+
+    <div class="field">
+      <label class="label">Occupation</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${OCCUPATIONS.map(o => `
+          <button class="apply-pill ${data.occupation === o.id ? 'active' : ''}" onclick="setApplyChoice('occupation','${o.id}')">${o.label}</button>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="field" id="apEmployerWrap" style="display:${data.occupation === 'employee' || data.occupation === 'self' ? 'block' : 'none'};">
+      <label class="label">${data.occupation === 'self' ? 'Business / trade name' : 'Employer'}</label>
+      <input class="input" id="apEmployer" placeholder="${data.occupation === 'self' ? 'Trading name' : 'Company name'}" value="${escapeAttr(data.employer || '')}" oninput="onApplyInput()">
+    </div>
+
+    <div class="field">
+      <label class="label">Identity</label>
+      <div class="input" style="background:var(--paper-2);color:var(--ink);display:flex;align-items:center;justify-content:space-between;">
+        <span>Verified personal ID on file</span>
+        <span class="badge gold" style="font-size:8px;padding:3px 7px;">Reused</span>
+      </div>
+    </div>
+  `;
+}
+
+const INCOME_SOURCES = [
+  { id: 'salary', label: 'Salary / wages' },
+  { id: 'self', label: 'Self-employment' },
+  { id: 'investment', label: 'Investment income' },
+  { id: 'savings', label: 'Existing savings' },
+  { id: 'other', label: 'Other' },
+];
+
+function renderPersonalSourceStep(data) {
+  const ccy = state.residence?.currency || 'SGD';
+  return `
+    <h3 style="font-family:var(--serif);font-size:18px;font-weight:500;margin-bottom:6px;letter-spacing:-0.01em;">Source &amp; <em style="color:var(--gold-2);font-style:italic;">purpose</em></h3>
+    <p style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:16px;">Helps us set sensible default limits and prevent fraud.</p>
+
+    <div class="field">
+      <label class="label">Source of income</label>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        ${INCOME_SOURCES.map(o => `
+          <button class="apply-row-choice ${data.incomeSource === o.id ? 'active' : ''}" onclick="setApplyChoice('incomeSource','${o.id}')">
+            <div class="apply-row-radio"></div>
+            <span>${o.label}</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Primary use for this account</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${PURPOSES.map(p => `
+          <button class="apply-pill ${data.purpose === p.id ? 'active' : ''}" onclick="setApplyChoice('purpose','${p.id}')">${p.label}</button>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Expected monthly inflow (${ccy})</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${VOLUME_BANDS.map(b => `
+          <button class="apply-pill ${data.volume === b.id ? 'active' : ''}" onclick="setApplyChoice('volume','${b.id}')">${ccy} ${b.label}</button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderApplyReview(isBusiness, data) {
+  const incCountry = countries.find(c => c.code === (data.incCountry || state.residence?.code || 'SG'));
+  const incLabel = incCountry ? `${incCountry.flag} ${incCountry.name}` : '—';
+  const ccy = state.residence?.currency || 'SGD';
+  const businessTypeLabel = BUSINESS_TYPES.find(t => t.id === data.bizType)?.label || '—';
+  const sourceLabel = (isBusiness ? SOURCE_OF_FUNDS_OPTIONS : INCOME_SOURCES).find(o => o.id === (isBusiness ? data.sourceFunds : data.incomeSource))?.label || '—';
+  const volumeLabel = VOLUME_BANDS.find(b => b.id === data.volume)?.label || '—';
+  const occupationLabel = OCCUPATIONS.find(o => o.id === data.occupation)?.label || '—';
+  const purposeLabel = PURPOSES.find(p => p.id === data.purpose)?.label || '—';
+
+  const rows = isBusiness ? [
+    ['Business name', escapeHtml(data.bizName || '—')],
+    ['Registration', escapeHtml(data.uen || '—')],
+    ['Type', businessTypeLabel],
+    ['Incorporation', incLabel],
+    ['Director', escapeHtml(data.directorName || '—')],
+    ['Source of funds', sourceLabel],
+    ['Monthly volume', `${ccy} ${volumeLabel}`],
+  ] : [
+    ['Full name', escapeHtml(data.fullName || '—')],
+    ['Occupation', occupationLabel],
+    ['Employer', escapeHtml(data.employer || (data.occupation === 'employee' || data.occupation === 'self' ? '—' : '—'))],
+    ['Source of income', sourceLabel],
+    ['Primary use', purposeLabel],
+    ['Monthly inflow', `${ccy} ${volumeLabel}`],
+  ];
+
+  return `
+    <h3 style="font-family:var(--serif);font-size:18px;font-weight:500;margin-bottom:6px;letter-spacing:-0.01em;">Review &amp; <em style="color:var(--gold-2);font-style:italic;">submit</em></h3>
+    <p style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:16px;">Make sure everything is correct. You can edit by tapping <strong>Back</strong>.</p>
+
+    <div style="border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;">
+      ${rows.map(([k, v], i) => `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:11px 14px;${i < rows.length - 1 ? 'border-bottom:1px solid var(--line);' : ''}">
+          <span style="font-family:var(--mono);font-size:10px;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);flex-shrink:0;">${k}</span>
+          <span style="font-size:13px;text-align:right;font-weight:500;">${v}</span>
+        </div>
+      `).join('')}
+    </div>
+
+    <div style="font-size:11px;color:var(--muted);line-height:1.5;text-align:center;margin-bottom:6px;">By submitting, you confirm the information is accurate and authorise Fynco to provision a new ${isBusiness ? 'business' : 'personal'} profile under your existing identity.</div>
+  `;
+}
+
+function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function escapeAttr(s) { return escapeHtml(s); }
+
+function onApplyInput() {
+  const data = state._applyData;
+  ['apBizName','apBizUEN','apFullName','apEmployer'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (id === 'apBizName') data.bizName = el.value;
+    if (id === 'apBizUEN') data.uen = el.value;
+    if (id === 'apFullName') data.fullName = el.value;
+    if (id === 'apEmployer') data.employer = el.value;
+  });
+  validateApplyStep();
+}
+
+function setApplyChoice(key, val) {
+  state._applyData[key] = val;
+  // For occupation, the employer field visibility may change
+  if (key === 'occupation') {
+    renderApplyStep();
+  } else {
+    // light re-render so active state on pills updates
+    renderApplyStep();
+  }
+}
+
+function setApplyBizType(id) {
+  state._applyData.bizType = id;
+  renderApplyStep();
+}
+
+const COMMON_INC_COUNTRIES = ['SG','MY','HK','GB','US','AE','AU','ID','PH','TH','VN'];
+function cycleApplyIncCountry() {
+  const cur = state._applyData.incCountry || state.residence?.code || 'SG';
+  const list = COMMON_INC_COUNTRIES.includes(cur) ? COMMON_INC_COUNTRIES : [cur, ...COMMON_INC_COUNTRIES];
+  const idx = list.indexOf(cur);
+  const next = list[(idx + 1) % list.length];
+  state._applyData.incCountry = next;
+  renderApplyStep();
+}
+
+function validateApplyStep() {
+  const type = state._pendingApplyType;
+  const step = state._applyStep;
+  const data = state._applyData;
+  let valid = false;
+  if (step === 1) valid = true;
+  else if (step === 2) {
+    if (type === 'business') {
+      valid = !!(data.bizName && data.bizName.trim() && data.uen && data.uen.trim() && data.bizType && data.incCountry);
+    } else {
+      const employerNeeded = data.occupation === 'employee' || data.occupation === 'self';
+      valid = !!(data.fullName && data.fullName.trim() && data.occupation && (!employerNeeded || (data.employer && data.employer.trim())));
+    }
+  } else if (step === 3) {
+    if (type === 'business') {
+      valid = !!(data.sourceFunds && data.volume);
+    } else {
+      valid = !!(data.incomeSource && data.purpose && data.volume);
+    }
+  } else if (step === 4) {
+    valid = true;
+  }
+  document.getElementById('applyNextBtn').disabled = !valid;
+}
+
+function applyStepBack() {
+  if (state._applyStep <= 1) {
+    cancelApplyAccountType();
+    return;
+  }
+  state._applyStep -= 1;
+  renderApplyStep();
+}
+
+function applyStepNext() {
+  if (state._applyStep < APPLY_TOTAL_STEPS) {
+    state._applyStep += 1;
+    renderApplyStep();
+    return;
+  }
+  // Final step → submit
+  submitApplyAccountType();
+}
+
+function submitApplyAccountType() {
+  const nextBtn = document.getElementById('applyNextBtn');
+  const backBtn = document.getElementById('applyBackBtn');
+  nextBtn.disabled = true;
+  backBtn.disabled = true;
+  nextBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="animation:spin 0.8s linear infinite;"><path d="M21 12a9 9 0 11-6.22-8.56"/></svg> Provisioning…';
+
+  // Show a processing block in the body
+  const body = document.getElementById('applyStepBody');
+  body.innerHTML = `
+    <div style="text-align:center;padding:40px 20px;">
+      <div style="width:60px;height:60px;border-radius:50%;background:var(--paper-2);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--gold);">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1.2s linear infinite;"><path d="M21 12a9 9 0 11-6.22-8.56"/></svg>
+      </div>
+      <div style="font-family:var(--serif);font-size:18px;font-weight:500;margin-bottom:6px;letter-spacing:-0.01em;">Provisioning your <em style="color:var(--gold-2);font-style:italic;">${state._pendingApplyType === 'business' ? 'business' : 'personal'}</em> profile</div>
+      <div style="font-size:12px;color:var(--muted);max-width:280px;margin:0 auto;line-height:1.5;">Setting up accounts, issuing your starter card, and preparing your dashboard…</div>
+    </div>
+  `;
+
+  setTimeout(() => provisionApplyAccountType(), 1800);
+}
+
+function provisionApplyAccountType() {
+  const type = state._pendingApplyType;
+  if (!type) { cancelApplyAccountType(); return; }
   ensureProfilesInit();
   // Snapshot current first
   state.profiles[state.activeProfile] = snapshotProfile();
 
-  // Build a fresh profile snapshot and swap into active state
   const localCcy = state.residence?.currency || 'SGD';
   const fresh = {
     wallets: {},
@@ -5886,7 +6350,6 @@ function confirmApplyAccountType() {
     esimHistory: [],
     dashCardReveal: {},
   };
-  // Seed wallets and a starter card so the profile is usable in demo
   fresh.wallets[localCcy] = { name: getCurrencyName(localCcy), balance: type === 'business' ? 25000 : 5000, primary: true };
   if (localCcy !== 'SGD') {
     fresh.wallets['SGD'] = { name: 'Singapore Dollar', balance: type === 'business' ? 8000 : 1200, primary: false };
@@ -5898,23 +6361,46 @@ function confirmApplyAccountType() {
   ];
 
   state.profiles[type] = fresh;
-  // Now switch to it
   loadProfile(fresh);
   state.activeProfile = type;
   state.accountType = type;
 
-  // Make a starter card for the new profile
+  // If business, sync the bizName field so dashboard greeting picks it up
+  if (type === 'business' && state._applyData.bizName) {
+    document.getElementById('bizName').value = state._applyData.bizName;
+  }
+
   if (state.cards.length === 0) {
     const c = makeCard('standard');
-    c.active = true; // approved & ready since application "completed"
+    c.active = true;
     state.cards.push(c);
     state.defaultCardId = c.id;
   }
 
-  closeSheet();
-  initDashboard();
-  showCopyToast(`${type === 'business' ? 'Business' : 'Personal'} account opened`);
+  // Show success state, then close + dashboard
+  const body = document.getElementById('applyStepBody');
+  if (body) {
+    body.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;">
+        <div style="width:60px;height:60px;border-radius:50%;background:var(--success);color:var(--paper);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div style="font-family:var(--serif);font-size:20px;font-weight:500;margin-bottom:6px;letter-spacing:-0.01em;">Approved</div>
+        <div style="font-size:13px;color:var(--muted);max-width:280px;margin:0 auto;line-height:1.5;">Your ${type === 'business' ? 'business' : 'personal'} profile is live. Switching you over now…</div>
+      </div>
+    `;
+  }
+
+  // Reset apply state
+  state._applyData = {};
+  state._applyStep = 1;
   state._pendingApplyType = null;
+
+  setTimeout(() => {
+    closeSheet();
+    initDashboard();
+    showCopyToast(`${type === 'business' ? 'Business' : 'Personal'} account opened`);
+  }, 1200);
 }
 
 // ============ MANAGE ACCOUNTS ============
