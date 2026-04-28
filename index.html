@@ -2011,6 +2011,29 @@
     border-radius: 2px;
     font-weight: 600;
   }
+  /* Eye toggle button on dashboard carousel cards */
+  .dash-eye-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(247, 244, 237, 0.12);
+    border: 1px solid rgba(247, 244, 237, 0.18);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.15s;
+  }
+  .dash-eye-btn:hover { background: rgba(247, 244, 237, 0.2); }
+  .dash-eye-btn:active { transform: scale(0.92); }
+  .dash-eye-btn.active { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+  .card-slide.white .dash-eye-btn {
+    background: rgba(10, 22, 40, 0.08);
+    border-color: rgba(10, 22, 40, 0.15);
+    color: var(--ink);
+  }
+  .card-slide.white .dash-eye-btn:hover { background: rgba(10, 22, 40, 0.14); }
   .card-num-display {
     font-family: var(--mono);
     font-size: 15px;
@@ -2319,6 +2342,43 @@
   .card-list-title { font-size: 14px; font-weight: 500; }
   .card-list-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
   .card-list-arrow { color: var(--muted); flex-shrink: 0; }
+
+  /* Manage accounts list rows */
+  .manage-acct-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 4px;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .manage-acct-row:last-child { border-bottom: none; }
+  .manage-acct-row:hover { background: var(--paper-2); }
+  .manage-acct-row.manage-add-row .manage-add-cta {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .manage-remove-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: var(--paper-2);
+    color: var(--rust);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .manage-remove-btn:hover { background: rgba(179, 38, 30, 0.1); }
 
   /* Eye toggle masking effect */
   .masked { letter-spacing: 0.4em !important; font-size: 16px !important; }
@@ -2867,7 +2927,7 @@
     <section class="screen" id="screen-5">
       <div class="eyebrow">Your account structure</div>
       <h2 class="title">Here's what we'll <em>open</em>.</h2>
-      <p class="lede">Every Fynco account comes paired with SGD. Add USD if you transact internationally.</p>
+      <p class="lede">Every Fynco card comes with your local currency and SGD by default. Add USD if you transact internationally.</p>
 
       <div class="account-preview">
         <div class="account-preview-head">
@@ -2883,7 +2943,7 @@
               <div class="account-row-sub">Local · Primary</div>
             </div>
           </div>
-          <span class="badge gold">Required</span>
+          <span class="badge gold">Default</span>
         </div>
 
         <div class="account-row" id="sgdRow">
@@ -2894,7 +2954,7 @@
               <div class="account-row-sub">Regional hub</div>
             </div>
           </div>
-          <span class="badge">Included</span>
+          <span class="badge gold">Default</span>
         </div>
 
         <div class="account-row">
@@ -2902,7 +2962,7 @@
             <div class="currency-mark">USD</div>
             <div>
               <div class="account-row-name">US Dollar</div>
-              <div class="account-row-sub">Optional · Adds SWIFT</div>
+              <div class="account-row-sub">Optional · adds SWIFT &amp; ACH</div>
             </div>
           </div>
           <span class="badge" id="usdBadge">Off</span>
@@ -3206,7 +3266,7 @@
     <section class="screen" id="screen-13">
       <div class="eyebrow">Visa application</div>
       <h2 class="title">Choose your <em>card</em>.</h2>
-      <p class="lede">Both options come with a virtual card you can use in 60 seconds. Physical card is a free add-on.</p>
+      <p class="lede" id="cardScreenLede">Both options come with a virtual card you can use in 60 seconds. Spend in your local currency and SGD by default.</p>
 
       <div class="card-3d">
         <div class="card-face">
@@ -3215,9 +3275,9 @@
               <div class="card-brand">Fynco</div>
               <div class="card-type" id="cardTypeLabel">Personal · Multi-currency</div>
             </div>
-            <div class="card-chip-group"><div class="card-chip"></div><span class="card-contactless"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a14 14 0 010 8"/><path d="M9.5 6.5a18 18 0 010 11"/><path d="M14 5a22 22 0 010 14"/></svg></span></div>
           </div>
           <div>
+            <div class="card-chip-group" style="margin-bottom:10px;"><div class="card-chip"></div><span class="card-contactless"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a14 14 0 010 8"/><path d="M9.5 6.5a18 18 0 010 11"/><path d="M14 5a22 22 0 010 14"/></svg></span></div>
             <div class="card-number">4716 ●●●● ●●●● 2810</div>
             <div class="card-bottom">
               <div>
@@ -3278,9 +3338,9 @@
               <div class="card-brand">Fynco</div>
               <div class="card-type" id="cardTypeLabel2">Personal · Multi-currency</div>
             </div>
-            <div class="card-chip-group"><div class="card-chip"></div><span class="card-contactless"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a14 14 0 010 8"/><path d="M9.5 6.5a18 18 0 010 11"/><path d="M14 5a22 22 0 010 14"/></svg></span></div>
           </div>
           <div>
+            <div class="card-chip-group" style="margin-bottom:10px;"><div class="card-chip"></div><span class="card-contactless"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a14 14 0 010 8"/><path d="M9.5 6.5a18 18 0 010 11"/><path d="M14 5a22 22 0 010 14"/></svg></span></div>
             <div class="card-number" id="cardNumberFull">4716 8294 1736 2810</div>
             <div class="card-bottom">
               <div>
@@ -3368,7 +3428,7 @@
       <div class="dash-section">
         <div class="dash-section-head">
           <div class="dash-section-title">Accounts</div>
-          <button class="dash-section-link" onclick="goTo(18)">Manage</button>
+          <button class="dash-section-link" onclick="openSheet('manage-accounts')">Manage</button>
         </div>
         <div id="walletList"></div>
       </div>
@@ -4106,6 +4166,38 @@
     </div>
     <div class="sheet-foot">
       <button class="btn btn-primary" onclick="closeSheet(); goTo(17);">View card</button>
+    </div>
+  </div>
+
+  <!-- MANAGE ACCOUNTS SHEET -->
+  <div class="sheet" id="sheet-manage-accounts">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div class="sheet-title">Manage <em>accounts</em></div>
+      <button class="sheet-close" onclick="closeSheet()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;">View, rearrange, and add virtual accounts. Your local currency and SGD are locked as default accounts.</p>
+
+      <!-- Aggregate net worth -->
+      <div style="background:var(--ink);color:var(--paper);padding:16px 18px;border-radius:var(--radius);position:relative;overflow:hidden;margin-bottom:18px;">
+        <div style="position:absolute;top:-30%;right:-15%;width:70%;height:140%;background:radial-gradient(circle,rgba(201,169,97,0.15) 0%,transparent 60%);pointer-events:none;"></div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;opacity:0.6;margin-bottom:4px;position:relative;">Total balance · in <span id="manageNetCcy">SGD</span></div>
+        <div style="font-family:var(--serif);font-size:26px;font-weight:300;letter-spacing:-0.02em;line-height:1.1;font-variant-numeric:tabular-nums;position:relative;">
+          <span style="font-size:13px;color:var(--gold);font-style:italic;margin-right:6px;" id="manageNetCcy2">SGD</span><span id="manageNetTotal">0.00</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;opacity:0.55;margin-top:4px;letter-spacing:0.05em;position:relative;">Across <span id="manageNetCount">0</span> accounts · indicative FX</div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Your accounts</div>
+      <div id="manageAccountsList"></div>
+
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px;">Add account</div>
+      <div id="manageAvailableList"></div>
+
+      <div style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:16px;text-align:center;">Default currencies cannot be removed. Optional accounts can be opened or closed at any time.</div>
     </div>
   </div>
 
@@ -4875,6 +4967,17 @@ function populateCardScreen() {
   const labelText = state.accountType === 'business' ? 'Business · Multi-currency' : 'Personal · Multi-currency';
   document.getElementById('cardName').textContent = name;
   document.getElementById('cardTypeLabel').textContent = labelText;
+
+  // Update lede based on residence
+  const lede = document.getElementById('cardScreenLede');
+  const localCcy = state.residence?.currency;
+  let ccyLine = 'Spend in your local currency and SGD by default.';
+  if (localCcy && localCcy !== 'SGD') {
+    ccyLine = `Spend in ${localCcy} and SGD by default${state.usdEnabled ? ', plus your USD account' : ''}.`;
+  } else if (localCcy === 'SGD') {
+    ccyLine = `Spend in SGD by default${state.usdEnabled ? ' and your USD account' : ''}.`;
+  }
+  lede.textContent = `Both options come with a virtual card you can use in 60 seconds. ${ccyLine}`;
 }
 
 function populateCardIssued() {
@@ -5157,14 +5260,21 @@ function renderDashCardCarousel() {
     ...cards.filter(c => c.id !== state.defaultCardId),
   ];
 
+  // Lazily init the per-card dashboard reveal map
+  if (!state.dashCardReveal) state.dashCardReveal = {};
+
   track.innerHTML = ordered.map(c => {
     const isDefault = c.id === state.defaultCardId;
     const frozen = state.cardFrozen[c.id];
     const cls = tierClass(c.tier);
     const inactive = !c.active;
+    const revealed = !!state.dashCardReveal[c.id];
     const onClick = inactive
       ? `event.stopPropagation();openActivateSheet('${c.id}')`
       : `goTo(17); setTimeout(()=>scrollToCardOnDetail('${c.id}'), 50)`;
+    const numDisplay = revealed ? c.number : `•••• •••• •••• ${c.last4}`;
+    const eyeOpen = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    const eyeClosed = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
     return `
       <div class="card-slide ${cls}" onclick="${onClick}">
         ${frozen ? `<div class="card-slide-frozen">Frozen</div>` : ''}
@@ -5173,14 +5283,18 @@ function renderDashCardCarousel() {
           <div>
             <div class="card-slide-tier">Fynco · ${tierLabel(c.tier)}</div>
           </div>
-          ${isDefault ? `<span class="card-slide-default-tag">Default</span>` : ''}
+          <div style="display:flex;align-items:center;gap:8px;">
+            ${!inactive ? `<button class="dash-eye-btn ${revealed ? 'active' : ''}" onclick="event.stopPropagation();toggleDashCardReveal('${c.id}');" aria-label="${revealed ? 'Hide card number' : 'Show card number'}">${revealed ? eyeClosed : eyeOpen}</button>` : ''}
+            ${isDefault ? `<span class="card-slide-default-tag">Default</span>` : ''}
+          </div>
         </div>
         <div>
-          <div class="card-num-display">•••• •••• •••• ${c.last4}</div>
+          <div class="card-chip-group" style="margin-bottom:8px;"><div class="card-chip"></div><span class="card-contactless"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a14 14 0 010 8"/><path d="M9.5 6.5a18 18 0 010 11"/><path d="M14 5a22 22 0 010 14"/></svg></span></div>
+          <div class="card-num-display">${numDisplay}</div>
           <div class="card-bottom-row">
             <div>
               <div class="card-meta-label-mini">${c.holder}</div>
-              <div class="card-meta-label-mini" style="opacity:0.7;">EXP ${c.expMonth}/${c.expYear}</div>
+              <div class="card-meta-label-mini" style="opacity:0.7;">EXP ${c.expMonth}/${c.expYear}${revealed ? ` · CVV ${c.cvv}` : ''}</div>
             </div>
             <span class="visa-logo ${cls === 'white' ? 'ink' : 'gold'}">VISA</span>
           </div>
@@ -5209,6 +5323,21 @@ function renderDashCardCarousel() {
     const idx = Math.round(track.scrollLeft / (slideW + 12));
     dots.querySelectorAll('.card-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
   };
+}
+
+// Toggle revealing card details on the dashboard carousel for a single card
+function toggleDashCardReveal(cardId) {
+  if (!state.dashCardReveal) state.dashCardReveal = {};
+  state.dashCardReveal[cardId] = !state.dashCardReveal[cardId];
+  // Auto-hide after 8 seconds for safety
+  if (state.dashCardReveal[cardId]) {
+    clearTimeout(state._dashRevealTimer);
+    state._dashRevealTimer = setTimeout(() => {
+      state.dashCardReveal[cardId] = false;
+      renderDashCardCarousel();
+    }, 8000);
+  }
+  renderDashCardCarousel();
 }
 
 // Activate inactive card from dashboard tap
@@ -5344,9 +5473,9 @@ function renderCardsScreen() {
               <div class="card-slide-tier">Fynco · ${tierLabel(c.tier)}</div>
               ${isDefault ? `<div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--gold);margin-top:2px;">DEFAULT CARD</div>` : ''}
             </div>
-            <div class="card-chip-group"><div class="card-chip"></div><span class="card-contactless"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a14 14 0 010 8"/><path d="M9.5 6.5a18 18 0 010 11"/><path d="M14 5a22 22 0 010 14"/></svg></span></div>
           </div>
           <div>
+            <div class="card-chip-group" style="margin-bottom:10px;"><div class="card-chip"></div><span class="card-contactless"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a14 14 0 010 8"/><path d="M9.5 6.5a18 18 0 010 11"/><path d="M14 5a22 22 0 010 14"/></svg></span></div>
             <div class="card-detail-num">${num}</div>
             <div class="card-detail-meta-row">
               <div>
@@ -5479,6 +5608,129 @@ function addCardToWallet(provider) {
 
 // ============ ACCOUNT DETAIL ============
 let activeAccountCcy = null;
+// ============ MANAGE ACCOUNTS ============
+const MANAGE_AVAILABLE_CCYS = ['USD', 'EUR', 'GBP', 'AUD', 'JPY', 'HKD', 'CAD', 'NZD', 'AED', 'THB'];
+
+function initManageAccounts() {
+  // Aggregate balance in SGD (or local) for the headline
+  const headlineCcy = state.activeCcy || getPrimaryCcy();
+  const fxToHeadline = (ccy) => {
+    // From ccy → SGD → headlineCcy
+    const ccyToSgd = 1 / (FX_FROM_SGD[ccy] || 1);
+    const sgdToHead = FX_FROM_SGD[headlineCcy] || 1;
+    return ccyToSgd * sgdToHead;
+  };
+  let total = 0;
+  Object.entries(state.wallets).forEach(([ccy, w]) => {
+    total += w.balance * fxToHeadline(ccy);
+  });
+  document.getElementById('manageNetCcy').textContent = headlineCcy;
+  document.getElementById('manageNetCcy2').textContent = headlineCcy;
+  document.getElementById('manageNetTotal').textContent = formatMoney(total);
+  document.getElementById('manageNetCount').textContent = Object.keys(state.wallets).length;
+
+  // Render existing accounts
+  const localCcy = state.residence?.currency || 'SGD';
+  const list = document.getElementById('manageAccountsList');
+  list.innerHTML = Object.entries(state.wallets).map(([ccy, w]) => {
+    const isDefault = ccy === localCcy || ccy === 'SGD';
+    return `
+      <div class="manage-acct-row" onclick="closeSheet();setTimeout(()=>openAccountDetail('${ccy}'),120);">
+        <div class="currency-mark" style="width:38px;height:38px;font-size:11px;">${ccy}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:var(--serif);font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px;">
+            ${getCurrencyName(ccy)}
+            ${w.primary ? `<span class="badge gold" style="font-size:8px;padding:2px 6px;">Primary</span>` : ''}
+          </div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.05em;margin-top:1px;">${ccy} ${formatMoney(w.balance)} · ${isDefault ? 'Default · locked' : 'Optional'}</div>
+        </div>
+        ${isDefault
+          ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="color:var(--muted);flex-shrink:0;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>`
+          : `<button class="manage-remove-btn" onclick="event.stopPropagation();removeAccountCcy('${ccy}');" aria-label="Remove account">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+            </button>`
+        }
+      </div>
+    `;
+  }).join('');
+
+  // Render available currencies to add
+  const heldCcys = new Set(Object.keys(state.wallets));
+  const available = MANAGE_AVAILABLE_CCYS.filter(c => !heldCcys.has(c));
+  const availableList = document.getElementById('manageAvailableList');
+  if (available.length === 0) {
+    availableList.innerHTML = `<div style="text-align:center;padding:18px 0;font-size:12px;color:var(--muted);font-style:italic;">All available currencies are open.</div>`;
+  } else {
+    availableList.innerHTML = available.map(ccy => `
+      <div class="manage-acct-row manage-add-row" onclick="addAccountCcy('${ccy}')">
+        <div class="currency-mark" style="width:38px;height:38px;font-size:11px;background:var(--paper-2);color:var(--muted);">${ccy}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:var(--serif);font-size:14px;font-weight:500;">${getCurrencyName(ccy)}</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.05em;margin-top:1px;">No fee · open instantly</div>
+        </div>
+        <div class="manage-add-cta">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function addAccountCcy(ccy) {
+  if (state.wallets[ccy]) return;
+  state.wallets[ccy] = { name: getCurrencyName(ccy), balance: 0, primary: false };
+  state.cardBalance[ccy] = 0;
+  // Toast and re-render
+  showCopyToast(`${ccy} account opened`);
+  initManageAccounts();
+  renderDashboard();
+  // Re-render dashboard ccy tabs
+  const tabs = document.getElementById('dashCcyTabs');
+  if (tabs) {
+    tabs.innerHTML = Object.keys(state.wallets).map(c =>
+      `<button class="ccy-tab ${c === state.activeCcy ? 'active' : ''}" onclick="setActiveCcy('${c}')">${c}</button>`
+    ).join('');
+  }
+}
+
+function removeAccountCcy(ccy) {
+  const localCcy = state.residence?.currency || 'SGD';
+  if (ccy === localCcy || ccy === 'SGD') {
+    alert('Default currencies (local + SGD) cannot be removed.');
+    return;
+  }
+  const w = state.wallets[ccy];
+  if (!w) return;
+  if (w.balance > 0.01) {
+    if (!confirm(`This account still holds ${ccy} ${formatMoney(w.balance)}.\n\nClose anyway? Your balance will be moved to your primary account at indicative FX.`)) return;
+    // Convert and move balance to primary
+    const primaryCcy = getPrimaryCcy();
+    const ccyToSgd = 1 / (FX_FROM_SGD[ccy] || 1);
+    const sgdToPrimary = FX_FROM_SGD[primaryCcy] || 1;
+    const converted = w.balance * ccyToSgd * sgdToPrimary;
+    state.wallets[primaryCcy].balance += converted;
+    state.txns.unshift({
+      merchant: `Closed ${ccy} account`,
+      meta: `Balance moved to ${primaryCcy} · just now`,
+      amt: converted, ccy: primaryCcy, dir: 'in', ts: Date.now(), cat: 'transfer'
+    });
+  } else {
+    if (!confirm(`Close your ${getCurrencyName(ccy)} account?`)) return;
+  }
+  delete state.wallets[ccy];
+  delete state.cardBalance[ccy];
+  if (state.activeCcy === ccy) state.activeCcy = getPrimaryCcy();
+  showCopyToast(`${ccy} account closed`);
+  initManageAccounts();
+  renderDashboard();
+  const tabs = document.getElementById('dashCcyTabs');
+  if (tabs) {
+    tabs.innerHTML = Object.keys(state.wallets).map(c =>
+      `<button class="ccy-tab ${c === state.activeCcy ? 'active' : ''}" onclick="setActiveCcy('${c}')">${c}</button>`
+    ).join('');
+  }
+}
+
 function openAccountDetail(ccy) {
   if (!state.wallets[ccy]) return;
   activeAccountCcy = ccy;
@@ -5898,6 +6150,7 @@ function openSheet(name) {
   if (name === 'esim') initEsim();
   if (name === 'send-local') initSendLocal();
   if (name === 'send-overseas') initSendOverseas();
+  if (name === 'manage-accounts') initManageAccounts();
 }
 function closeSheet(silent) {
   document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open'));
