@@ -3507,7 +3507,7 @@
             <div class="dash-greeting">Good day</div>
             <div class="dash-name">Welcome, <em id="dashName">Jeremiah</em></div>
           </div>
-          <button class="acct-switcher" id="acctSwitcher" onclick="openSheet('switch-account')">
+          <button class="acct-switcher" id="acctSwitcher" onclick="onAcctSwitcherTap()">
             <span id="acctSwitcherLabel">Personal</span>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
@@ -5845,6 +5845,20 @@ function refreshAcctSwitcherLabel() {
   if (el) el.textContent = label;
 }
 
+// Tapping the switcher pill: if both profiles exist, switch directly.
+// Otherwise open the picker sheet so the user can choose / apply.
+function onAcctSwitcherTap() {
+  ensureProfilesInit();
+  const personalExists = profileExists('personal');
+  const businessExists = profileExists('business');
+  if (personalExists && businessExists) {
+    const target = state.activeProfile === 'business' ? 'personal' : 'business';
+    switchToProfile(target);
+    return;
+  }
+  openSheet('switch-account');
+}
+
 function initSwitchAccount() {
   ensureProfilesInit();
   const list = document.getElementById('acctSwitchList');
@@ -5990,7 +6004,12 @@ const BUSINESS_TYPES = [
 ];
 
 function renderBusinessDetailsStep(data) {
-  const incCountry = data.incCountry || (state.residence?.code || 'SG');
+  // Default the incorporation country to the existing profile's primary currency country
+  if (!data.incCountry) {
+    data.incCountry = inferDefaultIncCountry();
+  }
+  const incCountry = data.incCountry;
+  const incCountryObj = countries.find(c => c.code === incCountry);
   return `
     <h3 style="font-family:var(--serif);font-size:18px;font-weight:500;margin-bottom:6px;letter-spacing:-0.01em;">Business <em style="color:var(--gold-2);font-style:italic;">details</em></h3>
     <p style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:16px;">As registered with the relevant authority. Make sure these match your registration documents.</p>
@@ -6016,11 +6035,25 @@ function renderBusinessDetailsStep(data) {
 
     <div class="field">
       <label class="label">Country of incorporation</label>
-      <button class="input" style="text-align:left;cursor:pointer;display:flex;align-items:center;justify-content:space-between;" onclick="cycleApplyIncCountry()">
-        <span>${(countries.find(c => c.code === incCountry)?.flag || '')} ${(countries.find(c => c.code === incCountry)?.name || incCountry)}</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" style="color:var(--muted);"><path d="M9 18l6-6-6-6"/></svg>
-      </button>
-      <div class="field-help">Tap to cycle through common jurisdictions.</div>
+
+      <div id="apIncSelected">
+        <div class="country-item selected" style="border-radius:var(--radius);border:1px solid var(--ink);" onclick="openApplyIncSearch()">
+          <span class="country-flag">${incCountryObj?.flag || ''}</span>
+          <span class="country-name">${incCountryObj?.name || incCountry}</span>
+          <span class="country-currency">${incCountryObj?.currency || ''} · ${incCountryObj?.dial || ''}</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" style="color:var(--muted);margin-left:8px;"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+
+      <div id="apIncPicker" style="display:none;">
+        <div class="country-search" style="margin-top:10px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="input" id="apIncSearch" placeholder="Search countries…" oninput="filterApplyIncCountries()">
+        </div>
+        <div class="country-list" id="apIncList" style="display:none;max-height:240px;"></div>
+      </div>
+
+      <div class="field-help">Where the business is legally registered.</div>
     </div>
 
     <div class="field">
@@ -6032,6 +6065,61 @@ function renderBusinessDetailsStep(data) {
       <div class="field-help">We'll reuse your verified personal identity.</div>
     </div>
   `;
+}
+
+// Default the incorporation country: use the active profile's primary
+// currency to find the matching country, falling back to residence.
+function inferDefaultIncCountry() {
+  // Try active profile's primary wallet
+  let primaryCcy = null;
+  for (const [ccy, w] of Object.entries(state.wallets || {})) {
+    if (w.primary) { primaryCcy = ccy; break; }
+  }
+  if (primaryCcy) {
+    const match = countries.find(c => c.currency === primaryCcy);
+    if (match) return match.code;
+  }
+  // Fall back to residence
+  return state.residence?.code || 'SG';
+}
+
+function openApplyIncSearch() {
+  const sel = document.getElementById('apIncSelected');
+  const picker = document.getElementById('apIncPicker');
+  if (!sel || !picker) return;
+  sel.style.display = 'none';
+  picker.style.display = 'block';
+  // Focus the input
+  setTimeout(() => {
+    const input = document.getElementById('apIncSearch');
+    if (input) input.focus();
+  }, 30);
+}
+
+function filterApplyIncCountries() {
+  const q = (document.getElementById('apIncSearch').value || '').toLowerCase().trim();
+  const list = document.getElementById('apIncList');
+  if (!q) { list.style.display = 'none'; list.innerHTML = ''; return; }
+  const filtered = countries.filter(c => c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q));
+  if (filtered.length === 0) {
+    list.style.display = 'block';
+    list.innerHTML = `<div style="padding:18px 14px;text-align:center;font-size:13px;color:var(--muted);font-style:italic;">No matches for "${q}"</div>`;
+    return;
+  }
+  list.style.display = 'block';
+  list.innerHTML = filtered.slice(0, 10).map(c => `
+    <div class="country-item ${state._applyData.incCountry === c.code ? 'selected' : ''}" onclick="pickApplyIncCountry('${c.code}')">
+      <span class="country-flag">${c.flag}</span>
+      <span class="country-name">${c.name}</span>
+      <span class="country-currency">${c.currency} · ${c.dial}</span>
+    </div>
+  `).join('');
+}
+
+function pickApplyIncCountry(code) {
+  state._applyData.incCountry = code;
+  // Re-render the step (this restores the collapsed selected pill)
+  renderApplyStep();
 }
 
 const SOURCE_OF_FUNDS_OPTIONS = [
@@ -6250,16 +6338,6 @@ function setApplyChoice(key, val) {
 
 function setApplyBizType(id) {
   state._applyData.bizType = id;
-  renderApplyStep();
-}
-
-const COMMON_INC_COUNTRIES = ['SG','MY','HK','GB','US','AE','AU','ID','PH','TH','VN'];
-function cycleApplyIncCountry() {
-  const cur = state._applyData.incCountry || state.residence?.code || 'SG';
-  const list = COMMON_INC_COUNTRIES.includes(cur) ? COMMON_INC_COUNTRIES : [cur, ...COMMON_INC_COUNTRIES];
-  const idx = list.indexOf(cur);
-  const next = list[(idx + 1) % list.length];
-  state._applyData.incCountry = next;
   renderApplyStep();
 }
 
