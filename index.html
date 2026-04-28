@@ -4270,13 +4270,13 @@
   <div class="sheet" id="sheet-apply-card">
     <div class="sheet-handle"></div>
     <div class="sheet-head">
-      <div class="sheet-title">Apply for a <em>card</em></div>
+      <div class="sheet-title" id="applyCardTitle">Apply for a <em>card</em></div>
       <button class="sheet-close" onclick="closeSheet()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
     <div class="sheet-body">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5;">Choose a card tier. All cards are Visa, accepted in 200+ countries.</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5;" id="applyCardLede">Choose a card tier. All cards are Visa, accepted in 200+ countries.</p>
       <div id="applyCardList">
         <button class="card-action" data-tier="standard" onclick="pickApplyTier(this)" style="padding:18px;margin-bottom:10px;border-radius:var(--radius);border:1px solid var(--line);width:100%;text-align:left;display:flex;align-items:center;gap:14px;">
           <div style="width:48px;height:32px;border-radius:4px;background:linear-gradient(135deg,#14223a,#0a1628);flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;padding:4px;"><span class="visa-logo" style="font-size:11px;">VISA</span></div>
@@ -6554,7 +6554,7 @@ function provisionApplyAccountType() {
   fresh.cardBalance[localCcy] = type === 'business' ? 1500 : 250;
   if (localCcy !== 'SGD') fresh.cardBalance['SGD'] = type === 'business' ? 400 : 80;
   fresh.txns = [
-    { merchant: type === 'business' ? 'Initial deposit' : 'Welcome bonus', meta: 'Card · today', amt: fresh.cardBalance[localCcy], ccy: localCcy, dir: 'in', ts: Date.now(), cat: 'card' },
+    { merchant: type === 'business' ? 'Initial deposit' : 'Welcome bonus', meta: 'Account · today', amt: fresh.cardBalance[localCcy], ccy: localCcy, dir: 'in', ts: Date.now(), cat: 'transfer' },
   ];
 
   state.profiles[type] = fresh;
@@ -6567,12 +6567,9 @@ function provisionApplyAccountType() {
     document.getElementById('bizName').value = state._applyData.bizName;
   }
 
-  if (state.cards.length === 0) {
-    const c = makeCard('standard');
-    c.active = true;
-    state.cards.push(c);
-    state.defaultCardId = c.id;
-  }
+  // No starter card — the user must apply for a Visa card explicitly
+  // from the dashboard if they want one. The empty-state apply tile
+  // renders on the dashboard and cards screen until they do.
 
   // Show success state, then close + dashboard
   const body = document.getElementById('applyStepBody');
@@ -6987,6 +6984,37 @@ function confirmSendOverseas() {
 
 // ============ APPLY CARD ============
 let applyCardTier = null;
+
+// Sets the apply-card sheet title and lede based on the active profile,
+// and resets any previous tier selection. Called every time the sheet opens.
+function initApplyCardSheet() {
+  applyCardTier = null;
+  const isBusiness = state.activeProfile === 'business';
+  const titleEl = document.getElementById('applyCardTitle');
+  const ledeEl = document.getElementById('applyCardLede');
+  if (titleEl) {
+    titleEl.innerHTML = isBusiness
+      ? 'Apply for a <em>business card</em>'
+      : 'Apply for a <em>card</em>';
+  }
+  if (ledeEl) {
+    ledeEl.textContent = isBusiness
+      ? 'Choose a card tier for your business profile. All cards are Visa, accepted in 200+ countries.'
+      : 'Choose a card tier. All cards are Visa, accepted in 200+ countries.';
+  }
+  // Reset visual selection on tier rows
+  document.querySelectorAll('#sheet-apply-card [data-tier]').forEach(b => {
+    b.style.borderColor = 'var(--line)';
+    b.style.background = 'var(--paper)';
+  });
+  // Disable the issue button until a tier is picked
+  const btn = document.getElementById('applyCardBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Choose a card tier';
+  }
+}
+
 function pickApplyTier(el) {
   applyCardTier = el.dataset.tier;
   document.querySelectorAll('#sheet-apply-card [data-tier]').forEach(b => {
@@ -7150,6 +7178,7 @@ function openSheet(name) {
   if (name === 'manage-accounts') initManageAccounts();
   if (name === 'switch-account') initSwitchAccount();
   if (name === 'apply-account-type') initApplyAccountType();
+  if (name === 'apply-card') initApplyCardSheet();
 }
 function closeSheet(silent) {
   document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open'));
