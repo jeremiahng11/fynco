@@ -506,8 +506,7 @@
   .country-list {
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    max-height: calc(100vh - 360px);
-    min-height: 200px;
+    max-height: 320px;
     overflow-y: auto;
     background: var(--paper);
     margin-bottom: 12px;
@@ -1857,14 +1856,14 @@
 
   /* ============ CARD CAROUSEL (DASHBOARD) ============ */
   .card-carousel {
-    margin: 16px -8px 0;
+    margin: 14px 0 0;
     overflow: hidden;
     position: relative;
   }
   .card-track {
     display: flex;
-    gap: 14px;
-    padding: 6px 8px 16px;
+    gap: 12px;
+    padding: 6px 24px 14px;
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
@@ -1873,7 +1872,7 @@
   }
   .card-track::-webkit-scrollbar { display: none; }
   .card-slide {
-    flex: 0 0 calc(100% - 16px);
+    flex: 0 0 calc(100% - 48px);
     scroll-snap-align: center;
     border-radius: 14px;
     aspect-ratio: 1.586;
@@ -1994,7 +1993,7 @@
 
   /* Dashboard card add tile */
   .card-slide-add {
-    flex: 0 0 calc(100% - 16px);
+    flex: 0 0 calc(100% - 48px);
     scroll-snap-align: center;
     aspect-ratio: 1.586;
     border: 1.5px dashed var(--line-strong);
@@ -2281,6 +2280,46 @@
 
   /* Eye toggle masking effect */
   .masked { letter-spacing: 0.4em !important; font-size: 16px !important; }
+
+  /* Floating action icons on the card detail */
+  .card-icon-overlay {
+    position: absolute;
+    display: flex;
+    gap: 8px;
+    z-index: 3;
+  }
+  .card-icon-overlay.top-right {
+    top: 14px;
+    right: 14px;
+  }
+  .card-icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(247, 244, 237, 0.12);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(247, 244, 237, 0.18);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .card-icon-btn:hover { background: rgba(247, 244, 237, 0.2); }
+  .card-icon-btn:active { transform: scale(0.92); }
+  .card-icon-btn.active {
+    background: var(--gold);
+    color: var(--ink);
+    border-color: var(--gold);
+  }
+  /* On white-tier cards the icons need darker color */
+  .card-detail-card.white .card-icon-btn {
+    background: rgba(10, 22, 40, 0.08);
+    border-color: rgba(10, 22, 40, 0.15);
+    color: var(--ink);
+  }
+  .card-detail-card.white .card-icon-btn:hover { background: rgba(10, 22, 40, 0.14); }
 
   /* ============ ACTIVITY SCREEN ============ */
   .activity-head {
@@ -2629,17 +2668,19 @@
 
     <!-- ============ 2. CITIZENSHIP ============ -->
     <section class="screen" id="screen-2">
-      <div class="eyebrow" id="citizenshipEyebrow">Country of issuance · 1 of 2</div>
+      <div class="eyebrow" id="citizenshipEyebrow">Country of issuance</div>
       <h2 class="title" id="citizenshipTitle">Which passport do <em>you</em> hold?</h2>
-      <p class="lede">Your citizenship determines compliance checks, tax reporting, and which regulator owns your file.</p>
+      <p class="lede">Type to find your country.</p>
+
+      <div id="citizenshipSelectedSlot" style="display:none;margin-bottom:12px;"></div>
 
       <div class="country-search">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input class="input" id="citizenshipSearch" placeholder="Search countries…" oninput="filterCountries('citizenship')">
       </div>
-      <div class="country-list" id="citizenshipList"></div>
+      <div class="country-list" id="citizenshipList" style="display:none;"></div>
 
-      <div class="check-row checked" id="checkResideHere" onclick="toggleResideHere()" style="border-top:1px solid var(--line);padding:16px 0;margin-top:4px;">
+      <div class="check-row checked" id="checkResideHere" onclick="toggleResideHere()" style="border-top:1px solid var(--line);padding:14px 0;margin-top:8px;">
         <div class="checkbox"></div>
         <div class="check-text">
           <div style="font-weight:500;color:var(--ink);margin-bottom:2px;">I currently reside in <span id="resideCountryName">this country</span></div>
@@ -2652,13 +2693,15 @@
     <section class="screen" id="screen-3">
       <div class="eyebrow">Country of residence</div>
       <h2 class="title">And where are you <em>living</em> right now?</h2>
-      <p class="lede">We'll register your account in your country of residence. This becomes your primary local-currency account.</p>
+      <p class="lede">Type to find your country of residence.</p>
+
+      <div id="residenceSelectedSlot" style="display:none;margin-bottom:12px;"></div>
 
       <div class="country-search">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input class="input" id="residenceSearch" placeholder="Search countries…" oninput="filterCountries('residence')">
       </div>
-      <div class="country-list" id="residenceList"></div>
+      <div class="country-list" id="residenceList" style="display:none;"></div>
     </section>
 
     <!-- ============ 4. PERSONAL / BUSINESS INFO ============ -->
@@ -3090,32 +3133,30 @@
         <div class="approved-stamp">Approved</div>
       </div>
 
-      <h2 class="title" style="text-align:center;">Welcome to <em>Fynco</em>.</h2>
-      <p class="lede" style="text-align:center;margin:0 auto 12px;">Your account is live. Confirmation sent to email.</p>
+      <h2 class="title" style="text-align:center;margin-bottom:4px;">Welcome to <em>Fynco</em>.</h2>
+      <p style="text-align:center;font-size:13px;color:var(--muted);margin:0 auto 8px;">Your account is live.</p>
       <div class="reference">REFERENCE · <span id="refNum">FYN-2026-0000000</span></div>
 
-      <div style="border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0;margin-bottom:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <div>
-            <div class="label" style="margin-bottom:2px;">Primary account</div>
-            <div style="font-family:var(--serif);font-size:16px;" id="approvedLocal">SGD Singapore Dollar</div>
+      <div style="border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="min-width:0;flex:1;">
+            <div class="label" style="margin-bottom:2px;font-size:9px;">Primary account</div>
+            <div style="font-family:var(--serif);font-size:14px;" id="approvedLocal">SGD Singapore Dollar</div>
+            <div style="font-family:var(--mono);font-size:11px;letter-spacing:0.04em;color:var(--muted);margin-top:2px;" id="approvedIBAN">SG-FYN-2847-1936-2810</div>
           </div>
-          <span class="badge gold">Active</span>
+          <span class="badge gold" style="flex-shrink:0;">Active</span>
         </div>
-        <div style="font-family:var(--mono);font-size:12px;letter-spacing:0.05em;" id="approvedIBAN">SG-FYN-2847-1936-2810</div>
       </div>
 
-      <div style="background:var(--ink);color:var(--paper);padding:16px;border-radius:var(--radius);">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
-          <div>
-            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;opacity:0.6;margin-bottom:4px;">Next step · Optional</div>
-            <div style="font-family:var(--serif);font-size:17px;">Apply for your Visa.</div>
+      <div style="background:var(--ink);color:var(--paper);padding:14px 16px;border-radius:var(--radius);">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;opacity:0.6;margin-bottom:2px;">Next step · Optional</div>
+            <div style="font-family:var(--serif);font-size:16px;line-height:1.2;margin-bottom:4px;">Apply for your Visa</div>
+            <div style="font-size:11px;opacity:0.75;line-height:1.4;">Virtual card instant · physical 5–7 days</div>
           </div>
-          <svg width="36" height="22" viewBox="0 0 40 26" fill="none" style="flex-shrink:0;">
-            <text x="0" y="20" font-family="serif" font-style="italic" font-weight="700" font-size="22" fill="#c9a961" letter-spacing="-0.5">VISA</text>
-          </svg>
+          <span class="card-visa" style="font-size:24px;flex-shrink:0;">VISA</span>
         </div>
-        <div style="font-size:12px;opacity:0.8;line-height:1.45;">Virtual card issued instantly. Physical card ships in 5–7 days.</div>
       </div>
     </section>
 
@@ -3182,14 +3223,14 @@
 
     <!-- ============ 14. CARD ISSUED ============ -->
     <section class="screen" id="screen-14">
-      <div class="eyebrow" style="text-align:center;justify-content:center;display:flex;">
-        <span style="background:var(--success);color:var(--paper);padding:2px 8px;border-radius:2px;font-size:10px;letter-spacing:0.1em;">CARD ISSUED</span>
+      <div class="eyebrow" id="cardIssuedBadge" style="text-align:center;justify-content:center;display:flex;">
+        <span style="background:var(--gold);color:var(--ink);padding:2px 8px;border-radius:2px;font-size:10px;letter-spacing:0.1em;">CARD READY</span>
       </div>
-      <h2 class="title" style="text-align:center;">Your Visa is <em>live</em>.</h2>
-      <p class="lede" style="text-align:center;margin:0 auto 12px;">Use it now in apps and online. Add it to your wallet for tap-to-pay.</p>
+      <h2 class="title" id="cardIssuedTitle" style="text-align:center;">Your Visa is <em>ready</em>.</h2>
+      <p class="lede" id="cardIssuedLede" style="text-align:center;margin:0 auto 12px;font-size:13px;">Activate to start using it.</p>
 
       <div class="card-3d">
-        <div class="card-face">
+        <div class="card-face" id="issuedCardFace">
           <div class="card-top">
             <div>
               <div class="card-brand">Fynco</div>
@@ -3201,16 +3242,22 @@
             <div class="card-number" id="cardNumberFull">4716 8294 1736 2810</div>
             <div class="card-bottom">
               <div>
-                <div class="card-meta-label">Cardholder · Exp 04/30</div>
+                <div class="card-meta-label">Cardholder · Exp <span id="cardExpDisplay">04/30</span></div>
                 <div class="card-name" id="cardName2">JEREMIAH NG</div>
               </div>
               <div class="card-visa">VISA</div>
             </div>
           </div>
+          <div id="cardInactiveOverlay" style="position:absolute;inset:0;background:rgba(10,22,40,0.55);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;border-radius:14px;font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;">Inactive</div>
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;">
+      <button id="activateCardBtn" class="btn btn-primary" onclick="activateIssuedCard()" style="margin-bottom:10px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Activate card
+      </button>
+
+      <div id="walletButtonsRow" style="display:none;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
         <button class="btn btn-ghost" style="font-size:13px;padding:12px;" onclick="alert('Apple Wallet — would launch native add-card flow.')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
           Apple Wallet
@@ -3221,7 +3268,7 @@
         </button>
       </div>
 
-      <div style="border-top:1px solid var(--line);padding-top:14px;font-size:12px;color:var(--muted);line-height:1.5;">
+      <div style="border-top:1px solid var(--line);padding-top:12px;font-size:11px;color:var(--muted);line-height:1.5;text-align:center;">
         Daily limit SGD 5,000 · Auto-FX · Freeze instantly in app
       </div>
     </section>
@@ -3333,24 +3380,6 @@
       </div>
 
       <div class="card-actions-grid">
-        <button class="card-action" id="cardActionDefault" onclick="setDefaultCard()">
-          <div class="ca-icon">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </div>
-          <div class="ca-text">
-            <div class="ca-title">Set as default</div>
-            <div class="ca-sub" id="cardActionDefaultSub">For dashboard</div>
-          </div>
-        </button>
-        <button class="card-action" onclick="toggleCardSensitive()">
-          <div class="ca-icon" id="cardEyeIcon">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </div>
-          <div class="ca-text">
-            <div class="ca-title" id="cardEyeTitle">Show details</div>
-            <div class="ca-sub">Number, CVV</div>
-          </div>
-        </button>
         <button class="card-action" onclick="addCardToWallet('apple')">
           <div class="ca-icon">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
@@ -3943,10 +3972,41 @@ const countries = [
 ];
 
 function renderCountryList(target) {
-  const filter = (document.getElementById(target + 'Search').value || '').toLowerCase();
+  const filter = (document.getElementById(target + 'Search').value || '').toLowerCase().trim();
   const list = document.getElementById(target + 'List');
+  const selectedSlot = document.getElementById(target + 'SelectedSlot');
+  const selected = state[target];
+
+  // Show selected country as a pill above the search if one is picked and the user isn't typing
+  if (selected && !filter && selectedSlot) {
+    selectedSlot.style.display = 'block';
+    selectedSlot.innerHTML = `
+      <div class="country-item selected" style="border-radius:var(--radius);border:1px solid var(--ink);" onclick="clearCountry('${target}')">
+        <span class="country-flag">${selected.flag}</span>
+        <span class="country-name">${selected.name}</span>
+        <span class="country-currency">${selected.currency} · ${selected.dial}</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-left:8px;opacity:0.6;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>`;
+  } else if (selectedSlot) {
+    selectedSlot.style.display = 'none';
+    selectedSlot.innerHTML = '';
+  }
+
+  // Only render the dropdown when the user is actively typing
+  if (!filter) {
+    list.style.display = 'none';
+    list.innerHTML = '';
+    return;
+  }
+
   const filtered = countries.filter(c => c.name.toLowerCase().includes(filter) || c.code.toLowerCase().includes(filter));
-  list.innerHTML = filtered.map(c => {
+  if (filtered.length === 0) {
+    list.style.display = 'block';
+    list.innerHTML = `<div style="padding:18px 14px;text-align:center;font-size:13px;color:var(--muted);font-style:italic;">No matches for "${filter}"</div>`;
+    return;
+  }
+  list.style.display = 'block';
+  list.innerHTML = filtered.slice(0, 8).map(c => {
     const sel = state[target] && state[target].code === c.code ? 'selected' : '';
     return `<div class="country-item ${sel}" onclick="pickCountry('${target}','${c.code}')">
       <span class="country-flag">${c.flag}</span>
@@ -3958,8 +4018,26 @@ function renderCountryList(target) {
 
 function filterCountries(target) { renderCountryList(target); }
 
+function clearCountry(target) {
+  state[target] = null;
+  if (target === 'residence') {
+    const ph = document.getElementById('phonePrefix');
+    if (ph) ph.textContent = '+65';
+  }
+  // Clear search and re-focus
+  const searchEl = document.getElementById(target + 'Search');
+  searchEl.value = '';
+  searchEl.focus();
+  renderCountryList(target);
+  if (target === 'citizenship') updateResideLabel();
+  updateActions();
+}
+
 function pickCountry(target, code) {
   state[target] = countries.find(c => c.code === code);
+  // Clear search box so the selection-pill renders cleanly
+  const searchEl = document.getElementById(target + 'Search');
+  if (searchEl) searchEl.value = '';
   renderCountryList(target);
   // sync phone prefix when residence chosen
   if (target === 'residence') {
@@ -4233,7 +4311,17 @@ function updateActions() {
     case 11: actions.style.display = 'none'; break;
     case 12: txt.textContent = 'Apply for Visa card'; meta.innerHTML = '<a href="#" onclick="event.preventDefault();goTo(0);">Skip for now — go to dashboard</a>'; break;
     case 13: txt.textContent = 'Issue my card'; meta.innerHTML = '<span style="opacity:0.7;">Virtual card ready in 60 seconds</span>'; break;
-    case 14: txt.textContent = 'Open dashboard'; meta.innerHTML = '<span style="opacity:0.7;">You can revisit setup anytime in Settings</span>'; break;
+    case 14: {
+      const card = state.cards[0];
+      if (card && card.active) {
+        txt.textContent = 'Open dashboard';
+        meta.innerHTML = '<span style="opacity:0.7;">Your card is live and ready to use</span>';
+      } else {
+        txt.textContent = 'Open dashboard';
+        meta.innerHTML = '<span style="opacity:0.7;">You can activate your card later from the dashboard</span>';
+      }
+      break;
+    }
     case 15: actions.style.display = 'none'; break;
   }
 
@@ -4501,6 +4589,52 @@ function populateCardIssued() {
   }
   const card = state.cards[0];
   document.getElementById('cardNumberFull').textContent = card.number;
+  document.getElementById('cardExpDisplay').textContent = `${card.expMonth}/${card.expYear}`;
+
+  // Reflect activation state visually
+  reflectIssuedCardState(card);
+}
+
+function reflectIssuedCardState(card) {
+  const overlay = document.getElementById('cardInactiveOverlay');
+  const badge = document.getElementById('cardIssuedBadge');
+  const title = document.getElementById('cardIssuedTitle');
+  const lede = document.getElementById('cardIssuedLede');
+  const activateBtn = document.getElementById('activateCardBtn');
+  const wallets = document.getElementById('walletButtonsRow');
+  if (!overlay) return;
+
+  if (card.active) {
+    overlay.style.display = 'none';
+    badge.innerHTML = '<span style="background:var(--success);color:var(--paper);padding:2px 8px;border-radius:2px;font-size:10px;letter-spacing:0.1em;">CARD LIVE</span>';
+    title.innerHTML = 'Your Visa is <em>live</em>.';
+    lede.textContent = 'Use it now in apps and online.';
+    activateBtn.style.display = 'none';
+    wallets.style.display = 'grid';
+  } else {
+    overlay.style.display = 'flex';
+    badge.innerHTML = '<span style="background:var(--gold);color:var(--ink);padding:2px 8px;border-radius:2px;font-size:10px;letter-spacing:0.1em;">CARD READY</span>';
+    title.innerHTML = 'Your Visa is <em>ready</em>.';
+    lede.textContent = 'Activate to start using it.';
+    activateBtn.style.display = 'flex';
+    activateBtn.disabled = false;
+    activateBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Activate card';
+    wallets.style.display = 'none';
+  }
+}
+
+function activateIssuedCard() {
+  const card = state.cards[0];
+  if (!card) return;
+  const btn = document.getElementById('activateCardBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="animation:spin 0.8s linear infinite;"><path d="M21 12a9 9 0 11-6.22-8.56"/></svg> Activating…';
+  setTimeout(() => {
+    card.active = true;
+    reflectIssuedCardState(card);
+    // Update the action bar copy from "Open dashboard" to "Continue to dashboard"
+    if (state.step === 14) updateActions();
+  }, 1100);
 }
 
 // ============ DEV BAR ============
@@ -4691,6 +4825,7 @@ function makeCard(tier) {
     cvv: String(Math.floor(100 + Math.random() * 900)),
     issuedAt: Date.now(),
     holder: getCardholderName(),
+    active: false,
   };
 }
 
@@ -4720,9 +4855,14 @@ function renderDashCardCarousel() {
     const isDefault = c.id === state.defaultCardId;
     const frozen = state.cardFrozen[c.id];
     const cls = tierClass(c.tier);
+    const inactive = !c.active;
+    const onClick = inactive
+      ? `event.stopPropagation();openActivateSheet('${c.id}')`
+      : `goTo(17); setTimeout(()=>scrollToCardOnDetail('${c.id}'), 50)`;
     return `
-      <div class="card-slide ${cls}" onclick="goTo(17); setTimeout(()=>scrollToCardOnDetail('${c.id}'), 50);">
+      <div class="card-slide ${cls}" onclick="${onClick}">
         ${frozen ? `<div class="card-slide-frozen">Frozen</div>` : ''}
+        ${inactive ? `<div class="card-slide-frozen" style="background:rgba(10,22,40,0.6);"><div style="text-align:center;"><div style="margin-bottom:6px;">Tap to activate</div><div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--gold);">INACTIVE</div></div></div>` : ''}
         <div class="card-slide-top">
           <div>
             <div class="card-slide-tier">Fynco · ${tierLabel(c.tier)}</div>
@@ -4760,9 +4900,20 @@ function renderDashCardCarousel() {
   // Wire scroll → dot
   track.onscroll = () => {
     const slideW = track.children[0]?.getBoundingClientRect().width || 1;
-    const idx = Math.round(track.scrollLeft / (slideW + 14));
+    const idx = Math.round(track.scrollLeft / (slideW + 12));
     dots.querySelectorAll('.card-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
   };
+}
+
+// Activate inactive card from dashboard tap
+function openActivateSheet(cardId) {
+  const card = state.cards.find(c => c.id === cardId);
+  if (!card || card.active) return;
+  if (!confirm(`Activate Fynco ${tierLabel(card.tier)} ending in ${card.last4}?\n\nYour card will become active immediately.`)) return;
+  card.active = true;
+  renderDashCardCarousel();
+  // Render cards screen too if it's been initialized
+  if (document.getElementById('cardsPager')?.children.length) renderCardsScreen();
 }
 
 function setActiveCcy(ccy) {
@@ -4866,12 +5017,26 @@ function renderCardsScreen() {
     const showSensitive = state.cardSensitiveVisible && state.visibleCardId === c.id;
     const num = showSensitive ? c.number : `•••• •••• •••• ${c.last4}`;
     const cvv = showSensitive ? c.cvv : '•••';
+    const isDefault = c.id === state.defaultCardId;
+    const eyeOpen = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+    const eyeClosed = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+    const starOutline = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+    const starFill = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
     return `
       <div data-card-id="${c.id}">
         <div class="card-detail-card ${cls} ${frozen ? 'frozen' : ''}">
+          <div class="card-icon-overlay top-right">
+            <div class="card-icon-btn ${showSensitive ? 'active' : ''}" onclick="event.stopPropagation();toggleCardSensitive();" title="${showSensitive ? 'Hide details' : 'Show details'}">
+              ${showSensitive ? eyeClosed : eyeOpen}
+            </div>
+            <div class="card-icon-btn ${isDefault ? 'active' : ''}" onclick="event.stopPropagation();setDefaultCard();" title="${isDefault ? 'Default card' : 'Set as default'}">
+              ${isDefault ? starFill : starOutline}
+            </div>
+          </div>
           <div class="card-slide-top">
             <div>
               <div class="card-slide-tier">Fynco · ${tierLabel(c.tier)}</div>
+              ${isDefault ? `<div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--gold);margin-top:2px;">DEFAULT CARD</div>` : ''}
             </div>
             <div class="card-chip"></div>
           </div>
@@ -4931,28 +5096,6 @@ function updateCardDetailMeta() {
   const ccy = state.activeCcy || 'SGD';
   document.getElementById('cardDetailCcy').textContent = ccy;
   document.getElementById('cardDetailBal').textContent = formatMoney(state.cardBalance[ccy] || 0);
-
-  // Default button state
-  const defaultBtn = document.getElementById('cardActionDefault');
-  const defaultSub = document.getElementById('cardActionDefaultSub');
-  if (c.id === state.defaultCardId) {
-    defaultBtn.classList.add('active');
-    defaultSub.textContent = 'Currently default';
-  } else {
-    defaultBtn.classList.remove('active');
-    defaultSub.textContent = 'Tap to make default';
-  }
-
-  // Eye state
-  const eyeTitle = document.getElementById('cardEyeTitle');
-  const eyeIcon = document.getElementById('cardEyeIcon');
-  if (state.cardSensitiveVisible) {
-    eyeTitle.textContent = 'Hide details';
-    eyeIcon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
-  } else {
-    eyeTitle.textContent = 'Show details';
-    eyeIcon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
-  }
 
   // Freeze state
   const frozen = state.cardFrozen[c.id];
