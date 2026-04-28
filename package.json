@@ -1,0 +1,15 @@
+{
+  "name": "fynco-onboarding",
+  "version": "1.0.0",
+  "description": "Fynco — virtual account & Visa card onboarding simulation",
+  "private": true,
+  "scripts": {
+    "start": "serve -s . -l $PORT --no-clipboard"
+  },
+  "dependencies": {
+    "serve": "^14.2.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

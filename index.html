@@ -1,0 +1,2555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#0a1628" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>Fynco — Open your account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a1628;
+    --ink-2: #14223a;
+    --ink-3: #1e2f4d;
+    --paper: #f7f4ed;
+    --paper-2: #efe9dc;
+    --gold: #c9a961;
+    --gold-2: #b8954a;
+    --sage: #6b7f5e;
+    --rust: #a85a3c;
+    --line: rgba(10, 22, 40, 0.12);
+    --line-strong: rgba(10, 22, 40, 0.24);
+    --muted: rgba(10, 22, 40, 0.6);
+    --muted-2: rgba(10, 22, 40, 0.45);
+    --success: #2d6a4f;
+    --warning: #c4831f;
+    --error: #b3261e;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --radius: 4px;
+    --shadow-sm: 0 1px 2px rgba(10, 22, 40, 0.04), 0 1px 3px rgba(10, 22, 40, 0.06);
+    --shadow-md: 0 4px 12px rgba(10, 22, 40, 0.08), 0 2px 4px rgba(10, 22, 40, 0.04);
+    --shadow-lg: 0 12px 32px rgba(10, 22, 40, 0.12), 0 4px 8px rgba(10, 22, 40, 0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overscroll-behavior: none; }
+  body {
+    font-family: var(--sans);
+    background: var(--paper);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 15px;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  /* ============ APP SHELL ============ */
+  .app {
+    max-width: 440px;
+    margin: 0 auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--paper);
+    position: relative;
+    box-shadow: 0 0 60px rgba(10, 22, 40, 0.08);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Subtle paper grain */
+  .app::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.04 0 0 0 0 0.09 0 0 0 0 0.16 0 0 0 0.025 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    z-index: 100;
+    mix-blend-mode: multiply;
+    opacity: 0.6;
+  }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px 12px;
+    position: sticky;
+    top: 0;
+    background: var(--paper);
+    z-index: 10;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .topbar.scrolled { border-bottom-color: var(--line); }
+
+  .brand {
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .brand-mark {
+    width: 22px; height: 22px;
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .brand-mark::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    background: var(--gold);
+    border-radius: 50%;
+  }
+
+  .back-btn, .icon-btn {
+    width: 36px; height: 36px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    border-radius: 50%;
+    transition: background 0.15s;
+  }
+  .back-btn:hover, .icon-btn:hover { background: rgba(10, 22, 40, 0.06); }
+  .back-btn:active, .icon-btn:active { background: rgba(10, 22, 40, 0.1); }
+
+  /* ============ PROGRESS ============ */
+  .progress {
+    padding: 0 24px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-track {
+    flex: 1;
+    height: 2px;
+    background: var(--line);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--ink);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 1px;
+  }
+  .progress-text {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ============ MAIN ============ */
+  main {
+    flex: 1;
+    padding: 8px 24px 120px;
+  }
+
+  .screen {
+    display: none;
+    animation: fadeUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .screen.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ TYPOGRAPHY ============ */
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 16px; height: 1px;
+    background: var(--ink);
+  }
+
+  h1.display {
+    font-family: var(--serif);
+    font-size: 36px;
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    margin-bottom: 16px;
+  }
+  h1.display em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--gold-2);
+  }
+
+  h2.title {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  h2.title em { font-style: italic; color: var(--gold-2); font-weight: 300; }
+
+  .lede {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.55;
+    margin-bottom: 28px;
+    max-width: 36ch;
+  }
+
+  .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  /* ============ HERO (welcome) ============ */
+  .hero-art {
+    margin: 8px -24px 28px;
+    height: 240px;
+    position: relative;
+    overflow: hidden;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .hero-art svg { display: block; width: 100%; height: 100%; }
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .hero-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    opacity: 0.6;
+  }
+
+  /* ============ BUTTONS ============ */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 16px 20px;
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: -0.005em;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .btn-primary:hover { background: var(--ink-2); }
+  .btn-primary:active { transform: scale(0.99); }
+  .btn-primary:disabled {
+    background: var(--line-strong);
+    color: var(--muted-2);
+    cursor: not-allowed;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+  }
+  .btn-ghost:hover { background: rgba(10, 22, 40, 0.04); }
+
+  .btn-arrow svg {
+    transition: transform 0.2s;
+  }
+  .btn-arrow:hover svg { transform: translateX(3px); }
+
+  /* ============ CHOICE CARDS ============ */
+  .choice-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .choice {
+    border: 1px solid var(--line);
+    background: var(--paper);
+    padding: 20px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    position: relative;
+  }
+  .choice:hover {
+    border-color: var(--ink);
+    background: var(--paper-2);
+  }
+  .choice.selected {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .choice.selected .choice-meta { color: rgba(247, 244, 237, 0.6); }
+  .choice.selected .choice-icon { color: var(--gold); border-color: rgba(247, 244, 237, 0.3); }
+
+  .choice-icon {
+    width: 44px; height: 44px;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--ink);
+    transition: all 0.2s;
+  }
+  .choice-body { flex: 1; }
+  .choice-title {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 2px;
+    letter-spacing: -0.01em;
+  }
+  .choice-meta {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .choice-check {
+    position: absolute;
+    top: 20px; right: 20px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--line-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .choice.selected .choice-check {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+  .choice.selected .choice-check::after {
+    content: '';
+    width: 5px; height: 9px;
+    border: solid var(--ink);
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg) translate(-1px, -1px);
+  }
+
+  /* ============ FORM FIELDS ============ */
+  .field {
+    margin-bottom: 18px;
+  }
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .input, .select {
+    width: 100%;
+    padding: 14px 14px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    background: var(--paper);
+    font-family: var(--sans);
+    font-size: 15px;
+    color: var(--ink);
+    transition: all 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .input:focus, .select:focus {
+    outline: none;
+    border-color: var(--ink);
+    background: #fff;
+  }
+  .input::placeholder { color: var(--muted-2); }
+
+  .select {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1L6 6L11 1' stroke='%230a1628' stroke-width='1.5' fill='none' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px;
+  }
+
+  .input-prefix {
+    position: relative;
+  }
+  .input-prefix .prefix {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 13px;
+    pointer-events: none;
+  }
+  .input-prefix .input { padding-left: 42px; }
+
+  .field-help {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+  .field-error {
+    font-size: 12px;
+    color: var(--error);
+    margin-top: 6px;
+  }
+
+  /* Country picker */
+  .country-search {
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .country-search .input { padding-left: 42px; }
+  .country-search svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+  }
+  .country-list {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    max-height: 280px;
+    overflow-y: auto;
+    background: var(--paper);
+    margin-bottom: 24px;
+  }
+  .country-item {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .country-item:last-child { border-bottom: none; }
+  .country-item:hover { background: var(--paper-2); }
+  .country-item.selected {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .country-flag {
+    font-size: 22px;
+    width: 28px;
+    text-align: center;
+    line-height: 1;
+  }
+  .country-name { flex: 1; font-weight: 500; font-size: 14px; }
+  .country-currency {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+  .country-item.selected .country-currency { color: rgba(247, 244, 237, 0.7); }
+
+  /* ============ ACCOUNT PREVIEW ============ */
+  .account-preview {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    background: var(--paper);
+    transition: all 0.2s;
+  }
+  .account-preview-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .account-preview-title {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 4px 8px;
+    border: 1px solid var(--line-strong);
+    border-radius: 2px;
+    color: var(--muted);
+  }
+  .badge.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .badge.gold { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+
+  .account-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .account-row:last-child { border-bottom: none; }
+  .account-row-left { display: flex; align-items: center; gap: 12px; }
+  .currency-mark {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--paper-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+  .account-row-name {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .account-row-sub {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono);
+    letter-spacing: 0.03em;
+  }
+
+  /* ============ TOGGLE ============ */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--paper);
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .toggle-row:hover { border-color: var(--line-strong); }
+  .toggle-row.on { border-color: var(--ink); background: var(--paper-2); }
+
+  .toggle-info { flex: 1; padding-right: 16px; }
+  .toggle-label {
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toggle-desc { font-size: 12px; color: var(--muted); }
+
+  .switch {
+    width: 44px;
+    height: 26px;
+    background: var(--line-strong);
+    border-radius: 13px;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .switch::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 20px; height: 20px;
+    background: var(--paper);
+    border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle-row.on .switch { background: var(--ink); }
+  .toggle-row.on .switch::after { transform: translateX(18px); }
+
+  /* ============ KYC ============ */
+  .kyc-step {
+    border: 1px solid var(--line);
+    padding: 16px;
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.2s;
+  }
+  .kyc-step.done { background: var(--paper-2); border-color: var(--line-strong); }
+  .kyc-step.active { border-color: var(--ink); }
+
+  .kyc-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--line-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .kyc-step.done .kyc-num {
+    background: var(--success);
+    color: var(--paper);
+    border-color: var(--success);
+  }
+  .kyc-step.active .kyc-num {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .kyc-info { flex: 1; }
+  .kyc-name { font-weight: 500; font-size: 14px; }
+  .kyc-detail { font-size: 12px; color: var(--muted); }
+  .kyc-arrow { color: var(--muted); }
+
+  /* ============ DOC UPLOAD ============ */
+  .upload-zone {
+    border: 1.5px dashed var(--line-strong);
+    border-radius: var(--radius);
+    padding: 32px 20px;
+    text-align: center;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--paper);
+  }
+  .upload-zone:hover {
+    border-color: var(--ink);
+    background: var(--paper-2);
+  }
+  .upload-zone.uploaded {
+    border-style: solid;
+    border-color: var(--success);
+    background: rgba(45, 106, 79, 0.04);
+  }
+  .upload-icon {
+    width: 48px; height: 48px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    background: var(--paper-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+  }
+  .upload-zone.uploaded .upload-icon {
+    background: var(--success);
+    color: var(--paper);
+  }
+  .upload-title { font-weight: 500; font-size: 14px; margin-bottom: 4px; }
+  .upload-sub { font-size: 12px; color: var(--muted); }
+
+  /* ============ SELFIE / CAMERA SIM ============ */
+  .selfie-frame {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--ink);
+    margin: 16px auto 24px;
+    max-width: 240px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--paper);
+  }
+  .selfie-frame::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    border: 2px dashed var(--gold);
+    animation: spin 20s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .selfie-frame.scanning::before {
+    border-style: solid;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse { 50% { opacity: 0.3; } }
+  .selfie-status {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  /* ============ REVIEW ============ */
+  .review-section {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .review-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: var(--paper-2);
+    border-bottom: 1px solid var(--line);
+  }
+  .review-title {
+    font-family: var(--serif);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .edit-link {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--gold);
+    text-underline-offset: 3px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .review-body { padding: 12px 16px; }
+  .review-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 13px;
+  }
+  .review-key { color: var(--muted); }
+  .review-val { font-weight: 500; text-align: right; }
+
+  /* ============ APPROVED ============ */
+  .approved-art {
+    margin: 24px -24px;
+    height: 280px;
+    background: var(--ink);
+    color: var(--paper);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .approved-art svg { width: 100%; height: 100%; position: absolute; inset: 0; }
+  .approved-stamp {
+    position: relative;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 22px;
+    color: var(--gold);
+    border: 1.5px solid var(--gold);
+    padding: 12px 32px;
+    border-radius: 999px;
+    transform: rotate(-4deg);
+    background: var(--ink);
+    z-index: 2;
+    letter-spacing: 0.02em;
+    box-shadow: 0 0 0 4px var(--ink), 0 0 0 5px var(--gold);
+  }
+
+  .reference {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  /* ============ CARD VISUAL ============ */
+  .card-3d {
+    perspective: 1000px;
+    margin: 16px -8px 24px;
+  }
+  .card-face {
+    aspect-ratio: 1.586;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #14223a 0%, #0a1628 60%, #1e2f4d 100%);
+    color: var(--paper);
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+      0 20px 50px rgba(10, 22, 40, 0.3),
+      0 0 0 1px rgba(201, 169, 97, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transform: rotateX(8deg) rotateY(-6deg);
+    transition: transform 0.4s ease;
+  }
+  .card-face::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 20%, rgba(201, 169, 97, 0.15), transparent 50%);
+  }
+  .card-face::after {
+    content: '';
+    position: absolute;
+    top: -50%; right: -30%;
+    width: 200%; height: 200%;
+    background: conic-gradient(from 220deg at 50% 50%, transparent, rgba(201, 169, 97, 0.08), transparent 30%);
+    pointer-events: none;
+  }
+  .card-3d:hover .card-face { transform: rotateX(0) rotateY(0); }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1;
+  }
+  .card-brand {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .card-type {
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    opacity: 0.7;
+    margin-top: 2px;
+  }
+  .card-chip {
+    width: 36px; height: 28px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #d4af6a 0%, #a37f44 100%);
+    position: relative;
+  }
+  .card-chip::before, .card-chip::after {
+    content: '';
+    position: absolute;
+    background: rgba(0,0,0,0.15);
+  }
+  .card-chip::before {
+    inset: 4px 0;
+    border-top: 1px solid rgba(0,0,0,0.2);
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+  }
+  .card-chip::after {
+    inset: 0 12px;
+    border-left: 1px solid rgba(0,0,0,0.2);
+    border-right: 1px solid rgba(0,0,0,0.2);
+  }
+
+  .card-number {
+    font-family: var(--mono);
+    font-size: 17px;
+    letter-spacing: 0.08em;
+    margin: 14px 0 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    position: relative;
+    z-index: 1;
+  }
+  .card-name {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+  }
+  .card-meta-label {
+    font-family: var(--mono);
+    font-size: 8px;
+    opacity: 0.5;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .card-visa {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--gold);
+  }
+
+  /* ============ BOTTOM ACTION BAR ============ */
+  .actions {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 440px;
+    padding: 16px 24px 24px;
+    background: linear-gradient(to top, var(--paper) 70%, rgba(247, 244, 237, 0));
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .actions-meta {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .actions-meta a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--gold);
+    text-underline-offset: 2px;
+  }
+
+  /* ============ CHECKBOX ============ */
+  .check-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px 0;
+    cursor: pointer;
+  }
+  .checkbox {
+    width: 20px; height: 20px;
+    border: 1.5px solid var(--line-strong);
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .check-row.checked .checkbox {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+  .check-row.checked .checkbox::after {
+    content: '';
+    width: 6px; height: 10px;
+    border: solid var(--paper);
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg) translate(-1px, -1px);
+  }
+  .check-text {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .check-text a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 2px; }
+
+  /* ============ LOADER ============ */
+  .loader-screen {
+    text-align: center;
+    padding: 80px 24px 40px;
+  }
+  .loader-ring {
+    width: 64px; height: 64px;
+    border: 2px solid var(--line);
+    border-top-color: var(--ink);
+    border-radius: 50%;
+    margin: 0 auto 24px;
+    animation: spin 0.8s linear infinite;
+  }
+  .loader-text {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .loader-sub {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: var(--mono);
+    letter-spacing: 0.05em;
+  }
+
+  /* ============ DEV BAR ============ */
+  .dev-bar {
+    position: fixed;
+    top: 12px; right: 12px;
+    z-index: 1000;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dev-bar:hover { opacity: 1; }
+  .dev-bar-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+  .dev-panel {
+    position: fixed;
+    top: 50px; right: 12px;
+    z-index: 1000;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 12px;
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 200px;
+  }
+  .dev-panel.open { display: flex; }
+  .dev-panel button {
+    background: rgba(247, 244, 237, 0.1);
+    border: none;
+    color: var(--paper);
+    padding: 6px 10px;
+    text-align: left;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 10px;
+    border-radius: 3px;
+  }
+  .dev-panel button:hover { background: rgba(247, 244, 237, 0.2); }
+
+  /* ============ BIZ ENTITY FORM ============ */
+  .director-card {
+    border: 1px solid var(--line);
+    padding: 16px;
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .director-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--paper-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .director-info { flex: 1; }
+  .director-name { font-weight: 500; font-size: 14px; }
+  .director-role { font-size: 11px; color: var(--muted); font-family: var(--mono); letter-spacing: 0.05em; text-transform: uppercase; }
+
+  .add-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius);
+    color: var(--ink);
+    cursor: pointer;
+    font-size: 13px;
+    background: none;
+    width: 100%;
+    transition: all 0.2s;
+  }
+  .add-link:hover { border-color: var(--ink); background: var(--paper-2); }
+
+  /* mobile tweaks */
+  @media (max-width: 380px) {
+    h1.display { font-size: 32px; }
+    h2.title { font-size: 22px; }
+    main { padding: 8px 20px 120px; }
+    .topbar, .progress, .actions { padding-left: 20px; padding-right: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="dev-bar" id="devBar">
+  <span class="dev-bar-dot"></span>
+  <span id="devStep">Step 0/12</span>
+</div>
+<div class="dev-panel" id="devPanel">
+  <button onclick="goTo(0)">→ Welcome</button>
+  <button onclick="goTo(1)">→ Account type</button>
+  <button onclick="goTo(2)">→ Citizenship</button>
+  <button onclick="goTo(3)">→ Residence</button>
+  <button onclick="goTo(4)">→ Personal info</button>
+  <button onclick="goTo(5)">→ Account preview</button>
+  <button onclick="goTo(6)">→ KYC overview</button>
+  <button onclick="goTo(7)">→ ID upload</button>
+  <button onclick="goTo(8)">→ Selfie</button>
+  <button onclick="goTo(9)">→ Address proof</button>
+  <button onclick="goTo(10)">→ Review</button>
+  <button onclick="goTo(11)">→ Processing</button>
+  <button onclick="goTo(12)">→ Approved</button>
+  <button onclick="goTo(13)">→ Card application</button>
+  <button onclick="goTo(14)">→ Card issued</button>
+  <button onclick="resetAll()" style="background:var(--rust);margin-top:6px;">↺ Reset</button>
+</div>
+
+<div class="app">
+
+  <!-- TOP BAR -->
+  <div class="topbar" id="topbar">
+    <button class="back-btn" id="backBtn" onclick="goBack()" style="visibility:hidden;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <span>Fynco</span>
+    </div>
+    <button class="icon-btn" onclick="alert('Need help? Chat or call +65 6816 0000')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </button>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress" id="progressEl" style="display:none;">
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <span class="progress-text" id="progressText">01 / 10</span>
+  </div>
+
+  <main id="main">
+
+    <!-- ============ 0. WELCOME ============ -->
+    <section class="screen active" id="screen-0">
+      <div class="hero-art">
+        <svg viewBox="0 0 440 240" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="g1" cx="30%" cy="40%" r="60%">
+              <stop offset="0%" stop-color="#1e2f4d"/>
+              <stop offset="100%" stop-color="#0a1628"/>
+            </radialGradient>
+            <pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="0.6" fill="#c9a961" opacity="0.25"/>
+            </pattern>
+          </defs>
+          <rect width="440" height="240" fill="url(#g1)"/>
+          <rect width="440" height="240" fill="url(#dots)"/>
+          <!-- abstract globe lines -->
+          <g stroke="#c9a961" stroke-width="0.5" fill="none" opacity="0.4">
+            <ellipse cx="220" cy="120" rx="120" ry="120"/>
+            <ellipse cx="220" cy="120" rx="120" ry="40"/>
+            <ellipse cx="220" cy="120" rx="120" ry="80"/>
+            <ellipse cx="220" cy="120" rx="80" ry="120"/>
+            <ellipse cx="220" cy="120" rx="40" ry="120"/>
+            <line x1="100" y1="120" x2="340" y2="120"/>
+            <line x1="220" y1="0" x2="220" y2="240"/>
+          </g>
+          <!-- city dots -->
+          <g fill="#c9a961">
+            <circle cx="180" cy="100" r="2.5"/>
+            <circle cx="245" cy="135" r="2.5"/>
+            <circle cx="278" cy="85" r="2.5"/>
+            <circle cx="160" cy="155" r="2.5"/>
+            <circle cx="220" cy="60" r="2"/>
+          </g>
+          <!-- thin connecting arcs -->
+          <path d="M 180 100 Q 220 60 278 85" stroke="#c9a961" stroke-width="0.8" fill="none" opacity="0.6" stroke-dasharray="2 2"/>
+          <path d="M 245 135 Q 160 145 160 155" stroke="#c9a961" stroke-width="0.8" fill="none" opacity="0.6" stroke-dasharray="2 2"/>
+        </svg>
+        <div class="hero-overlay">
+          <div class="hero-tag">Borderless · Personal · Business</div>
+          <div class="hero-meta">
+            <span>EST. 2024</span>
+            <span>SG · MY · ID · PH · GLOBAL</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="eyebrow">A new chapter</div>
+      <h1 class="display">Banking, written in <em>your</em> currency.</h1>
+      <p class="lede">Open a virtual account in your country, hold SGD and USD beside it, and carry a Visa card built for the way you actually move.</p>
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:32px;">
+        <div style="display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-top:1px solid var(--line);">
+          <span class="currency-mark" style="background:var(--ink);color:var(--gold);">01</span>
+          <div>
+            <div style="font-weight:500;font-size:14px;margin-bottom:2px;">Multi-currency by default</div>
+            <div style="font-size:12px;color:var(--muted);">Local · SGD · USD on demand. One account, three currencies.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-top:1px solid var(--line);">
+          <span class="currency-mark" style="background:var(--ink);color:var(--gold);">02</span>
+          <div>
+            <div style="font-weight:500;font-size:14px;margin-bottom:2px;">Visa card, fully virtual</div>
+            <div style="font-size:12px;color:var(--muted);">Issue instantly after KYC. Physical card optional.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+          <span class="currency-mark" style="background:var(--ink);color:var(--gold);">03</span>
+          <div>
+            <div style="font-weight:500;font-size:14px;margin-bottom:2px;">KYC in under 6 minutes</div>
+            <div style="font-size:12px;color:var(--muted);">Most accounts approved the same day.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 1. ACCOUNT TYPE ============ -->
+    <section class="screen" id="screen-1">
+      <div class="eyebrow">Step one</div>
+      <h2 class="title">What are you opening <em>today</em>?</h2>
+      <p class="lede">Different rails, different paperwork. Choose the one that fits.</p>
+
+      <div class="choice-grid">
+        <button class="choice" data-val="consumer" onclick="pickAccountType(this)">
+          <div class="choice-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1"/></svg>
+          </div>
+          <div class="choice-body">
+            <div class="choice-title">Personal</div>
+            <div class="choice-meta">For individuals. Spending, saving, and travel currencies.</div>
+          </div>
+          <div class="choice-check"></div>
+        </button>
+
+        <button class="choice" data-val="business" onclick="pickAccountType(this)">
+          <div class="choice-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="1"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="3" y1="13" x2="21" y2="13"/></svg>
+          </div>
+          <div class="choice-body">
+            <div class="choice-title">Business</div>
+            <div class="choice-meta">For registered companies. Payroll, FX, and supplier payouts.</div>
+          </div>
+          <div class="choice-check"></div>
+        </button>
+      </div>
+    </section>
+
+    <!-- ============ 2. CITIZENSHIP ============ -->
+    <section class="screen" id="screen-2">
+      <div class="eyebrow" id="citizenshipEyebrow">Country of issuance · 1 of 2</div>
+      <h2 class="title" id="citizenshipTitle">Which passport do <em>you</em> hold?</h2>
+      <p class="lede">Your citizenship determines compliance checks, tax reporting, and which regulator owns your file.</p>
+
+      <div class="country-search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="input" id="citizenshipSearch" placeholder="Search countries…" oninput="filterCountries('citizenship')">
+      </div>
+      <div class="country-list" id="citizenshipList"></div>
+
+      <div class="check-row checked" id="checkResideHere" onclick="toggleResideHere()" style="border-top:1px solid var(--line);padding:16px 0;margin-top:4px;">
+        <div class="checkbox"></div>
+        <div class="check-text">
+          <div style="font-weight:500;color:var(--ink);margin-bottom:2px;">I currently reside in <span id="resideCountryName">this country</span></div>
+          <div style="font-size:12px;color:var(--muted);">Uncheck if you live in a different country than your passport.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 3. RESIDENCE ============ -->
+    <section class="screen" id="screen-3">
+      <div class="eyebrow">Country of residence</div>
+      <h2 class="title">And where are you <em>living</em> right now?</h2>
+      <p class="lede">We'll register your account in your country of residence. This becomes your primary local-currency account.</p>
+
+      <div class="country-search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="input" id="residenceSearch" placeholder="Search countries…" oninput="filterCountries('residence')">
+      </div>
+      <div class="country-list" id="residenceList"></div>
+    </section>
+
+    <!-- ============ 4. PERSONAL / BUSINESS INFO ============ -->
+    <section class="screen" id="screen-4">
+      <div id="personalForm">
+        <div class="eyebrow">Tell us about yourself</div>
+        <h2 class="title">A few <em>details</em>.</h2>
+        <p class="lede">Use the name exactly as printed on your government-issued ID.</p>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="label">Legal first name</label>
+            <input class="input" id="firstName" placeholder="Jeremiah">
+          </div>
+          <div class="field">
+            <label class="label">Legal last name</label>
+            <input class="input" id="lastName" placeholder="Ng">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Date of birth</label>
+          <div class="field-row" style="grid-template-columns: 1fr 1fr 1.2fr;">
+            <select class="select" id="dobDay"><option value="">DD</option></select>
+            <select class="select" id="dobMonth"><option value="">MM</option></select>
+            <select class="select" id="dobYear"><option value="">YYYY</option></select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Email address</label>
+          <input class="input" id="email" type="email" placeholder="you@email.com">
+          <div class="field-help">We'll send a verification code here.</div>
+        </div>
+
+        <div class="field">
+          <label class="label">Mobile number</label>
+          <div class="input-prefix">
+            <span class="prefix" id="phonePrefix">+65</span>
+            <input class="input" id="phone" type="tel" placeholder="9123 4567">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Source of funds</label>
+          <select class="select" id="sourceFunds">
+            <option value="">Select one…</option>
+            <option>Salary / employment income</option>
+            <option>Business income</option>
+            <option>Investment returns</option>
+            <option>Savings</option>
+            <option>Inheritance / gift</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="businessForm" style="display:none;">
+        <div class="eyebrow">About the business</div>
+        <h2 class="title">Tell us about <em>the company</em>.</h2>
+        <p class="lede">Information must match your business registration documents.</p>
+
+        <div class="field">
+          <label class="label">Registered legal name</label>
+          <input class="input" id="bizName" placeholder="Rudra Tech Pte Ltd">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="label">Registration number</label>
+            <input class="input" id="bizUEN" placeholder="202227454M">
+          </div>
+          <div class="field">
+            <label class="label">Incorporated</label>
+            <input class="input" id="bizYear" placeholder="2022">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Industry</label>
+          <select class="select" id="bizIndustry">
+            <option value="">Select industry…</option>
+            <option>Software / IT services</option>
+            <option>E-commerce / retail</option>
+            <option>Financial services</option>
+            <option>Professional services</option>
+            <option>Manufacturing</option>
+            <option>Hospitality / F&B</option>
+            <option>Real estate</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label">Expected monthly turnover</label>
+          <select class="select" id="bizTurnover">
+            <option value="">Select range…</option>
+            <option>Under SGD 10,000</option>
+            <option>SGD 10,000 – 50,000</option>
+            <option>SGD 50,000 – 250,000</option>
+            <option>SGD 250,000 – 1,000,000</option>
+            <option>Over SGD 1,000,000</option>
+          </select>
+        </div>
+
+        <div class="label" style="margin-top:24px;">Directors &amp; signatories</div>
+        <div id="directorList">
+          <div class="director-card">
+            <div class="director-avatar">JN</div>
+            <div class="director-info">
+              <div class="director-name">Jeremiah Ng</div>
+              <div class="director-role">Director · Primary signatory · You</div>
+            </div>
+          </div>
+        </div>
+        <button class="add-link" onclick="alert('Add director — would open a sub-form in production.')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add another director
+        </button>
+      </div>
+    </section>
+
+    <!-- ============ 5. ACCOUNT PREVIEW ============ -->
+    <section class="screen" id="screen-5">
+      <div class="eyebrow">Your account structure</div>
+      <h2 class="title">Here's what we'll <em>open</em>.</h2>
+      <p class="lede">Every Fynco account comes paired with SGD. Add USD if you transact internationally.</p>
+
+      <div class="account-preview">
+        <div class="account-preview-head">
+          <div class="account-preview-title" id="accountHolder">Personal account</div>
+          <span class="badge primary" id="accountIssuer">Issued in SG</span>
+        </div>
+
+        <div class="account-row">
+          <div class="account-row-left">
+            <div class="currency-mark" id="localMark">SGD</div>
+            <div>
+              <div class="account-row-name" id="localName">Singapore Dollar</div>
+              <div class="account-row-sub">Local · Primary</div>
+            </div>
+          </div>
+          <span class="badge gold">Required</span>
+        </div>
+
+        <div class="account-row" id="sgdRow">
+          <div class="account-row-left">
+            <div class="currency-mark">SGD</div>
+            <div>
+              <div class="account-row-name">Singapore Dollar</div>
+              <div class="account-row-sub">Regional hub</div>
+            </div>
+          </div>
+          <span class="badge">Included</span>
+        </div>
+
+        <div class="account-row">
+          <div class="account-row-left">
+            <div class="currency-mark">USD</div>
+            <div>
+              <div class="account-row-name">US Dollar</div>
+              <div class="account-row-sub">Optional · Adds SWIFT</div>
+            </div>
+          </div>
+          <span class="badge" id="usdBadge">Off</span>
+        </div>
+      </div>
+
+      <div class="toggle-row" id="usdToggle" onclick="toggleUSD()">
+        <div class="toggle-info">
+          <div class="toggle-label">
+            Add USD account
+            <span style="font-family:var(--mono);font-size:9px;background:var(--gold);color:var(--ink);padding:2px 6px;border-radius:2px;letter-spacing:0.05em;">FREE</span>
+          </div>
+          <div class="toggle-desc">Hold and receive USD via wire (SWIFT) and ACH. No monthly fee.</div>
+        </div>
+        <div class="switch"></div>
+      </div>
+
+      <div style="font-size:12px;color:var(--muted);padding:14px 0;line-height:1.5;border-top:1px solid var(--line);margin-top:8px;">
+        Account opening is free. Maintenance fees waived for the first 12 months. FX conversion uses interbank mid-rate + 0.35%.
+      </div>
+    </section>
+
+    <!-- ============ 6. KYC OVERVIEW ============ -->
+    <section class="screen" id="screen-6">
+      <div class="eyebrow">Identity verification</div>
+      <h2 class="title">Three things to <em>confirm</em>.</h2>
+      <p class="lede">Required by your local regulator. Most people finish this in under six minutes.</p>
+
+      <div id="kycStepsList">
+        <div class="kyc-step active" onclick="goTo(7)">
+          <div class="kyc-num">1</div>
+          <div class="kyc-info">
+            <div class="kyc-name">Government-issued ID</div>
+            <div class="kyc-detail">Passport, NRIC, or driver's license</div>
+          </div>
+          <svg class="kyc-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="kyc-step">
+          <div class="kyc-num">2</div>
+          <div class="kyc-info">
+            <div class="kyc-name">Selfie liveness check</div>
+            <div class="kyc-detail">Quick face scan to match your ID</div>
+          </div>
+          <svg class="kyc-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="kyc-step">
+          <div class="kyc-num">3</div>
+          <div class="kyc-info">
+            <div class="kyc-name">Proof of address</div>
+            <div class="kyc-detail">Utility bill or bank statement, last 3 months</div>
+          </div>
+          <svg class="kyc-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="kyc-step" id="kycBizExtra" style="display:none;">
+          <div class="kyc-num">4</div>
+          <div class="kyc-info">
+            <div class="kyc-name">Business documents</div>
+            <div class="kyc-detail">Certificate of incorporation, M&amp;AA</div>
+          </div>
+          <svg class="kyc-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;padding:14px;background:var(--paper-2);border-radius:var(--radius);font-size:12px;color:var(--muted);line-height:1.5;display:flex;gap:10px;align-items:flex-start;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;color:var(--ink);"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Your documents are encrypted end-to-end and never stored after verification. Read our <a href="#" style="color:var(--ink);">data policy</a>.
+      </div>
+    </section>
+
+    <!-- ============ 7. ID UPLOAD ============ -->
+    <section class="screen" id="screen-7">
+      <div class="eyebrow">Verification · 1 of 3</div>
+      <h2 class="title">Upload your <em>ID</em>.</h2>
+      <p class="lede">Choose what you have. Make sure all four corners are visible and the photo isn't blurry.</p>
+
+      <div class="field">
+        <label class="label">Document type</label>
+        <select class="select" id="idType">
+          <option>Passport</option>
+          <option>National ID / NRIC</option>
+          <option>Driver's license</option>
+        </select>
+      </div>
+
+      <div class="upload-zone" id="idFront" onclick="simulateUpload(this, 'idFrontDone')">
+        <div class="upload-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="9" cy="13" r="2"/><path d="M15 11h3M15 14h3"/></svg>
+        </div>
+        <div class="upload-title" id="idFrontTitle">Front of document</div>
+        <div class="upload-sub" id="idFrontSub">Tap to take a photo or upload</div>
+      </div>
+
+      <div class="upload-zone" id="idBack" onclick="simulateUpload(this, 'idBackDone')">
+        <div class="upload-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><line x1="6" y1="11" x2="18" y2="11"/><line x1="6" y1="14" x2="14" y2="14"/></svg>
+        </div>
+        <div class="upload-title" id="idBackTitle">Back of document</div>
+        <div class="upload-sub" id="idBackSub">Tap to take a photo or upload</div>
+      </div>
+    </section>
+
+    <!-- ============ 8. SELFIE ============ -->
+    <section class="screen" id="screen-8">
+      <div class="eyebrow">Verification · 2 of 3</div>
+      <h2 class="title">Look at the <em>camera</em>.</h2>
+      <p class="lede">We'll match your face to the ID you uploaded. This takes about ten seconds.</p>
+
+      <div class="selfie-frame" id="selfieFrame">
+        <video id="selfieVideo" autoplay playsinline muted style="display:none;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);"></video>
+        <div id="selfiePlaceholder" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 21v-1a8 8 0 0116 0v1"/>
+          </svg>
+        </div>
+        <div id="selfieCheckmark" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(45,106,79,0.85);">
+          <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+      </div>
+      <div class="selfie-status" id="selfieStatus">Camera will start when you tap Begin scan</div>
+
+      <button class="btn btn-ghost" id="selfieStartBtn" onclick="startSelfieCamera()" style="margin-top:16px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span>Begin scan</span>
+      </button>
+      <div id="selfieError" style="display:none;font-size:12px;color:var(--error);margin-top:8px;text-align:center;line-height:1.5;"></div>
+    </section>
+
+    <!-- ============ 9. ADDRESS ============ -->
+    <section class="screen" id="screen-9">
+      <div class="eyebrow">Verification · 3 of 3</div>
+      <h2 class="title">Proof of <em>address</em>.</h2>
+      <p class="lede">A document dated within the last 3 months that shows your full name and home address.</p>
+
+      <div class="field">
+        <label class="label">Home address</label>
+        <input class="input" id="addrLine1" placeholder="Street and number">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="label">City</label>
+          <input class="input" id="addrCity" placeholder="Singapore">
+        </div>
+        <div class="field">
+          <label class="label">Postal code</label>
+          <input class="input" id="addrPostal" placeholder="123456">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Document type</label>
+        <select class="select">
+          <option>Utility bill (electricity, water, gas)</option>
+          <option>Bank or credit card statement</option>
+          <option>Government-issued letter</option>
+          <option>Tenancy agreement</option>
+        </select>
+      </div>
+
+      <div class="upload-zone" id="addrDoc" onclick="simulateUpload(this, 'addrDocDone')">
+        <div class="upload-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div class="upload-title" id="addrDocTitle">Upload document</div>
+        <div class="upload-sub" id="addrDocSub">PDF, JPG, or PNG · Max 10MB</div>
+      </div>
+    </section>
+
+    <!-- ============ 10. REVIEW ============ -->
+    <section class="screen" id="screen-10">
+      <div class="eyebrow">Almost there</div>
+      <h2 class="title">Take a final <em>look</em>.</h2>
+      <p class="lede">You can edit anything before submitting. After this, changes go through compliance.</p>
+
+      <div class="review-section">
+        <div class="review-head">
+          <div class="review-title">Account</div>
+          <button class="edit-link" onclick="goTo(1)">Edit</button>
+        </div>
+        <div class="review-body">
+          <div class="review-row"><span class="review-key">Type</span><span class="review-val" id="rType">—</span></div>
+          <div class="review-row"><span class="review-key">Citizenship</span><span class="review-val" id="rCitizen">—</span></div>
+          <div class="review-row"><span class="review-key">Country of issuance</span><span class="review-val" id="rIssue">—</span></div>
+        </div>
+      </div>
+
+      <div class="review-section">
+        <div class="review-head">
+          <div class="review-title" id="rPersonHead">Personal information</div>
+          <button class="edit-link" onclick="goTo(4)">Edit</button>
+        </div>
+        <div class="review-body" id="rPersonBody"></div>
+      </div>
+
+      <div class="review-section">
+        <div class="review-head">
+          <div class="review-title">Currencies</div>
+          <button class="edit-link" onclick="goTo(5)">Edit</button>
+        </div>
+        <div class="review-body">
+          <div class="review-row"><span class="review-key">Local</span><span class="review-val" id="rLocal">—</span></div>
+          <div class="review-row"><span class="review-key">SGD</span><span class="review-val">Included</span></div>
+          <div class="review-row"><span class="review-key">USD</span><span class="review-val" id="rUSD">Off</span></div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;">
+        <div class="check-row" id="checkTos" onclick="this.classList.toggle('checked');updateActions();">
+          <div class="checkbox"></div>
+          <div class="check-text">I agree to the <a href="#">Account Terms</a>, <a href="#">Visa Cardholder Agreement</a>, and the <a href="#">Privacy Policy</a>.</div>
+        </div>
+        <div class="check-row" id="checkAcc" onclick="this.classList.toggle('checked');updateActions();">
+          <div class="checkbox"></div>
+          <div class="check-text">I confirm the information above is accurate, and I understand that providing false information is an offence.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 11. PROCESSING ============ -->
+    <section class="screen" id="screen-11">
+      <div class="loader-screen">
+        <div class="loader-ring"></div>
+        <div class="loader-text" id="loaderText">Verifying your details</div>
+        <div class="loader-sub" id="loaderSub">This usually takes 30 seconds…</div>
+      </div>
+      <div style="max-width:300px;margin:0 auto;">
+        <div class="kyc-step done" id="procStep1">
+          <div class="kyc-num">✓</div>
+          <div class="kyc-info"><div class="kyc-name">Identity match</div><div class="kyc-detail">Face matches ID</div></div>
+        </div>
+        <div class="kyc-step active" id="procStep2">
+          <div class="kyc-num">2</div>
+          <div class="kyc-info"><div class="kyc-name">Sanctions &amp; PEP screening</div><div class="kyc-detail">Cross-checking watchlists</div></div>
+        </div>
+        <div class="kyc-step" id="procStep3">
+          <div class="kyc-num">3</div>
+          <div class="kyc-info"><div class="kyc-name">Account provisioning</div><div class="kyc-detail">Issuing your virtual IBAN</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 12. APPROVED ============ -->
+    <section class="screen" id="screen-12">
+      <div class="approved-art">
+        <svg viewBox="0 0 440 280" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="g2" cx="50%" cy="50%" r="60%">
+              <stop offset="0%" stop-color="#1e2f4d"/>
+              <stop offset="100%" stop-color="#0a1628"/>
+            </radialGradient>
+            <pattern id="dots2" width="16" height="16" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="0.5" fill="#c9a961" opacity="0.3"/>
+            </pattern>
+          </defs>
+          <rect width="440" height="280" fill="url(#g2)"/>
+          <rect width="440" height="280" fill="url(#dots2)"/>
+          <g stroke="#c9a961" stroke-width="0.4" fill="none" opacity="0.3">
+            <circle cx="220" cy="140" r="40"/>
+            <circle cx="220" cy="140" r="80"/>
+            <circle cx="220" cy="140" r="120"/>
+            <circle cx="220" cy="140" r="160"/>
+          </g>
+        </svg>
+        <div class="approved-stamp">Approved</div>
+      </div>
+
+      <h2 class="title" style="text-align:center;">Welcome to <em>Fynco</em>.</h2>
+      <p class="lede" style="text-align:center;margin:0 auto 20px;">Your account is live. We've sent a confirmation to your email and verified your phone.</p>
+      <div class="reference">REFERENCE · <span id="refNum">FYN-2026-0000000</span></div>
+
+      <div style="border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:20px 0;margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div>
+            <div class="label" style="margin-bottom:2px;">Primary account</div>
+            <div style="font-family:var(--serif);font-size:18px;" id="approvedLocal">SGD Singapore Dollar</div>
+          </div>
+          <span class="badge gold">Active</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:13px;letter-spacing:0.05em;" id="approvedIBAN">SG-FYN-2847-1936-2810</div>
+      </div>
+
+      <div style="background:var(--ink);color:var(--paper);padding:24px;border-radius:var(--radius);margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div>
+            <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;opacity:0.6;margin-bottom:6px;">Next step · Optional</div>
+            <div style="font-family:var(--serif);font-size:20px;">Apply for your Visa.</div>
+          </div>
+          <svg width="40" height="26" viewBox="0 0 40 26" fill="none" style="flex-shrink:0;">
+            <text x="0" y="20" font-family="serif" font-style="italic" font-weight="700" font-size="22" fill="#c9a961" letter-spacing="-0.5">VISA</text>
+          </svg>
+        </div>
+        <div style="font-size:13px;opacity:0.8;line-height:1.5;margin-bottom:16px;">Virtual card issued instantly. Add to Apple Pay or Google Wallet in under a minute. Physical card ships in 5–7 business days.</div>
+      </div>
+    </section>
+
+    <!-- ============ 13. CARD APPLICATION ============ -->
+    <section class="screen" id="screen-13">
+      <div class="eyebrow">Visa application</div>
+      <h2 class="title">Choose your <em>card</em>.</h2>
+      <p class="lede">Both options come with a virtual card you can use in 60 seconds. Physical card is a free add-on.</p>
+
+      <div class="card-3d">
+        <div class="card-face">
+          <div class="card-top">
+            <div>
+              <div class="card-brand">Fynco</div>
+              <div class="card-type" id="cardTypeLabel">Personal · Multi-currency</div>
+            </div>
+            <div class="card-chip"></div>
+          </div>
+          <div>
+            <div class="card-number">4716 ●●●● ●●●● 2810</div>
+            <div class="card-bottom">
+              <div>
+                <div class="card-meta-label">Cardholder</div>
+                <div class="card-name" id="cardName">JEREMIAH NG</div>
+              </div>
+              <div class="card-visa">VISA</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="choice-grid">
+        <button class="choice selected" data-card="virtual" onclick="pickCard(this)">
+          <div class="choice-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          </div>
+          <div class="choice-body">
+            <div class="choice-title">Virtual only</div>
+            <div class="choice-meta">Issued in 60 seconds. Apple Pay &amp; Google Wallet ready. No fee.</div>
+          </div>
+          <div class="choice-check"></div>
+        </button>
+
+        <button class="choice" data-card="physical" onclick="pickCard(this)">
+          <div class="choice-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h2M11 15h2"/></svg>
+          </div>
+          <div class="choice-body">
+            <div class="choice-title">Virtual + Physical</div>
+            <div class="choice-meta">Metal card ships in 5–7 days. SGD 0 issuance fee.</div>
+          </div>
+          <div class="choice-check"></div>
+        </button>
+      </div>
+
+      <div class="field">
+        <label class="label">Set a 6-digit card PIN</label>
+        <div class="input-prefix">
+          <input class="input" id="cardPin" type="password" inputmode="numeric" maxlength="6" placeholder="● ● ● ● ● ●" style="letter-spacing:0.4em;font-family:var(--mono);">
+        </div>
+        <div class="field-help">You'll use this for ATM withdrawals and high-value transactions.</div>
+      </div>
+    </section>
+
+    <!-- ============ 14. CARD ISSUED ============ -->
+    <section class="screen" id="screen-14">
+      <div class="eyebrow" style="text-align:center;justify-content:center;display:flex;">
+        <span style="background:var(--success);color:var(--paper);padding:2px 8px;border-radius:2px;font-size:10px;letter-spacing:0.1em;">CARD ISSUED</span>
+      </div>
+      <h2 class="title" style="text-align:center;">Your Visa is <em>live</em>.</h2>
+      <p class="lede" style="text-align:center;margin:0 auto 12px;">Use it now in apps and online. Add it to your wallet for tap-to-pay.</p>
+
+      <div class="card-3d">
+        <div class="card-face">
+          <div class="card-top">
+            <div>
+              <div class="card-brand">Fynco</div>
+              <div class="card-type" id="cardTypeLabel2">Personal · Multi-currency</div>
+            </div>
+            <div class="card-chip"></div>
+          </div>
+          <div>
+            <div class="card-number" id="cardNumberFull">4716 8294 1736 2810</div>
+            <div class="card-bottom">
+              <div>
+                <div class="card-meta-label">Cardholder · Exp 04/30</div>
+                <div class="card-name" id="cardName2">JEREMIAH NG</div>
+              </div>
+              <div class="card-visa">VISA</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;">
+        <button class="btn btn-ghost" style="font-size:13px;padding:14px;" onclick="alert('Apple Wallet — would launch native add-card flow.')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+          Apple Wallet
+        </button>
+        <button class="btn btn-ghost" style="font-size:13px;padding:14px;" onclick="alert('Google Wallet — would launch native add-card flow.')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="12" cy="13" r="2"/></svg>
+          Google Wallet
+        </button>
+      </div>
+
+      <div style="border-top:1px solid var(--line);padding-top:20px;">
+        <div style="font-family:var(--serif);font-size:18px;margin-bottom:14px;">A few things to know</div>
+        <div style="display:flex;gap:14px;align-items:flex-start;padding:10px 0;">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);width:18px;flex-shrink:0;">01</span>
+          <div style="font-size:13px;line-height:1.5;">Daily online spend limit is SGD 5,000. Tap to raise it after 30 days.</div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;padding:10px 0;">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);width:18px;flex-shrink:0;">02</span>
+          <div style="font-size:13px;line-height:1.5;">Auto-FX: spend in any currency, we'll pull from the matching wallet first.</div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;padding:10px 0;">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);width:18px;flex-shrink:0;">03</span>
+          <div style="font-size:13px;line-height:1.5;">Lost your card? Freeze it instantly from the app.</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ ACTIONS ============ -->
+  <div class="actions" id="actions">
+    <button class="btn btn-primary btn-arrow" id="primaryBtn" onclick="goNext()">
+      <span id="primaryBtnText">Begin</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+    <div class="actions-meta" id="actionsMeta">Already have an account? <a href="#" onclick="event.preventDefault();alert('Sign in flow goes here.')">Sign in</a></div>
+  </div>
+
+</div>
+
+<script>
+// ============ STATE ============
+const state = {
+  step: 0,
+  accountType: null, // 'consumer' | 'business'
+  citizenship: null,
+  residence: null,
+  resideHere: true, // default: passport country = residence
+  usdEnabled: false,
+  cardOption: 'virtual',
+  idFrontDone: false,
+  idBackDone: false,
+  selfieDone: false,
+  addrDocDone: false,
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+};
+
+const TOTAL_STEPS = 14;
+const SHOW_PROGRESS_FROM = 1;
+const SHOW_PROGRESS_TO = 10;
+
+// ============ COUNTRIES ============
+const countries = [
+  { code: 'SG', name: 'Singapore', flag: '🇸🇬', currency: 'SGD', dial: '+65' },
+  { code: 'MY', name: 'Malaysia', flag: '🇲🇾', currency: 'MYR', dial: '+60' },
+  { code: 'ID', name: 'Indonesia', flag: '🇮🇩', currency: 'IDR', dial: '+62' },
+  { code: 'PH', name: 'Philippines', flag: '🇵🇭', currency: 'PHP', dial: '+63' },
+  { code: 'TH', name: 'Thailand', flag: '🇹🇭', currency: 'THB', dial: '+66' },
+  { code: 'VN', name: 'Vietnam', flag: '🇻🇳', currency: 'VND', dial: '+84' },
+  { code: 'HK', name: 'Hong Kong', flag: '🇭🇰', currency: 'HKD', dial: '+852' },
+  { code: 'JP', name: 'Japan', flag: '🇯🇵', currency: 'JPY', dial: '+81' },
+  { code: 'KR', name: 'South Korea', flag: '🇰🇷', currency: 'KRW', dial: '+82' },
+  { code: 'IN', name: 'India', flag: '🇮🇳', currency: 'INR', dial: '+91' },
+  { code: 'AU', name: 'Australia', flag: '🇦🇺', currency: 'AUD', dial: '+61' },
+  { code: 'NZ', name: 'New Zealand', flag: '🇳🇿', currency: 'NZD', dial: '+64' },
+  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', currency: 'GBP', dial: '+44' },
+  { code: 'US', name: 'United States', flag: '🇺🇸', currency: 'USD', dial: '+1' },
+  { code: 'CA', name: 'Canada', flag: '🇨🇦', currency: 'CAD', dial: '+1' },
+  { code: 'DE', name: 'Germany', flag: '🇩🇪', currency: 'EUR', dial: '+49' },
+  { code: 'FR', name: 'France', flag: '🇫🇷', currency: 'EUR', dial: '+33' },
+  { code: 'AE', name: 'UAE', flag: '🇦🇪', currency: 'AED', dial: '+971' },
+];
+
+function renderCountryList(target) {
+  const filter = (document.getElementById(target + 'Search').value || '').toLowerCase();
+  const list = document.getElementById(target + 'List');
+  const filtered = countries.filter(c => c.name.toLowerCase().includes(filter) || c.code.toLowerCase().includes(filter));
+  list.innerHTML = filtered.map(c => {
+    const sel = state[target] && state[target].code === c.code ? 'selected' : '';
+    return `<div class="country-item ${sel}" onclick="pickCountry('${target}','${c.code}')">
+      <span class="country-flag">${c.flag}</span>
+      <span class="country-name">${c.name}</span>
+      <span class="country-currency">${c.currency} · ${c.dial}</span>
+    </div>`;
+  }).join('');
+}
+
+function filterCountries(target) { renderCountryList(target); }
+
+function pickCountry(target, code) {
+  state[target] = countries.find(c => c.code === code);
+  renderCountryList(target);
+  // sync phone prefix when residence chosen
+  if (target === 'residence') {
+    const ph = document.getElementById('phonePrefix');
+    if (ph) ph.textContent = state.residence.dial;
+  }
+  // when picking citizenship and 'reside here' is checked, mirror to residence
+  if (target === 'citizenship') {
+    updateResideLabel();
+    if (state.resideHere) {
+      state.residence = state.citizenship;
+      const ph = document.getElementById('phonePrefix');
+      if (ph) ph.textContent = state.residence.dial;
+    }
+  }
+  updateActions();
+}
+
+function toggleResideHere() {
+  state.resideHere = !state.resideHere;
+  const row = document.getElementById('checkResideHere');
+  if (state.resideHere) {
+    row.classList.add('checked');
+    // mirror citizenship to residence
+    if (state.citizenship) {
+      state.residence = state.citizenship;
+      const ph = document.getElementById('phonePrefix');
+      if (ph) ph.textContent = state.residence.dial;
+    }
+  } else {
+    row.classList.remove('checked');
+    // user wants to pick a different residence — clear it
+    state.residence = null;
+  }
+  updateActions();
+}
+
+function updateResideLabel() {
+  const el = document.getElementById('resideCountryName');
+  if (!el) return;
+  if (state.citizenship) {
+    el.textContent = `${state.citizenship.flag} ${state.citizenship.name}`;
+  } else {
+    el.textContent = 'this country';
+  }
+}
+
+// ============ TYPE ============
+function pickAccountType(el) {
+  document.querySelectorAll('#screen-1 .choice').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.accountType = el.dataset.val;
+  updateActions();
+}
+
+// ============ TOGGLE USD ============
+function toggleUSD() {
+  state.usdEnabled = !state.usdEnabled;
+  const t = document.getElementById('usdToggle');
+  const b = document.getElementById('usdBadge');
+  if (state.usdEnabled) { t.classList.add('on'); b.textContent = 'On'; b.classList.add('primary'); }
+  else { t.classList.remove('on'); b.textContent = 'Off'; b.classList.remove('primary'); }
+}
+
+// ============ CARD ============
+function pickCard(el) {
+  document.querySelectorAll('#screen-13 .choice').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.cardOption = el.dataset.card;
+}
+
+// ============ UPLOAD SIMULATION ============
+function simulateUpload(el, stateKey) {
+  if (el.classList.contains('uploaded')) return;
+  el.classList.add('uploaded');
+  const titleEl = el.querySelector('.upload-title');
+  const subEl = el.querySelector('.upload-sub');
+  titleEl.textContent = 'Uploaded';
+  subEl.textContent = 'Looks good · tap to replace';
+  el.querySelector('.upload-icon').innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  state[stateKey] = true;
+  updateActions();
+}
+
+// ============ NAVIGATION ============
+function goTo(step) {
+  // Stop camera if leaving the selfie screen
+  if (state.step === 8 && step !== 8) {
+    stopSelfieCamera();
+  }
+
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + step).classList.add('active');
+  state.step = step;
+
+  // Special handling on step entry
+  if (step === 2) {
+    renderCountryList('citizenship');
+    updateResideLabel();
+    // sync checkbox visual to current state
+    const row = document.getElementById('checkResideHere');
+    if (state.resideHere) row.classList.add('checked'); else row.classList.remove('checked');
+  }
+  if (step === 3) {
+    renderCountryList('residence');
+  }
+  if (step === 4) {
+    populateDOB();
+    if (state.accountType === 'business') {
+      document.getElementById('personalForm').style.display = 'none';
+      document.getElementById('businessForm').style.display = 'block';
+    } else {
+      document.getElementById('personalForm').style.display = 'block';
+      document.getElementById('businessForm').style.display = 'none';
+    }
+  }
+  if (step === 5) {
+    updateAccountPreview();
+  }
+  if (step === 6) {
+    document.getElementById('kycBizExtra').style.display = state.accountType === 'business' ? 'flex' : 'none';
+  }
+  if (step === 8) {
+    runSelfieFlow();
+  }
+  if (step === 10) {
+    populateReview();
+  }
+  if (step === 11) {
+    runProcessing();
+  }
+  if (step === 12) {
+    populateApproved();
+  }
+  if (step === 13) {
+    populateCardScreen();
+  }
+  if (step === 14) {
+    populateCardIssued();
+  }
+
+  updateProgress();
+  updateActions();
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  document.getElementById('devStep').textContent = `Step ${step}/${TOTAL_STEPS}`;
+}
+
+function goNext() {
+  if (!canAdvance()) return;
+  if (state.step === 10) { goTo(11); return; }
+  if (state.step === 13) { goTo(11); /* second processing */ setTimeout(()=>goTo(14), 2200); return; }
+  if (state.step === 14) { alert('Onboarding complete. In production, this would open the main banking app.'); return; }
+  // Skip residence screen if user said they reside in passport country
+  if (state.step === 2 && state.resideHere && state.citizenship) {
+    state.residence = state.citizenship;
+    const ph = document.getElementById('phonePrefix');
+    if (ph) ph.textContent = state.residence.dial;
+    goTo(4);
+    return;
+  }
+  goTo(state.step + 1);
+}
+
+function goBack() {
+  if (state.step === 0) return;
+  // Skip residence on the way back too
+  if (state.step === 4 && state.resideHere) {
+    goTo(2);
+    return;
+  }
+  goTo(state.step - 1);
+}
+
+function canAdvance() {
+  switch (state.step) {
+    case 1: return !!state.accountType;
+    case 2: return !!state.citizenship;
+    case 3: return !!state.residence;
+    case 4: return validatePersonal();
+    case 7: return state.idFrontDone && state.idBackDone;
+    case 8: return state.selfieDone;
+    case 9: return state.addrDocDone;
+    case 10: return document.getElementById('checkTos').classList.contains('checked') &&
+                    document.getElementById('checkAcc').classList.contains('checked');
+    default: return true;
+  }
+}
+
+function validatePersonal() {
+  if (state.accountType === 'business') {
+    return document.getElementById('bizName').value.trim() &&
+           document.getElementById('bizUEN').value.trim() &&
+           document.getElementById('bizIndustry').value;
+  }
+  return document.getElementById('firstName').value.trim() &&
+         document.getElementById('lastName').value.trim() &&
+         document.getElementById('email').value.trim() &&
+         document.getElementById('phone').value.trim();
+}
+
+// ============ PROGRESS ============
+function updateProgress() {
+  const progressEl = document.getElementById('progressEl');
+  if (state.step >= SHOW_PROGRESS_FROM && state.step <= SHOW_PROGRESS_TO) {
+    progressEl.style.display = 'flex';
+    const pct = ((state.step - SHOW_PROGRESS_FROM + 1) / (SHOW_PROGRESS_TO - SHOW_PROGRESS_FROM + 1)) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+    const cur = String(state.step - SHOW_PROGRESS_FROM + 1).padStart(2, '0');
+    const tot = String(SHOW_PROGRESS_TO - SHOW_PROGRESS_FROM + 1).padStart(2, '0');
+    document.getElementById('progressText').textContent = `${cur} / ${tot}`;
+  } else {
+    progressEl.style.display = 'none';
+  }
+
+  // back button
+  const back = document.getElementById('backBtn');
+  if (state.step > 0 && state.step !== 11 && state.step !== 12 && state.step !== 14) {
+    back.style.visibility = 'visible';
+  } else {
+    back.style.visibility = 'hidden';
+  }
+}
+
+// ============ ACTION BAR ============
+function updateActions() {
+  const btn = document.getElementById('primaryBtn');
+  const txt = document.getElementById('primaryBtnText');
+  const meta = document.getElementById('actionsMeta');
+  const actions = document.getElementById('actions');
+
+  actions.style.display = 'flex';
+  meta.style.display = 'block';
+
+  switch (state.step) {
+    case 0: txt.textContent = 'Begin'; meta.innerHTML = 'Already have an account? <a href="#" onclick="event.preventDefault();alert(\'Sign in flow goes here.\')">Sign in</a>'; break;
+    case 1: txt.textContent = 'Continue'; meta.innerHTML = `<span style="opacity:0.7;">Both account types are fully digital</span>`; break;
+    case 2: {
+      txt.textContent = 'Continue';
+      if (!state.citizenship) {
+        meta.innerHTML = 'Select your citizenship to continue';
+      } else if (state.resideHere) {
+        meta.innerHTML = `Account will be issued in ${state.citizenship.flag} ${state.citizenship.name}`;
+      } else {
+        meta.innerHTML = `Citizenship: ${state.citizenship.flag} ${state.citizenship.name} · pick residence next`;
+      }
+      break;
+    }
+    case 3: txt.textContent = 'Continue'; meta.innerHTML = state.residence ? `Account will be issued in ${state.residence.flag} ${state.residence.name}` : 'Select your country of residence'; break;
+    case 4: txt.textContent = 'Continue'; meta.innerHTML = '<span style="opacity:0.7;">All information is encrypted</span>'; break;
+    case 5: txt.textContent = 'Looks good — continue'; meta.innerHTML = '<span style="opacity:0.7;">You can change currency settings anytime</span>'; break;
+    case 6: txt.textContent = 'Start verification'; meta.innerHTML = '<span style="opacity:0.7;">Estimated time: 6 minutes</span>'; break;
+    case 7: txt.textContent = state.idFrontDone && state.idBackDone ? 'Continue' : 'Upload both sides to continue'; meta.innerHTML = '<span style="opacity:0.7;">Your ID is encrypted in transit</span>'; break;
+    case 8: txt.textContent = state.selfieDone ? 'Continue' : 'Scanning…'; meta.innerHTML = '<span style="opacity:0.7;">Look directly at the camera</span>'; break;
+    case 9: txt.textContent = state.addrDocDone ? 'Continue' : 'Upload to continue'; meta.innerHTML = '<span style="opacity:0.7;">Document must be from the last 90 days</span>'; break;
+    case 10: txt.textContent = 'Submit application'; meta.innerHTML = '<span style="opacity:0.7;">By submitting, you agree to a soft credit check</span>'; break;
+    case 11: actions.style.display = 'none'; break;
+    case 12: txt.textContent = 'Apply for Visa card'; meta.innerHTML = '<a href="#" onclick="event.preventDefault();goTo(0);">Skip for now — go to dashboard</a>'; break;
+    case 13: txt.textContent = 'Issue my card'; meta.innerHTML = '<span style="opacity:0.7;">Virtual card ready in 60 seconds</span>'; break;
+    case 14: txt.textContent = 'Open dashboard'; meta.innerHTML = '<span style="opacity:0.7;">You can revisit setup anytime in Settings</span>'; break;
+  }
+
+  btn.disabled = !canAdvance();
+}
+
+// ============ FORM POPULATORS ============
+function populateDOB() {
+  const day = document.getElementById('dobDay');
+  const mon = document.getElementById('dobMonth');
+  const yr = document.getElementById('dobYear');
+  if (day.options.length > 1) return;
+  for (let i = 1; i <= 31; i++) day.innerHTML += `<option>${String(i).padStart(2,'0')}</option>`;
+  ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].forEach((m,i) => mon.innerHTML += `<option value="${i+1}">${m}</option>`);
+  for (let y = 2008; y >= 1940; y--) yr.innerHTML += `<option>${y}</option>`;
+}
+
+function updateAccountPreview() {
+  const issuer = state.residence;
+  document.getElementById('accountHolder').textContent = state.accountType === 'business' ? 'Business account' : 'Personal account';
+  document.getElementById('accountIssuer').textContent = issuer ? `Issued in ${issuer.code}` : 'Issued in —';
+  document.getElementById('localMark').textContent = issuer ? issuer.currency : '—';
+  document.getElementById('localName').textContent = issuer ? `${getCurrencyName(issuer.currency)}` : '—';
+
+  // hide SGD row if local IS SGD
+  const sgdRow = document.getElementById('sgdRow');
+  if (issuer && issuer.currency === 'SGD') {
+    sgdRow.style.display = 'none';
+  } else {
+    sgdRow.style.display = 'flex';
+  }
+}
+
+function getCurrencyName(code) {
+  const map = {
+    SGD: 'Singapore Dollar', MYR: 'Malaysian Ringgit', IDR: 'Indonesian Rupiah',
+    PHP: 'Philippine Peso', THB: 'Thai Baht', VND: 'Vietnamese Dong',
+    HKD: 'Hong Kong Dollar', JPY: 'Japanese Yen', KRW: 'Korean Won',
+    INR: 'Indian Rupee', AUD: 'Australian Dollar', NZD: 'New Zealand Dollar',
+    GBP: 'British Pound', USD: 'US Dollar', CAD: 'Canadian Dollar',
+    EUR: 'Euro', AED: 'UAE Dirham',
+  };
+  return map[code] || code;
+}
+
+// ============ SELFIE (real camera + simulated liveness) ============
+let selfieStream = null;
+
+function runSelfieFlow() {
+  // Reset UI to its initial pre-camera state
+  state.selfieDone = false;
+  const frame = document.getElementById('selfieFrame');
+  const status = document.getElementById('selfieStatus');
+  const startBtn = document.getElementById('selfieStartBtn');
+  const errEl = document.getElementById('selfieError');
+  const placeholder = document.getElementById('selfiePlaceholder');
+  const checkmark = document.getElementById('selfieCheckmark');
+  const video = document.getElementById('selfieVideo');
+
+  frame.classList.remove('scanning');
+  frame.style.background = '';
+  status.textContent = 'Camera will start when you tap Begin scan';
+  startBtn.style.display = 'flex';
+  startBtn.disabled = false;
+  startBtn.querySelector('span').textContent = 'Begin scan';
+  errEl.style.display = 'none';
+  placeholder.style.display = 'flex';
+  checkmark.style.display = 'none';
+  video.style.display = 'none';
+
+  stopSelfieCamera();
+  updateActions();
+}
+
+async function startSelfieCamera() {
+  const status = document.getElementById('selfieStatus');
+  const startBtn = document.getElementById('selfieStartBtn');
+  const errEl = document.getElementById('selfieError');
+  const placeholder = document.getElementById('selfiePlaceholder');
+  const video = document.getElementById('selfieVideo');
+  const frame = document.getElementById('selfieFrame');
+
+  errEl.style.display = 'none';
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    errEl.textContent = 'Your browser does not support camera access. Try Chrome or Safari.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  try {
+    startBtn.disabled = true;
+    startBtn.querySelector('span').textContent = 'Requesting permission…';
+    status.textContent = 'Allow camera access to continue';
+
+    selfieStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 640 } },
+      audio: false,
+    });
+
+    if (state.step !== 8) { stopSelfieCamera(); return; }
+
+    video.srcObject = selfieStream;
+    video.style.display = 'block';
+    placeholder.style.display = 'none';
+    startBtn.style.display = 'none';
+    status.textContent = 'Position your face inside the circle';
+
+    // Brief settle, then run the simulated liveness sequence
+    setTimeout(() => {
+      if (state.step !== 8) return;
+      frame.classList.add('scanning');
+      status.textContent = 'Hold still · scanning…';
+
+      setTimeout(() => {
+        if (state.step !== 8) return;
+        status.textContent = 'Detecting liveness · blink naturally…';
+      }, 1400);
+
+      setTimeout(() => {
+        if (state.step !== 8) return;
+        status.textContent = 'Match confirmed ✓';
+        frame.classList.remove('scanning');
+        document.getElementById('selfieCheckmark').style.display = 'flex';
+        state.selfieDone = true;
+        stopSelfieCamera();
+        updateActions();
+      }, 3200);
+    }, 1500);
+
+  } catch (err) {
+    startBtn.disabled = false;
+    startBtn.querySelector('span').textContent = 'Try again';
+    if (err && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')) {
+      errEl.textContent = 'Camera permission was denied. Enable it in your browser settings and try again.';
+    } else if (err && (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError')) {
+      errEl.textContent = 'No camera found on this device.';
+    } else {
+      errEl.textContent = 'Could not access the camera. ' + (err.message || '');
+    }
+    errEl.style.display = 'block';
+    status.textContent = 'Camera unavailable';
+  }
+}
+
+function stopSelfieCamera() {
+  if (selfieStream) {
+    selfieStream.getTracks().forEach(t => t.stop());
+    selfieStream = null;
+  }
+  const video = document.getElementById('selfieVideo');
+  if (video) video.srcObject = null;
+}
+
+// ============ REVIEW ============
+function populateReview() {
+  document.getElementById('rType').textContent = state.accountType === 'business' ? 'Business' : 'Personal';
+  document.getElementById('rCitizen').textContent = state.citizenship ? `${state.citizenship.flag} ${state.citizenship.name}` : '—';
+  document.getElementById('rIssue').textContent = state.residence ? `${state.residence.flag} ${state.residence.name}` : '—';
+  document.getElementById('rLocal').textContent = state.residence ? state.residence.currency : '—';
+  document.getElementById('rUSD').textContent = state.usdEnabled ? 'Enabled' : 'Off';
+
+  const body = document.getElementById('rPersonBody');
+  if (state.accountType === 'business') {
+    document.getElementById('rPersonHead').textContent = 'Business information';
+    body.innerHTML = `
+      <div class="review-row"><span class="review-key">Legal name</span><span class="review-val">${document.getElementById('bizName').value || '—'}</span></div>
+      <div class="review-row"><span class="review-key">Reg. no.</span><span class="review-val">${document.getElementById('bizUEN').value || '—'}</span></div>
+      <div class="review-row"><span class="review-key">Industry</span><span class="review-val">${document.getElementById('bizIndustry').value || '—'}</span></div>
+      <div class="review-row"><span class="review-key">Turnover</span><span class="review-val">${document.getElementById('bizTurnover').value || '—'}</span></div>
+    `;
+  } else {
+    document.getElementById('rPersonHead').textContent = 'Personal information';
+    const fn = document.getElementById('firstName').value;
+    const ln = document.getElementById('lastName').value;
+    const em = document.getElementById('email').value;
+    const ph = document.getElementById('phone').value;
+    body.innerHTML = `
+      <div class="review-row"><span class="review-key">Name</span><span class="review-val">${fn} ${ln}</span></div>
+      <div class="review-row"><span class="review-key">Email</span><span class="review-val">${em || '—'}</span></div>
+      <div class="review-row"><span class="review-key">Phone</span><span class="review-val">${state.residence ? state.residence.dial + ' ' : ''}${ph || '—'}</span></div>
+      <div class="review-row"><span class="review-key">Source of funds</span><span class="review-val">${document.getElementById('sourceFunds').value || '—'}</span></div>
+    `;
+  }
+}
+
+// ============ PROCESSING ============
+function runProcessing() {
+  const text = document.getElementById('loaderText');
+  const sub = document.getElementById('loaderSub');
+  const s1 = document.getElementById('procStep1');
+  const s2 = document.getElementById('procStep2');
+  const s3 = document.getElementById('procStep3');
+
+  // reset
+  s1.classList.remove('done', 'active'); s1.querySelector('.kyc-num').textContent = '1';
+  s2.classList.remove('done', 'active'); s2.querySelector('.kyc-num').textContent = '2';
+  s3.classList.remove('done', 'active'); s3.querySelector('.kyc-num').textContent = '3';
+  s1.classList.add('active');
+
+  text.textContent = 'Verifying your details';
+  sub.textContent = 'Matching face to ID…';
+
+  setTimeout(() => {
+    if (state.step !== 11) return;
+    s1.classList.remove('active'); s1.classList.add('done'); s1.querySelector('.kyc-num').textContent = '✓';
+    s2.classList.add('active');
+    text.textContent = 'Running compliance checks';
+    sub.textContent = 'Sanctions, PEP, and AML screening…';
+  }, 1400);
+
+  setTimeout(() => {
+    if (state.step !== 11) return;
+    s2.classList.remove('active'); s2.classList.add('done'); s2.querySelector('.kyc-num').textContent = '✓';
+    s3.classList.add('active');
+    text.textContent = 'Provisioning your account';
+    sub.textContent = 'Issuing your virtual IBAN…';
+  }, 2800);
+
+  setTimeout(() => {
+    if (state.step !== 11) return;
+    s3.classList.remove('active'); s3.classList.add('done'); s3.querySelector('.kyc-num').textContent = '✓';
+    text.textContent = 'All set';
+    sub.textContent = 'Taking you to your account…';
+    setTimeout(() => { if (state.step === 11) goTo(12); }, 900);
+  }, 4200);
+}
+
+// ============ APPROVED ============
+function populateApproved() {
+  const ref = 'FYN-' + new Date().getFullYear() + '-' + Math.floor(1000000 + Math.random() * 9000000);
+  document.getElementById('refNum').textContent = ref;
+  if (state.residence) {
+    document.getElementById('approvedLocal').textContent = `${state.residence.currency} ${getCurrencyName(state.residence.currency)}`;
+    const ibanNum = Math.floor(1000 + Math.random() * 9000) + '-' + Math.floor(1000 + Math.random() * 9000) + '-' + Math.floor(1000 + Math.random() * 9000);
+    document.getElementById('approvedIBAN').textContent = `${state.residence.code}-FYN-${ibanNum}`;
+  }
+}
+
+// ============ CARD ============
+function populateCardScreen() {
+  const fn = (document.getElementById('firstName').value || 'Jeremiah').toUpperCase();
+  const ln = (document.getElementById('lastName').value || 'Ng').toUpperCase();
+  const bizName = (document.getElementById('bizName').value || '').toUpperCase();
+  const name = state.accountType === 'business' && bizName ? bizName : `${fn} ${ln}`;
+  const labelText = state.accountType === 'business' ? 'Business · Multi-currency' : 'Personal · Multi-currency';
+  document.getElementById('cardName').textContent = name;
+  document.getElementById('cardTypeLabel').textContent = labelText;
+}
+
+function populateCardIssued() {
+  const fn = (document.getElementById('firstName').value || 'Jeremiah').toUpperCase();
+  const ln = (document.getElementById('lastName').value || 'Ng').toUpperCase();
+  const bizName = (document.getElementById('bizName').value || '').toUpperCase();
+  const name = state.accountType === 'business' && bizName ? bizName : `${fn} ${ln}`;
+  const labelText = state.accountType === 'business' ? 'Business · Multi-currency' : 'Personal · Multi-currency';
+  document.getElementById('cardName2').textContent = name;
+  document.getElementById('cardTypeLabel2').textContent = labelText;
+  // randomize last 4 each time
+  const last4 = String(Math.floor(1000 + Math.random() * 9000));
+  document.getElementById('cardNumberFull').textContent = `4716 8294 1736 ${last4}`;
+}
+
+// ============ DEV BAR ============
+document.getElementById('devBar').addEventListener('click', () => {
+  document.getElementById('devPanel').classList.toggle('open');
+});
+
+function resetAll() {
+  stopSelfieCamera();
+  Object.assign(state, {
+    step: 0, accountType: null, citizenship: null, residence: null,
+    resideHere: true,
+    usdEnabled: false, cardOption: 'virtual',
+    idFrontDone: false, idBackDone: false, selfieDone: false, addrDocDone: false,
+  });
+  // reset uploads visually
+  ['idFront','idBack','addrDoc'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('uploaded');
+  });
+  document.getElementById('idFrontTitle').textContent = 'Front of document';
+  document.getElementById('idFrontSub').textContent = 'Tap to take a photo or upload';
+  document.getElementById('idBackTitle').textContent = 'Back of document';
+  document.getElementById('idBackSub').textContent = 'Tap to take a photo or upload';
+  document.getElementById('addrDocTitle').textContent = 'Upload document';
+  document.getElementById('addrDocSub').textContent = 'PDF, JPG, or PNG · Max 10MB';
+  // reset choices
+  document.querySelectorAll('.choice').forEach(c => c.classList.remove('selected'));
+  document.querySelector('#screen-13 .choice[data-card="virtual"]').classList.add('selected');
+  document.getElementById('checkTos').classList.remove('checked');
+  document.getElementById('checkAcc').classList.remove('checked');
+  // reset reside-here checkbox to default checked
+  const rh = document.getElementById('checkResideHere');
+  if (rh) rh.classList.add('checked');
+  // reset USD toggle
+  const t = document.getElementById('usdToggle');
+  if (t) { t.classList.remove('on'); document.getElementById('usdBadge').textContent = 'Off'; document.getElementById('usdBadge').classList.remove('primary'); }
+  goTo(0);
+  document.getElementById('devPanel').classList.remove('open');
+}
+
+// ============ TOPBAR SCROLL ============
+window.addEventListener('scroll', () => {
+  const tb = document.getElementById('topbar');
+  if (window.scrollY > 4) tb.classList.add('scrolled'); else tb.classList.remove('scrolled');
+});
+
+// re-validate on input
+document.addEventListener('input', updateActions);
+document.addEventListener('change', updateActions);
+
+// ============ INIT ============
+goTo(0);
+</script>
+</body>
+</html>
