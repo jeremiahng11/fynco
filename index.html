@@ -4190,9 +4190,11 @@ function goTo(step) {
   // Reset main scroll to top when changing screens
   if (main) main.scrollTop = 0;
   document.getElementById('devStep').textContent = `Step ${step}/${TOTAL_STEPS}`;
-  // Hide dev bar on dashboard for clean app feel
+  // Always close the dev panel after any navigation
+  document.getElementById('devPanel').classList.remove('open');
+  // Hide dev bar on all post-onboarding screens for clean app feel
   const devBar = document.getElementById('devBar');
-  if (step === 15) {
+  if (step >= 15) {
     devBar.style.display = 'none';
   } else {
     devBar.style.display = 'flex';
@@ -4309,7 +4311,7 @@ function updateActions() {
     case 9: txt.textContent = state.addrDocDone ? 'Continue' : 'Upload to continue'; meta.innerHTML = '<span style="opacity:0.7;">Document must be from the last 90 days</span>'; break;
     case 10: txt.textContent = 'Submit application'; meta.innerHTML = '<span style="opacity:0.7;">By submitting, you agree to a soft credit check</span>'; break;
     case 11: actions.style.display = 'none'; break;
-    case 12: txt.textContent = 'Apply for Visa card'; meta.innerHTML = '<a href="#" onclick="event.preventDefault();goTo(0);">Skip for now — go to dashboard</a>'; break;
+    case 12: txt.textContent = 'Apply for Visa card'; meta.innerHTML = '<a href="#" onclick="event.preventDefault();goTo(15);">Skip for now — go to dashboard</a>'; break;
     case 13: txt.textContent = 'Issue my card'; meta.innerHTML = '<span style="opacity:0.7;">Virtual card ready in 60 seconds</span>'; break;
     case 14: {
       const card = state.cards[0];
@@ -4322,7 +4324,12 @@ function updateActions() {
       }
       break;
     }
-    case 15: actions.style.display = 'none'; break;
+    case 15:
+    case 16:
+    case 17:
+    case 18:
+      actions.style.display = 'none';
+      break;
   }
 
   btn.disabled = !canAdvance();
