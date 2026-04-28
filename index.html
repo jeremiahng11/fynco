@@ -45,7 +45,7 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; overscroll-behavior: none; }
+  html, body { height: 100%; overscroll-behavior: none; overflow: hidden; }
   body {
     font-family: var(--sans);
     background: var(--paper);
@@ -54,20 +54,23 @@
     -moz-osx-font-smoothing: grayscale;
     font-size: 15px;
     line-height: 1.5;
-    overflow-x: hidden;
+    overflow: hidden;
+    position: fixed;
+    inset: 0;
   }
 
   /* ============ APP SHELL ============ */
   .app {
     max-width: 440px;
     margin: 0 auto;
-    min-height: 100vh;
-    min-height: 100dvh;
+    height: 100vh;
+    height: 100dvh;
     background: var(--paper);
     position: relative;
     box-shadow: 0 0 60px rgba(10, 22, 40, 0.08);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
 
   /* Subtle paper grain */
@@ -88,12 +91,11 @@
     align-items: center;
     justify-content: space-between;
     padding: 18px 24px 12px;
-    position: sticky;
-    top: 0;
     background: var(--paper);
     z-index: 10;
     border-bottom: 1px solid transparent;
     transition: border-color 0.2s;
+    flex-shrink: 0;
   }
   .topbar.scrolled { border-bottom-color: var(--line); }
 
@@ -142,6 +144,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-shrink: 0;
   }
   .progress-track {
     flex: 1;
@@ -168,7 +171,16 @@
   main {
     flex: 1;
     padding: 8px 24px 120px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
+  /* Hide scrollbar to feel app-like */
+  main::-webkit-scrollbar { width: 0; height: 0; display: none; }
+  main { scrollbar-width: none; }
+  /* Dashboard variant has no padding so it can do full-bleed cards */
+  main.dashboard-mode { padding: 0 0 96px; }
 
   .screen {
     display: none;
@@ -950,12 +962,11 @@
 
   /* ============ BOTTOM ACTION BAR ============ */
   .actions {
-    position: fixed;
+    position: absolute;
     bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
     width: 100%;
-    max-width: 440px;
     padding: 16px 24px 24px;
     background: linear-gradient(to top, var(--paper) 70%, rgba(247, 244, 237, 0));
     z-index: 20;
@@ -1143,7 +1154,666 @@
     h1.display { font-size: 32px; }
     h2.title { font-size: 22px; }
     main { padding: 8px 20px 120px; }
+    main.dashboard-mode { padding: 0 0 96px; }
     .topbar, .progress, .actions { padding-left: 20px; padding-right: 20px; }
+  }
+
+  /* ============ DASHBOARD ============ */
+  .dash-hero {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 16px 24px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .dash-hero::before {
+    content: '';
+    position: absolute;
+    top: -40%; right: -20%;
+    width: 80%; height: 140%;
+    background: radial-gradient(circle, rgba(201, 169, 97, 0.12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .dash-greeting {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 4px;
+    position: relative;
+  }
+  .dash-name {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .dash-name em { font-style: italic; color: var(--gold); font-weight: 300; }
+
+  .dash-currency-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .ccy-tab {
+    background: rgba(247, 244, 237, 0.1);
+    color: var(--paper);
+    border: 1px solid rgba(247, 244, 237, 0.15);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .ccy-tab.active {
+    background: var(--gold);
+    color: var(--ink);
+    border-color: var(--gold);
+  }
+
+  .dash-balance-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 6px;
+    position: relative;
+  }
+  .dash-balance {
+    font-family: var(--serif);
+    font-size: 38px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 4px;
+    position: relative;
+    font-variant-numeric: tabular-nums;
+  }
+  .dash-balance .ccy {
+    font-size: 18px;
+    color: var(--gold);
+    margin-right: 6px;
+    font-style: italic;
+  }
+  .dash-card-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    opacity: 0.5;
+    position: relative;
+  }
+
+  /* Quick action grid */
+  .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    padding: 0 16px;
+    margin-top: -20px;
+    position: relative;
+    z-index: 2;
+  }
+  .qa-btn {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 6px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin: 0 -0.5px;
+  }
+  .qa-btn:hover { background: var(--paper-2); }
+  .qa-btn:active { transform: scale(0.96); }
+  .qa-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .qa-label {
+    font-size: 10px;
+    color: var(--ink);
+    font-weight: 500;
+    text-align: center;
+    letter-spacing: -0.005em;
+  }
+
+  /* Sections */
+  .dash-section {
+    padding: 24px 24px 8px;
+  }
+  .dash-section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+  .dash-section-title {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .dash-section-link {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+
+  /* VA wallet cards */
+  .wallet-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    transition: background 0.15s;
+    margin: 0 -8px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-radius: var(--radius);
+  }
+  .wallet-row:hover { background: var(--paper-2); }
+  .wallet-row:last-child { border-bottom: none; }
+  .wallet-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+  .wallet-right { text-align: right; flex-shrink: 0; }
+  .wallet-name {
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 1px;
+  }
+  .wallet-sub {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono);
+    letter-spacing: 0.03em;
+  }
+  .wallet-amt {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .wallet-amt-ccy {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* Transactions */
+  .txn-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .txn-row:last-child { border-bottom: none; }
+  .txn-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--paper-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+  .txn-icon.in { background: rgba(45, 106, 79, 0.1); color: var(--success); }
+  .txn-icon.out { background: rgba(179, 38, 30, 0.08); color: var(--error); }
+  .txn-body { flex: 1; min-width: 0; }
+  .txn-merchant { font-weight: 500; font-size: 14px; }
+  .txn-meta { font-size: 11px; color: var(--muted); font-family: var(--mono); letter-spacing: 0.03em; }
+  .txn-amt {
+    font-family: var(--serif);
+    font-size: 15px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+  .txn-amt.in { color: var(--success); }
+
+  /* ============ SHEETS / MODALS ============ */
+  .sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 22, 40, 0.4);
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .sheet-backdrop.open { opacity: 1; pointer-events: auto; }
+
+  .sheet {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--paper);
+    border-radius: 18px 18px 0 0;
+    z-index: 51;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    max-height: 90%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 -10px 30px rgba(10, 22, 40, 0.15);
+  }
+  .sheet.open { transform: translateY(0); }
+  .sheet-handle {
+    width: 36px; height: 4px;
+    background: var(--line-strong);
+    border-radius: 2px;
+    margin: 10px auto 4px;
+    flex-shrink: 0;
+  }
+  .sheet-head {
+    padding: 16px 24px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .sheet-title {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .sheet-title em { font-style: italic; color: var(--gold-2); font-weight: 300; }
+  .sheet-close {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: var(--paper-2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+  }
+  .sheet-body {
+    padding: 8px 24px 24px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+  }
+  .sheet-body::-webkit-scrollbar { display: none; }
+  .sheet-body { scrollbar-width: none; }
+  .sheet-foot {
+    padding: 14px 24px 24px;
+    border-top: 1px solid var(--line);
+    background: var(--paper);
+    flex-shrink: 0;
+  }
+
+  /* Top-up amount entry */
+  .amount-entry {
+    text-align: center;
+    padding: 32px 0 24px;
+  }
+  .amount-display {
+    font-family: var(--serif);
+    font-size: 56px;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .amount-display .ccy {
+    font-size: 20px;
+    color: var(--gold-2);
+    margin-right: 8px;
+    font-style: italic;
+    vertical-align: 0.4em;
+  }
+  .amount-display.empty { color: var(--muted-2); }
+  .amount-source-hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 12px;
+    font-family: var(--mono);
+    letter-spacing: 0.05em;
+  }
+
+  .quick-amounts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 8px 0 20px;
+  }
+  .quick-amt {
+    padding: 10px;
+    border: 1px solid var(--line-strong);
+    background: transparent;
+    border-radius: var(--radius);
+    font-family: var(--mono);
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--ink);
+    transition: all 0.2s;
+  }
+  .quick-amt:hover { background: var(--paper-2); }
+
+  /* Numpad */
+  .numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .num-btn {
+    aspect-ratio: 2.4;
+    border: none;
+    background: transparent;
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ink);
+    cursor: pointer;
+    border-radius: var(--radius);
+    transition: background 0.1s;
+  }
+  .num-btn:hover { background: var(--paper-2); }
+  .num-btn:active { background: var(--line); }
+
+  /* Source selector inside top-up sheet */
+  .source-pick {
+    display: flex;
+    gap: 8px;
+    background: var(--paper-2);
+    border-radius: var(--radius);
+    padding: 4px;
+    margin-bottom: 16px;
+  }
+  .source-tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    transition: all 0.2s;
+    font-family: var(--sans);
+  }
+  .source-tab.active {
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  .source-detail {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+  }
+  .source-mark {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .source-info { flex: 1; min-width: 0; }
+  .source-name { font-weight: 500; font-size: 14px; }
+  .source-bal { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+
+  /* Scan & Pay */
+  .scan-frame {
+    aspect-ratio: 1;
+    background: var(--ink);
+    border-radius: var(--radius);
+    margin: 16px 0 24px;
+    position: relative;
+    overflow: hidden;
+    color: var(--paper);
+  }
+  .scan-frame video {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .scan-overlay {
+    position: absolute;
+    inset: 14%;
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    pointer-events: none;
+  }
+  .scan-overlay::before, .scan-overlay::after,
+  .scan-overlay > i, .scan-overlay > i + i {
+    content: '';
+    position: absolute;
+    width: 24px; height: 24px;
+    border: 3px solid var(--gold);
+  }
+  .scan-overlay::before { top: -3px; left: -3px; border-right: none; border-bottom: none; border-radius: 6px 0 0 0; }
+  .scan-overlay::after { top: -3px; right: -3px; border-left: none; border-bottom: none; border-radius: 0 6px 0 0; }
+  .scan-overlay > i:nth-child(1) { bottom: -3px; left: -3px; border-right: none; border-top: none; border-radius: 0 0 0 6px; }
+  .scan-overlay > i:nth-child(2) { bottom: -3px; right: -3px; border-left: none; border-top: none; border-radius: 0 0 6px 0; }
+  .scan-line {
+    position: absolute;
+    left: 14%; right: 14%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    top: 14%;
+    animation: scanMove 2s ease-in-out infinite;
+    box-shadow: 0 0 12px var(--gold);
+  }
+  @keyframes scanMove {
+    0%, 100% { top: 14%; }
+    50% { top: 86%; }
+  }
+  .scan-status {
+    position: absolute;
+    bottom: 16px;
+    left: 0; right: 0;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* eSIM cards */
+  .esim-plan {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+    background: var(--paper);
+  }
+  .esim-plan:hover { border-color: var(--ink); background: var(--paper-2); }
+  .esim-plan.selected { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+  .esim-plan.selected .esim-plan-region { color: var(--gold); }
+  .esim-plan.selected .esim-plan-meta { color: rgba(247, 244, 237, 0.7); }
+  .esim-flag {
+    font-size: 28px;
+    width: 40px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .esim-plan-info { flex: 1; min-width: 0; }
+  .esim-plan-region { font-family: var(--serif); font-size: 16px; font-weight: 500; }
+  .esim-plan-meta { font-size: 12px; color: var(--muted); }
+  .esim-plan-price {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 500;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .esim-plan-price-sub {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.05em;
+    opacity: 0.6;
+    text-transform: uppercase;
+  }
+
+  /* Result screen inside sheets */
+  .sheet-result {
+    text-align: center;
+    padding: 24px 0 8px;
+  }
+  .result-tick {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: var(--success);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    animation: tickIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  @keyframes tickIn {
+    0% { transform: scale(0.4); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .result-title {
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+  .result-title em { font-style: italic; color: var(--gold-2); font-weight: 300; }
+  .result-sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .result-detail-card {
+    background: var(--paper-2);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    text-align: left;
+    margin-bottom: 12px;
+  }
+  .result-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 13px;
+  }
+  .result-detail-key { color: var(--muted); }
+  .result-detail-val { font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  /* Bottom nav for dashboard */
+  .botnav {
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    background: var(--paper);
+    border-top: 1px solid var(--line);
+    padding: 8px 8px 12px;
+    display: flex;
+    justify-content: space-around;
+    z-index: 15;
+  }
+  .botnav-item {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 8px 4px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    color: var(--muted);
+    transition: color 0.15s;
+  }
+  .botnav-item.active { color: var(--ink); }
+  .botnav-item.active .botnav-icon { background: var(--ink); color: var(--gold); }
+  .botnav-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .botnav-label {
+    font-size: 9px;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-family: var(--mono);
+  }
+
+  /* Card on dashboard */
+  .dash-card-wrap {
+    margin: 20px 0 8px;
+    perspective: 1000px;
+    position: relative;
+  }
+  .dash-card-mini {
+    border-radius: 12px;
+    background: linear-gradient(135deg, #14223a 0%, #0a1628 60%, #1e2f4d 100%);
+    color: var(--paper);
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(10, 22, 40, 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  .dash-card-mini::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(201, 169, 97, 0.15), transparent 60%);
+  }
+
+  /* CC entry mini-form */
+  .cc-mini-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
   }
 </style>
 </head>
@@ -1169,6 +1839,7 @@
   <button onclick="goTo(12)">→ Approved</button>
   <button onclick="goTo(13)">→ Card application</button>
   <button onclick="goTo(14)">→ Card issued</button>
+  <button onclick="goTo(15)">→ Dashboard</button>
   <button onclick="resetAll()" style="background:var(--rust);margin-top:6px;">↺ Reset</button>
 </div>
 
@@ -1912,7 +2583,305 @@
       </div>
     </section>
 
+    <!-- ============ 15. DASHBOARD ============ -->
+    <section class="screen" id="screen-15">
+      <div class="dash-hero">
+        <div class="dash-greeting">Good day</div>
+        <div class="dash-name">Welcome, <em id="dashName">Jeremiah</em></div>
+
+        <div class="dash-currency-tabs" id="dashCcyTabs"></div>
+
+        <div class="dash-balance-label">Card balance</div>
+        <div class="dash-balance">
+          <span class="ccy" id="dashCcySymbol">SGD</span><span id="dashCardBalance">0.00</span>
+        </div>
+        <div class="dash-card-num">VISA •••• <span id="dashCardLast4">2810</span></div>
+      </div>
+
+      <div class="actions-grid">
+        <button class="qa-btn" onclick="openSheet('topup')">
+          <div class="qa-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <span class="qa-label">Top up</span>
+        </button>
+        <button class="qa-btn" onclick="openSheet('scan')">
+          <div class="qa-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 012-2h2"/><path d="M17 3h2a2 2 0 012 2v2"/><path d="M21 17v2a2 2 0 01-2 2h-2"/><path d="M7 21H5a2 2 0 01-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
+          </div>
+          <span class="qa-label">Scan & Pay</span>
+        </button>
+        <button class="qa-btn" onclick="openSheet('esim')">
+          <div class="qa-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <span class="qa-label">eSIM</span>
+        </button>
+        <button class="qa-btn" onclick="openSheet('send')">
+          <div class="qa-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </div>
+          <span class="qa-label">Send</span>
+        </button>
+      </div>
+
+      <div class="dash-section">
+        <div class="dash-section-head">
+          <div class="dash-section-title">Wallets</div>
+          <button class="dash-section-link">Manage</button>
+        </div>
+        <div id="walletList"></div>
+      </div>
+
+      <div class="dash-section">
+        <div class="dash-section-head">
+          <div class="dash-section-title">Recent activity</div>
+          <button class="dash-section-link">See all</button>
+        </div>
+        <div id="txnList"></div>
+      </div>
+    </section>
+
   </main>
+
+  <!-- ============ BOTTOM NAV (dashboard only) ============ -->
+  <div class="botnav" id="botnav" style="display:none;">
+    <button class="botnav-item active">
+      <div class="botnav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+      </div>
+      <span class="botnav-label">Home</span>
+    </button>
+    <button class="botnav-item" onclick="alert('Cards view — coming soon in this demo.')">
+      <div class="botnav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><line x1="2" y1="11" x2="22" y2="11"/></svg>
+      </div>
+      <span class="botnav-label">Cards</span>
+    </button>
+    <button class="botnav-item" onclick="alert('Transactions view — coming soon in this demo.')">
+      <div class="botnav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+      </div>
+      <span class="botnav-label">Activity</span>
+    </button>
+    <button class="botnav-item" onclick="alert('Settings — coming soon in this demo.')">
+      <div class="botnav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </div>
+      <span class="botnav-label">More</span>
+    </button>
+  </div>
+
+  <!-- ============ SHEETS ============ -->
+  <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeSheet()"></div>
+
+  <!-- TOP-UP SHEET -->
+  <div class="sheet" id="sheet-topup">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div class="sheet-title">Top up <em>card</em></div>
+      <button class="sheet-close" onclick="closeSheet()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body" id="topupBody">
+      <div class="source-pick">
+        <button class="source-tab active" data-src="va" onclick="pickTopupSource(this)">From wallet</button>
+        <button class="source-tab" data-src="cc" onclick="pickTopupSource(this)">From card</button>
+      </div>
+
+      <div id="topupSourceVA" class="source-detail">
+        <div class="source-mark" id="topupSrcMark">SGD</div>
+        <div class="source-info">
+          <div class="source-name" id="topupSrcName">Singapore Dollar wallet</div>
+          <div class="source-bal" id="topupSrcBal">Available: SGD 5,000.00</div>
+        </div>
+        <button class="edit-link" onclick="cycleTopupWallet()">Switch</button>
+      </div>
+
+      <div id="topupSourceCC" style="display:none;">
+        <div class="cc-mini-form">
+          <input class="input" placeholder="Card number" inputmode="numeric" maxlength="19" oninput="formatCC(this)">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <input class="input" placeholder="MM / YY" inputmode="numeric" maxlength="7">
+            <input class="input" placeholder="CVV" inputmode="numeric" maxlength="4">
+          </div>
+        </div>
+      </div>
+
+      <div class="amount-entry">
+        <div class="amount-display empty" id="topupAmtDisplay">
+          <span class="ccy" id="topupAmtCcy">SGD</span><span id="topupAmtVal">0.00</span>
+        </div>
+        <div class="amount-source-hint" id="topupHint">Top up your Visa card</div>
+      </div>
+
+      <div class="quick-amounts">
+        <button class="quick-amt" onclick="setTopupAmt(50)">+ 50</button>
+        <button class="quick-amt" onclick="setTopupAmt(100)">+ 100</button>
+        <button class="quick-amt" onclick="setTopupAmt(500)">+ 500</button>
+      </div>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-primary" id="topupConfirmBtn" onclick="confirmTopup()" disabled>Confirm top up</button>
+    </div>
+  </div>
+
+  <!-- TOP-UP RESULT SHEET -->
+  <div class="sheet" id="sheet-topup-result">
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <div class="sheet-result">
+        <div class="result-tick">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="result-title">Topped <em>up</em></div>
+        <div class="result-sub" id="topupResultSub">Funds are available on your card now.</div>
+        <div class="result-detail-card">
+          <div class="result-detail-row"><span class="result-detail-key">Amount</span><span class="result-detail-val" id="topupResultAmt">—</span></div>
+          <div class="result-detail-row"><span class="result-detail-key">From</span><span class="result-detail-val" id="topupResultFrom">—</span></div>
+          <div class="result-detail-row"><span class="result-detail-key">Reference</span><span class="result-detail-val" id="topupResultRef">—</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-primary" onclick="closeSheet()">Done</button>
+    </div>
+  </div>
+
+  <!-- SCAN & PAY SHEET -->
+  <div class="sheet" id="sheet-scan">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div class="sheet-title"><em>Scan</em> to pay</div>
+      <button class="sheet-close" onclick="closeSheet()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div class="scan-frame" id="scanFrame">
+        <video id="scanVideo" autoplay playsinline muted style="display:none;"></video>
+        <div class="scan-overlay"><i></i><i></i></div>
+        <div class="scan-line" id="scanLine" style="display:none;"></div>
+        <div class="scan-status" id="scanStatus">Tap Begin to start camera</div>
+      </div>
+      <button class="btn btn-ghost" id="scanStartBtn" onclick="startScanner()">Begin scanning</button>
+      <div id="scanError" style="display:none;font-size:12px;color:var(--error);margin-top:8px;text-align:center;line-height:1.5;"></div>
+    </div>
+  </div>
+
+  <!-- SCAN PAY CONFIRM SHEET -->
+  <div class="sheet" id="sheet-scan-pay">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div class="sheet-title">Confirm <em>payment</em></div>
+      <button class="sheet-close" onclick="closeSheet()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div style="text-align:center;padding:8px 0 16px;">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Pay to</div>
+        <div style="font-family:var(--serif);font-size:22px;margin-bottom:4px;" id="scanMerchant">Kopitiam Tampines</div>
+        <div style="font-size:12px;color:var(--muted);font-family:var(--mono);" id="scanMerchantId">PAYNOW · UEN 198304789K</div>
+      </div>
+      <div class="amount-entry" style="padding:16px 0 8px;">
+        <div class="amount-display" id="scanAmtDisplay">
+          <span class="ccy">SGD</span><span id="scanAmtVal">12.80</span>
+        </div>
+        <div class="amount-source-hint">Paying from Card balance</div>
+      </div>
+      <div class="result-detail-card" style="margin-top:24px;">
+        <div class="result-detail-row"><span class="result-detail-key">Card</span><span class="result-detail-val">VISA •••• <span id="scanCardLast4">2810</span></span></div>
+        <div class="result-detail-row"><span class="result-detail-key">Available</span><span class="result-detail-val" id="scanAvail">SGD 0.00</span></div>
+      </div>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-primary" id="scanPayBtn" onclick="confirmScanPay()">Pay now</button>
+    </div>
+  </div>
+
+  <!-- SCAN PAY RESULT -->
+  <div class="sheet" id="sheet-scan-result">
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <div class="sheet-result">
+        <div class="result-tick">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="result-title">Payment <em>sent</em></div>
+        <div class="result-sub" id="scanResultSub">Receipt has been sent to your email.</div>
+        <div class="result-detail-card">
+          <div class="result-detail-row"><span class="result-detail-key">Paid to</span><span class="result-detail-val" id="scanResultMerchant">—</span></div>
+          <div class="result-detail-row"><span class="result-detail-key">Amount</span><span class="result-detail-val" id="scanResultAmt">—</span></div>
+          <div class="result-detail-row"><span class="result-detail-key">Reference</span><span class="result-detail-val" id="scanResultRef">—</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-primary" onclick="closeSheet()">Done</button>
+    </div>
+  </div>
+
+  <!-- ESIM SHEET -->
+  <div class="sheet" id="sheet-esim">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div class="sheet-title"><em>eSIM</em> data plans</div>
+      <button class="sheet-close" onclick="closeSheet()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;">Pay with your Fynco wallet. Activated instantly via QR.</p>
+      <div id="esimPlanList"></div>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-primary" id="esimBuyBtn" onclick="confirmEsim()" disabled>Select a plan</button>
+    </div>
+  </div>
+
+  <!-- ESIM RESULT -->
+  <div class="sheet" id="sheet-esim-result">
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <div class="sheet-result">
+        <div class="result-tick">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="result-title"><em>eSIM</em> ready</div>
+        <div class="result-sub">Scan with your phone's settings to install.</div>
+        <div style="margin: 8px auto 16px; width:160px; height:160px; background:white; border:1px solid var(--line); border-radius:8px; display:flex; align-items:center; justify-content:center; padding:8px;">
+          <svg viewBox="0 0 100 100" style="width:100%;height:100%;" xmlns="http://www.w3.org/2000/svg" id="esimQR"></svg>
+        </div>
+        <div class="result-detail-card">
+          <div class="result-detail-row"><span class="result-detail-key">Plan</span><span class="result-detail-val" id="esimResultPlan">—</span></div>
+          <div class="result-detail-row"><span class="result-detail-key">Charged</span><span class="result-detail-val" id="esimResultAmt">—</span></div>
+          <div class="result-detail-row"><span class="result-detail-key">Reference</span><span class="result-detail-val" id="esimResultRef">—</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-primary" onclick="closeSheet()">Done</button>
+    </div>
+  </div>
+
+  <!-- SEND placeholder -->
+  <div class="sheet" id="sheet-send">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div class="sheet-title">Send <em>money</em></div>
+      <button class="sheet-close" onclick="closeSheet()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div style="text-align:center;padding:40px 0;">
+        <div style="font-family:var(--serif);font-size:18px;color:var(--muted);font-style:italic;">Beyond the scope of this demo.</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:8px;">Recipient picker, FX, and P2P wired in production.</div>
+      </div>
+    </div>
+  </div>
 
   <!-- ============ ACTIONS ============ -->
   <div class="actions" id="actions">
@@ -1943,9 +2912,20 @@ const state = {
   lastName: '',
   email: '',
   phone: '',
+  // ===== Dashboard state =====
+  cardLast4: '2810',
+  // wallets keyed by ccy code
+  wallets: {}, // populated when entering dashboard
+  cardBalance: {}, // per-currency card balance
+  activeCcy: null, // current dashboard view ccy
+  txns: [], // [{ icon, merchant, meta, amt, ccy, dir, ts }]
+  // Top-up sheet temp state
+  topup: { source: 'va', amount: '0', sourceCcy: null },
+  // eSIM
+  esimSelected: null,
 };
 
-const TOTAL_STEPS = 14;
+const TOTAL_STEPS = 15;
 const SHOW_PROGRESS_FROM = 1;
 const SHOW_PROGRESS_TO = 10;
 
@@ -2079,16 +3059,32 @@ function goTo(step) {
   if (state.step === 8 && step !== 8) {
     stopSelfieCamera();
   }
+  // Close any open sheets when navigating
+  closeSheet(true);
 
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + step).classList.add('active');
   state.step = step;
 
+  // Dashboard mode toggles
+  const main = document.getElementById('main');
+  const botnav = document.getElementById('botnav');
+  const actions = document.getElementById('actions');
+  if (step === 15) {
+    main.classList.add('dashboard-mode');
+    botnav.style.display = 'flex';
+    actions.style.display = 'none';
+    initDashboard();
+  } else {
+    main.classList.remove('dashboard-mode');
+    botnav.style.display = 'none';
+    actions.style.display = 'flex';
+  }
+
   // Special handling on step entry
   if (step === 2) {
     renderCountryList('citizenship');
     updateResideLabel();
-    // sync checkbox visual to current state
     const row = document.getElementById('checkResideHere');
     if (state.resideHere) row.classList.add('checked'); else row.classList.remove('checked');
   }
@@ -2105,34 +3101,19 @@ function goTo(step) {
       document.getElementById('businessForm').style.display = 'none';
     }
   }
-  if (step === 5) {
-    updateAccountPreview();
-  }
-  if (step === 6) {
-    document.getElementById('kycBizExtra').style.display = state.accountType === 'business' ? 'flex' : 'none';
-  }
-  if (step === 8) {
-    runSelfieFlow();
-  }
-  if (step === 10) {
-    populateReview();
-  }
-  if (step === 11) {
-    runProcessing();
-  }
-  if (step === 12) {
-    populateApproved();
-  }
-  if (step === 13) {
-    populateCardScreen();
-  }
-  if (step === 14) {
-    populateCardIssued();
-  }
+  if (step === 5) updateAccountPreview();
+  if (step === 6) document.getElementById('kycBizExtra').style.display = state.accountType === 'business' ? 'flex' : 'none';
+  if (step === 8) runSelfieFlow();
+  if (step === 10) populateReview();
+  if (step === 11) runProcessing();
+  if (step === 12) populateApproved();
+  if (step === 13) populateCardScreen();
+  if (step === 14) populateCardIssued();
 
   updateProgress();
   updateActions();
-  window.scrollTo({ top: 0, behavior: 'instant' });
+  // Reset main scroll to top when changing screens
+  if (main) main.scrollTop = 0;
   document.getElementById('devStep').textContent = `Step ${step}/${TOTAL_STEPS}`;
 }
 
@@ -2140,7 +3121,8 @@ function goNext() {
   if (!canAdvance()) return;
   if (state.step === 10) { goTo(11); return; }
   if (state.step === 13) { goTo(11); /* second processing */ setTimeout(()=>goTo(14), 2200); return; }
-  if (state.step === 14) { alert('Onboarding complete. In production, this would open the main banking app.'); return; }
+  if (state.step === 14) { goTo(15); return; }
+  if (state.step === 15) { return; /* dashboard is terminal */ }
   // Skip residence screen if user said they reside in passport country
   if (state.step === 2 && state.resideHere && state.citizenship) {
     state.residence = state.citizenship;
@@ -2205,7 +3187,7 @@ function updateProgress() {
 
   // back button
   const back = document.getElementById('backBtn');
-  if (state.step > 0 && state.step !== 11 && state.step !== 12 && state.step !== 14) {
+  if (state.step > 0 && state.step !== 11 && state.step !== 12 && state.step !== 14 && state.step !== 15) {
     back.style.visibility = 'visible';
   } else {
     back.style.visibility = 'hidden';
@@ -2248,6 +3230,7 @@ function updateActions() {
     case 12: txt.textContent = 'Apply for Visa card'; meta.innerHTML = '<a href="#" onclick="event.preventDefault();goTo(0);">Skip for now — go to dashboard</a>'; break;
     case 13: txt.textContent = 'Issue my card'; meta.innerHTML = '<span style="opacity:0.7;">Virtual card ready in 60 seconds</span>'; break;
     case 14: txt.textContent = 'Open dashboard'; meta.innerHTML = '<span style="opacity:0.7;">You can revisit setup anytime in Settings</span>'; break;
+    case 15: actions.style.display = 'none'; break;
   }
 
   btn.disabled = !canAdvance();
@@ -2517,11 +3500,16 @@ document.getElementById('devBar').addEventListener('click', () => {
 
 function resetAll() {
   stopSelfieCamera();
+  stopScannerCamera();
+  closeSheet(true);
   Object.assign(state, {
     step: 0, accountType: null, citizenship: null, residence: null,
     resideHere: true,
     usdEnabled: false, cardOption: 'virtual',
     idFrontDone: false, idBackDone: false, selfieDone: false, addrDocDone: false,
+    wallets: {}, cardBalance: {}, activeCcy: null, txns: [],
+    topup: { source: 'va', amount: '0', sourceCcy: null },
+    esimSelected: null,
   });
   // reset uploads visually
   ['idFront','idBack','addrDoc'].forEach(id => {
@@ -2619,6 +3607,421 @@ if ('serviceWorker' in navigator) {
       console.log('Service worker registration failed:', err);
     });
   });
+}
+
+// ============ DASHBOARD ============
+function initDashboard() {
+  // Build the wallet list based on residence + USD toggle
+  // Use defaults if onboarding was skipped via dev bar
+  if (!state.residence) state.residence = countries.find(c => c.code === 'SG');
+  const localCcy = state.residence.currency;
+
+  // First-time setup of wallet balances (don't reset if already present)
+  if (Object.keys(state.wallets).length === 0) {
+    state.wallets[localCcy] = { name: getCurrencyName(localCcy), balance: 5000, primary: true };
+    if (localCcy !== 'SGD') {
+      state.wallets['SGD'] = { name: 'Singapore Dollar', balance: 1200, primary: false };
+    }
+    if (state.usdEnabled) {
+      state.wallets['USD'] = { name: 'US Dollar', balance: 320.50, primary: false };
+    }
+    // Card balances per ccy
+    state.cardBalance = { [localCcy]: 250.00 };
+    if (localCcy !== 'SGD') state.cardBalance['SGD'] = 80.00;
+    if (state.usdEnabled) state.cardBalance['USD'] = 50.00;
+    state.activeCcy = localCcy;
+    // Seed a couple of transactions
+    state.txns = [
+      { merchant: 'Welcome bonus', meta: 'Card · today', amt: 250.00, ccy: localCcy, dir: 'in', ts: Date.now() },
+    ];
+  }
+
+  // Update name
+  const fn = document.getElementById('firstName').value || 'Jeremiah';
+  const bizName = document.getElementById('bizName').value;
+  const dashName = state.accountType === 'business' && bizName ? bizName.split(' ')[0] : fn;
+  document.getElementById('dashName').textContent = dashName;
+  document.getElementById('dashCardLast4').textContent = state.cardLast4;
+  document.getElementById('scanCardLast4').textContent = state.cardLast4;
+
+  // Build currency tabs
+  const tabs = document.getElementById('dashCcyTabs');
+  tabs.innerHTML = Object.keys(state.wallets).map(ccy =>
+    `<button class="ccy-tab ${ccy === state.activeCcy ? 'active' : ''}" onclick="setActiveCcy('${ccy}')">${ccy}</button>`
+  ).join('');
+
+  renderDashboard();
+}
+
+function setActiveCcy(ccy) {
+  state.activeCcy = ccy;
+  document.querySelectorAll('.ccy-tab').forEach(t => {
+    t.classList.toggle('active', t.textContent === ccy);
+  });
+  renderDashboard();
+}
+
+function renderDashboard() {
+  const ccy = state.activeCcy;
+  document.getElementById('dashCcySymbol').textContent = ccy;
+  document.getElementById('dashCardBalance').textContent = formatMoney(state.cardBalance[ccy] || 0);
+
+  // Wallets
+  document.getElementById('walletList').innerHTML = Object.entries(state.wallets).map(([code, w]) => `
+    <div class="wallet-row" onclick="setActiveCcy('${code}')">
+      <div class="wallet-left">
+        <div class="currency-mark">${code}</div>
+        <div>
+          <div class="wallet-name">${w.name}</div>
+          <div class="wallet-sub">${w.primary ? 'Primary · ' : ''}Virtual account</div>
+        </div>
+      </div>
+      <div class="wallet-right">
+        <div class="wallet-amt">${formatMoney(w.balance)}</div>
+        <div class="wallet-amt-ccy">${code}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Transactions (filter by active ccy)
+  const filtered = state.txns.filter(t => t.ccy === ccy);
+  const list = document.getElementById('txnList');
+  if (filtered.length === 0) {
+    list.innerHTML = `<div style="text-align:center;padding:24px 0;font-size:13px;color:var(--muted);font-style:italic;">No activity in ${ccy} yet</div>`;
+  } else {
+    list.innerHTML = filtered.slice(0, 8).map(t => {
+      const sign = t.dir === 'in' ? '+' : '−';
+      const icon = t.dir === 'in'
+        ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`
+        : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>`;
+      return `<div class="txn-row">
+        <div class="txn-icon ${t.dir}">${icon}</div>
+        <div class="txn-body">
+          <div class="txn-merchant">${t.merchant}</div>
+          <div class="txn-meta">${t.meta}</div>
+        </div>
+        <div class="txn-amt ${t.dir === 'in' ? 'in' : ''}">${sign}${formatMoney(t.amt)}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Update scan-pay sheet's available
+  document.getElementById('scanAvail').textContent = `${ccy} ${formatMoney(state.cardBalance[ccy] || 0)}`;
+}
+
+function formatMoney(n) {
+  return Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// ============ SHEETS ============
+let activeSheet = null;
+function openSheet(name) {
+  closeSheet(true);
+  activeSheet = name;
+  document.getElementById('sheetBackdrop').classList.add('open');
+  document.getElementById('sheet-' + name).classList.add('open');
+  // Per-sheet init
+  if (name === 'topup') resetTopup();
+  if (name === 'scan') resetScanner();
+  if (name === 'esim') initEsim();
+}
+function closeSheet(silent) {
+  document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open'));
+  document.getElementById('sheetBackdrop').classList.remove('open');
+  activeSheet = null;
+  // Stop scanner camera if it was running
+  stopScannerCamera();
+}
+
+// ============ TOP UP ============
+function resetTopup() {
+  state.topup = { source: 'va', amount: '0', sourceCcy: state.activeCcy };
+  document.querySelectorAll('#sheet-topup .source-tab').forEach(t => t.classList.toggle('active', t.dataset.src === 'va'));
+  document.getElementById('topupSourceVA').style.display = 'flex';
+  document.getElementById('topupSourceCC').style.display = 'none';
+  document.getElementById('topupAmtCcy').textContent = state.activeCcy;
+  document.getElementById('topupAmtVal').textContent = '0.00';
+  document.getElementById('topupAmtDisplay').classList.add('empty');
+  document.getElementById('topupConfirmBtn').disabled = true;
+  // Default source wallet
+  document.getElementById('topupSrcMark').textContent = state.activeCcy;
+  document.getElementById('topupSrcName').textContent = `${getCurrencyName(state.activeCcy)} wallet`;
+  document.getElementById('topupSrcBal').textContent = `Available: ${state.activeCcy} ${formatMoney(state.wallets[state.activeCcy]?.balance || 0)}`;
+}
+
+function pickTopupSource(el) {
+  const src = el.dataset.src;
+  state.topup.source = src;
+  document.querySelectorAll('#sheet-topup .source-tab').forEach(t => t.classList.toggle('active', t === el));
+  document.getElementById('topupSourceVA').style.display = src === 'va' ? 'flex' : 'none';
+  document.getElementById('topupSourceCC').style.display = src === 'cc' ? 'block' : 'none';
+  document.getElementById('topupHint').textContent = src === 'va' ? 'From your virtual account wallet' : 'From a credit/debit card';
+}
+
+function cycleTopupWallet() {
+  const codes = Object.keys(state.wallets);
+  const cur = state.topup.sourceCcy || codes[0];
+  const idx = codes.indexOf(cur);
+  const nxt = codes[(idx + 1) % codes.length];
+  state.topup.sourceCcy = nxt;
+  document.getElementById('topupSrcMark').textContent = nxt;
+  document.getElementById('topupSrcName').textContent = `${getCurrencyName(nxt)} wallet`;
+  document.getElementById('topupSrcBal').textContent = `Available: ${nxt} ${formatMoney(state.wallets[nxt].balance)}`;
+}
+
+function setTopupAmt(n) {
+  state.topup.amount = String(n);
+  refreshTopupDisplay();
+}
+
+function refreshTopupDisplay() {
+  const v = parseFloat(state.topup.amount) || 0;
+  const el = document.getElementById('topupAmtDisplay');
+  document.getElementById('topupAmtVal').textContent = formatMoney(v);
+  document.getElementById('topupAmtCcy').textContent = state.activeCcy;
+  if (v > 0) el.classList.remove('empty'); else el.classList.add('empty');
+  document.getElementById('topupConfirmBtn').disabled = v <= 0;
+}
+
+function confirmTopup() {
+  const amt = parseFloat(state.topup.amount) || 0;
+  if (amt <= 0) return;
+  const ccy = state.activeCcy;
+  const ref = 'TXN-' + Math.floor(100000 + Math.random() * 900000);
+
+  // Effects
+  state.cardBalance[ccy] = (state.cardBalance[ccy] || 0) + amt;
+  let fromLabel = '';
+  if (state.topup.source === 'va') {
+    const srcCcy = state.topup.sourceCcy || ccy;
+    state.wallets[srcCcy].balance -= amt; // simplified — same currency
+    fromLabel = `${srcCcy} wallet`;
+  } else {
+    fromLabel = 'Credit card';
+  }
+
+  state.txns.unshift({
+    merchant: 'Card top up', meta: `From ${fromLabel} · just now`,
+    amt, ccy, dir: 'in', ts: Date.now()
+  });
+  if (state.topup.source === 'va') {
+    state.txns.unshift({
+      merchant: 'Wallet to card transfer', meta: `Outgoing · just now`,
+      amt, ccy: state.topup.sourceCcy, dir: 'out', ts: Date.now()
+    });
+  }
+
+  // Update result sheet
+  document.getElementById('topupResultAmt').textContent = `${ccy} ${formatMoney(amt)}`;
+  document.getElementById('topupResultFrom').textContent = fromLabel;
+  document.getElementById('topupResultRef').textContent = ref;
+
+  renderDashboard();
+  // Switch sheet
+  document.getElementById('sheet-topup').classList.remove('open');
+  setTimeout(() => {
+    document.getElementById('sheet-topup-result').classList.add('open');
+  }, 150);
+}
+
+function formatCC(input) {
+  const v = input.value.replace(/\D/g, '').slice(0, 16);
+  input.value = v.replace(/(.{4})/g, '$1 ').trim();
+}
+
+// ============ SCAN & PAY ============
+let scannerStream = null;
+function resetScanner() {
+  document.getElementById('scanVideo').style.display = 'none';
+  document.getElementById('scanStartBtn').style.display = 'flex';
+  document.getElementById('scanStartBtn').disabled = false;
+  document.getElementById('scanStartBtn').innerHTML = '<span>Begin scanning</span>';
+  document.getElementById('scanStatus').textContent = 'Tap Begin to start camera';
+  document.getElementById('scanLine').style.display = 'none';
+  document.getElementById('scanError').style.display = 'none';
+}
+
+async function startScanner() {
+  const video = document.getElementById('scanVideo');
+  const btn = document.getElementById('scanStartBtn');
+  const status = document.getElementById('scanStatus');
+  const line = document.getElementById('scanLine');
+  const err = document.getElementById('scanError');
+
+  if (!navigator.mediaDevices?.getUserMedia) {
+    err.textContent = 'Camera not supported in this browser.';
+    err.style.display = 'block';
+    return;
+  }
+
+  try {
+    btn.disabled = true;
+    btn.innerHTML = '<span>Starting camera…</span>';
+    scannerStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 720 }, height: { ideal: 720 } },
+      audio: false,
+    });
+    video.srcObject = scannerStream;
+    video.style.display = 'block';
+    btn.style.display = 'none';
+    line.style.display = 'block';
+    status.textContent = 'Looking for a QR code…';
+
+    setTimeout(() => {
+      if (activeSheet !== 'scan') return;
+      status.textContent = 'QR detected ✓';
+      // pick a random merchant
+      const merchants = [
+        { name: 'Kopitiam Tampines', id: 'PAYNOW · UEN 198304789K', amt: 12.80 },
+        { name: 'Cold Storage Suntec', id: 'PAYNOW · UEN 196300012R', amt: 47.30 },
+        { name: 'Grab Singapore Pte Ltd', id: 'PAYNOW · UEN 201729739E', amt: 18.50 },
+        { name: 'NTUC FairPrice Bedok', id: 'PAYNOW · UEN 196800306W', amt: 65.20 },
+        { name: 'Starbucks Plaza Singapura', id: 'SGQR · M00012348', amt: 7.40 },
+      ];
+      const m = merchants[Math.floor(Math.random() * merchants.length)];
+      document.getElementById('scanMerchant').textContent = m.name;
+      document.getElementById('scanMerchantId').textContent = m.id;
+      document.getElementById('scanAmtVal').textContent = formatMoney(m.amt);
+      window._scanAmt = m.amt;
+      window._scanMerchant = m.name;
+
+      stopScannerCamera();
+      document.getElementById('sheet-scan').classList.remove('open');
+      setTimeout(() => {
+        document.getElementById('sheet-scan-pay').classList.add('open');
+      }, 200);
+    }, 2400);
+  } catch (e) {
+    btn.disabled = false;
+    btn.innerHTML = '<span>Try again</span>';
+    if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') {
+      err.textContent = 'Camera permission denied. Enable it in browser settings.';
+    } else if (e.name === 'NotFoundError') {
+      err.textContent = 'No camera found on this device.';
+    } else {
+      err.textContent = 'Could not start camera. ' + (e.message || '');
+    }
+    err.style.display = 'block';
+  }
+}
+
+function stopScannerCamera() {
+  if (scannerStream) {
+    scannerStream.getTracks().forEach(t => t.stop());
+    scannerStream = null;
+  }
+  const v = document.getElementById('scanVideo');
+  if (v) v.srcObject = null;
+}
+
+function confirmScanPay() {
+  const amt = window._scanAmt || 0;
+  const merchant = window._scanMerchant || 'Merchant';
+  const ccy = state.activeCcy;
+  if ((state.cardBalance[ccy] || 0) < amt) {
+    alert(`Insufficient card balance. Top up first.\n\nAvailable: ${ccy} ${formatMoney(state.cardBalance[ccy] || 0)}\nNeeded: ${ccy} ${formatMoney(amt)}`);
+    return;
+  }
+  state.cardBalance[ccy] -= amt;
+  const ref = 'PAY-' + Math.floor(100000 + Math.random() * 900000);
+  state.txns.unshift({
+    merchant, meta: `Card · just now · QR`,
+    amt, ccy, dir: 'out', ts: Date.now()
+  });
+  document.getElementById('scanResultMerchant').textContent = merchant;
+  document.getElementById('scanResultAmt').textContent = `${ccy} ${formatMoney(amt)}`;
+  document.getElementById('scanResultRef').textContent = ref;
+  renderDashboard();
+  document.getElementById('sheet-scan-pay').classList.remove('open');
+  setTimeout(() => document.getElementById('sheet-scan-result').classList.add('open'), 150);
+}
+
+// ============ ESIM ============
+const esimPlans = [
+  { id: 'sg-3gb', flag: '🇸🇬', region: 'Singapore', meta: '3 GB · 7 days', price: 8 },
+  { id: 'sg-10gb', flag: '🇸🇬', region: 'Singapore', meta: '10 GB · 30 days', price: 18 },
+  { id: 'asia-5gb', flag: '🌏', region: 'Asia 13 countries', meta: '5 GB · 15 days', price: 22 },
+  { id: 'global-3gb', flag: '🌐', region: 'Global 100+ countries', meta: '3 GB · 10 days', price: 35 },
+  { id: 'jp-5gb', flag: '🇯🇵', region: 'Japan', meta: '5 GB · 14 days', price: 16 },
+  { id: 'eu-10gb', flag: '🇪🇺', region: 'Europe 30 countries', meta: '10 GB · 30 days', price: 28 },
+];
+
+function initEsim() {
+  state.esimSelected = null;
+  const list = document.getElementById('esimPlanList');
+  list.innerHTML = esimPlans.map(p => `
+    <div class="esim-plan" data-id="${p.id}" onclick="selectEsim('${p.id}')">
+      <div class="esim-flag">${p.flag}</div>
+      <div class="esim-plan-info">
+        <div class="esim-plan-region">${p.region}</div>
+        <div class="esim-plan-meta">${p.meta}</div>
+      </div>
+      <div class="esim-plan-price">
+        <div>SGD ${p.price}</div>
+        <div class="esim-plan-price-sub">${state.activeCcy === 'SGD' ? 'Card' : 'auto-FX'}</div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('esimBuyBtn').disabled = true;
+  document.getElementById('esimBuyBtn').textContent = 'Select a plan';
+}
+
+function selectEsim(id) {
+  state.esimSelected = id;
+  document.querySelectorAll('.esim-plan').forEach(el => el.classList.toggle('selected', el.dataset.id === id));
+  const plan = esimPlans.find(p => p.id === id);
+  document.getElementById('esimBuyBtn').disabled = false;
+  document.getElementById('esimBuyBtn').textContent = `Buy for SGD ${plan.price}`;
+}
+
+function confirmEsim() {
+  const plan = esimPlans.find(p => p.id === state.esimSelected);
+  if (!plan) return;
+  // Deduct from SGD wallet (or local if SGD wallet absent)
+  const payCcy = state.wallets['SGD'] ? 'SGD' : Object.keys(state.wallets)[0];
+  if ((state.wallets[payCcy]?.balance || 0) < plan.price) {
+    alert(`Insufficient ${payCcy} wallet balance.\n\nNeeded: ${payCcy} ${plan.price}\nAvailable: ${payCcy} ${formatMoney(state.wallets[payCcy]?.balance || 0)}`);
+    return;
+  }
+  state.wallets[payCcy].balance -= plan.price;
+  const ref = 'ESM-' + Math.floor(100000 + Math.random() * 900000);
+  state.txns.unshift({
+    merchant: `eSIM · ${plan.region}`, meta: `${plan.meta} · just now`,
+    amt: plan.price, ccy: payCcy, dir: 'out', ts: Date.now()
+  });
+  document.getElementById('esimResultPlan').textContent = `${plan.region} · ${plan.meta}`;
+  document.getElementById('esimResultAmt').textContent = `${payCcy} ${formatMoney(plan.price)}`;
+  document.getElementById('esimResultRef').textContent = ref;
+  generateQR(ref);
+  renderDashboard();
+  document.getElementById('sheet-esim').classList.remove('open');
+  setTimeout(() => document.getElementById('sheet-esim-result').classList.add('open'), 150);
+}
+
+function generateQR(seed) {
+  // Cheap deterministic 21x21 pseudo-QR pattern (visual only)
+  const size = 21;
+  const cells = [];
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  function rand() { h = (h * 9301 + 49297) >>> 0; return (h % 233280) / 233280; }
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      // Three corner finders
+      const inFinder = (x < 7 && y < 7) || (x >= size - 7 && y < 7) || (x < 7 && y >= size - 7);
+      let on = false;
+      if (inFinder) {
+        const fx = x < 7 ? x : x - (size - 7);
+        const fy = y < 7 ? y : y - (size - 7);
+        on = (fx === 0 || fx === 6 || fy === 0 || fy === 6) || (fx >= 2 && fx <= 4 && fy >= 2 && fy <= 4);
+      } else {
+        on = rand() > 0.55;
+      }
+      if (on) cells.push(`<rect x="${x*4}" y="${y*4}" width="4" height="4" fill="#0a1628"/>`);
+    }
+  }
+  document.getElementById('esimQR').innerHTML = `<rect width="84" height="84" fill="white"/>${cells.join('')}`;
+  document.getElementById('esimQR').setAttribute('viewBox', '0 0 84 84');
 }
 
 // ============ INIT ============
