@@ -926,25 +926,57 @@
     margin-top: 2px;
   }
   .card-chip {
-    width: 36px; height: 28px;
-    border-radius: 4px;
-    background: linear-gradient(135deg, #d4af6a 0%, #a37f44 100%);
+    width: 38px; height: 28px;
+    border-radius: 5px;
+    background:
+      linear-gradient(135deg, #f4d999 0%, #c9a961 35%, #8a6e3a 70%, #5e4a25 100%);
     position: relative;
-  }
-  .card-chip::before, .card-chip::after {
-    content: '';
-    position: absolute;
-    background: rgba(0,0,0,0.15);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+      0 1px 2px rgba(0, 0, 0, 0.2);
   }
   .card-chip::before {
-    inset: 4px 0;
-    border-top: 1px solid rgba(0,0,0,0.2);
-    border-bottom: 1px solid rgba(0,0,0,0.2);
+    content: '';
+    position: absolute;
+    inset: 4px 5px;
+    border-radius: 2px;
+    background:
+      linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.18) 50%, transparent 100%),
+      linear-gradient(0deg, transparent 0%, rgba(0,0,0,0.18) 50%, transparent 100%);
+    background-size: 100% 1px, 1px 100%;
+    background-repeat: no-repeat;
+    background-position: center, center;
   }
   .card-chip::after {
-    inset: 0 12px;
-    border-left: 1px solid rgba(0,0,0,0.2);
-    border-right: 1px solid rgba(0,0,0,0.2);
+    content: '';
+    position: absolute;
+    inset: 7px 9px;
+    border: 0.5px solid rgba(0,0,0,0.25);
+    border-radius: 1px;
+    background:
+      linear-gradient(0deg, transparent 50%, rgba(0,0,0,0.15) 50%),
+      linear-gradient(90deg, transparent 33%, rgba(0,0,0,0.15) 33%, rgba(0,0,0,0.15) 66%, transparent 66%);
+    background-size: 100% 8px, 100% 100%;
+  }
+
+  /* Contactless tap-to-pay icon */
+  .card-contactless {
+    width: 16px; height: 18px;
+    margin-left: 8px;
+    color: var(--gold);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .card-detail-card.white .card-contactless { color: var(--ink); }
+  .card-slide.white .card-contactless { color: var(--ink); }
+
+  /* Card chip group container: chip + contactless side by side */
+  .card-chip-group {
+    display: flex;
+    align-items: center;
   }
 
   .card-number {
@@ -1253,6 +1285,17 @@
     background: var(--gold);
     color: var(--ink);
     border-color: var(--gold);
+  }
+  /* Light variant for use inside sheets on paper background */
+  .ccy-tab.ccy-tab-light {
+    background: var(--paper-2);
+    color: var(--ink);
+    border-color: var(--line);
+  }
+  .ccy-tab.ccy-tab-light.active {
+    background: var(--ink);
+    color: var(--gold);
+    border-color: var(--ink);
   }
 
   .dash-balance-label {
@@ -1690,6 +1733,26 @@
     text-transform: uppercase;
   }
 
+  /* eSIM day pills */
+  .day-pill {
+    padding: 10px 6px;
+    border: 1px solid var(--line-strong);
+    background: transparent;
+    border-radius: var(--radius);
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--ink);
+    transition: all 0.15s;
+  }
+  .day-pill:hover { background: var(--paper-2); }
+  .day-pill.active {
+    background: var(--ink);
+    color: var(--gold);
+    border-color: var(--ink);
+  }
+
   /* eSIM cards */
   .esim-plan {
     border: 1px solid var(--line);
@@ -2113,27 +2176,6 @@
     inset: 0;
     background: radial-gradient(circle at 80% 20%, rgba(201, 169, 97, 0.18), transparent 60%);
     pointer-events: none;
-  }
-  .card-detail-card .card-chip {
-    width: 36px; height: 28px;
-    border-radius: 4px;
-    background: linear-gradient(135deg, #d4af6a 0%, #a37f44 100%);
-    position: relative;
-  }
-  .card-detail-card .card-chip::before, .card-detail-card .card-chip::after {
-    content: '';
-    position: absolute;
-    background: rgba(0,0,0,0.15);
-  }
-  .card-detail-card .card-chip::before {
-    inset: 4px 0;
-    border-top: 1px solid rgba(0,0,0,0.2);
-    border-bottom: 1px solid rgba(0,0,0,0.2);
-  }
-  .card-detail-card .card-chip::after {
-    inset: 0 12px;
-    border-left: 1px solid rgba(0,0,0,0.2);
-    border-right: 1px solid rgba(0,0,0,0.2);
   }
   .card-detail-num {
     font-family: var(--mono);
@@ -3173,7 +3215,7 @@
               <div class="card-brand">Fynco</div>
               <div class="card-type" id="cardTypeLabel">Personal · Multi-currency</div>
             </div>
-            <div class="card-chip"></div>
+            <div class="card-chip-group"><div class="card-chip"></div><span class="card-contactless"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a14 14 0 010 8"/><path d="M9.5 6.5a18 18 0 010 11"/><path d="M14 5a22 22 0 010 14"/></svg></span></div>
           </div>
           <div>
             <div class="card-number">4716 ●●●● ●●●● 2810</div>
@@ -3236,7 +3278,7 @@
               <div class="card-brand">Fynco</div>
               <div class="card-type" id="cardTypeLabel2">Personal · Multi-currency</div>
             </div>
-            <div class="card-chip"></div>
+            <div class="card-chip-group"><div class="card-chip"></div><span class="card-contactless"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a14 14 0 010 8"/><path d="M9.5 6.5a18 18 0 010 11"/><path d="M14 5a22 22 0 010 14"/></svg></span></div>
           </div>
           <div>
             <div class="card-number" id="cardNumberFull">4716 8294 1736 2810</div>
@@ -3325,7 +3367,7 @@
 
       <div class="dash-section">
         <div class="dash-section-head">
-          <div class="dash-section-title">Wallets</div>
+          <div class="dash-section-title">Accounts</div>
           <button class="dash-section-link" onclick="goTo(18)">Manage</button>
         </div>
         <div id="walletList"></div>
@@ -3631,15 +3673,18 @@
       </button>
     </div>
     <div class="sheet-body" id="topupBody">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Top up to</div>
+      <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;" id="topupTargetTabs"></div>
+
       <div class="source-pick">
-        <button class="source-tab active" data-src="va" onclick="pickTopupSource(this)">From wallet</button>
+        <button class="source-tab active" data-src="va" onclick="pickTopupSource(this)">From account</button>
         <button class="source-tab" data-src="cc" onclick="pickTopupSource(this)">From card</button>
       </div>
 
       <div id="topupSourceVA" class="source-detail">
         <div class="source-mark" id="topupSrcMark">SGD</div>
         <div class="source-info">
-          <div class="source-name" id="topupSrcName">Singapore Dollar wallet</div>
+          <div class="source-name" id="topupSrcName">Singapore Dollar account</div>
           <div class="source-bal" id="topupSrcBal">Available: SGD 5,000.00</div>
         </div>
         <button class="edit-link" onclick="cycleTopupWallet()">Switch</button>
@@ -3773,17 +3818,54 @@
   <div class="sheet" id="sheet-esim">
     <div class="sheet-handle"></div>
     <div class="sheet-head">
-      <div class="sheet-title"><em>eSIM</em> data plans</div>
+      <div class="sheet-title"><em>eSIM</em> unlimited data</div>
       <button class="sheet-close" onclick="closeSheet()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
     <div class="sheet-body">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;">Pay with your Fynco wallet. Activated instantly via QR.</p>
-      <div id="esimPlanList"></div>
+      <!-- Region picker -->
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Region</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;" id="esimRegionTabs"></div>
+
+      <!-- Day selector -->
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Days</div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:14px;" id="esimDayTabs">
+        <button class="day-pill" data-d="1" onclick="setEsimDays(1)">1</button>
+        <button class="day-pill" data-d="3" onclick="setEsimDays(3)">3</button>
+        <button class="day-pill" data-d="7" onclick="setEsimDays(7)">7</button>
+        <button class="day-pill" data-d="14" onclick="setEsimDays(14)">14</button>
+        <button class="day-pill" data-d="30" onclick="setEsimDays(30)">30</button>
+        <button class="day-pill" data-d="custom" onclick="setEsimCustomDays()">···</button>
+      </div>
+
+      <!-- Custom day input (hidden until "···" tapped) -->
+      <div id="esimCustomDayWrap" style="display:none;margin-bottom:14px;">
+        <input type="number" min="1" max="365" class="input" id="esimCustomDayInput" placeholder="Enter number of days (1–365)" oninput="onEsimCustomDayInput()">
+      </div>
+
+      <!-- Price card -->
+      <div style="background:var(--ink);color:var(--paper);padding:18px 20px;border-radius:var(--radius);position:relative;overflow:hidden;margin-bottom:14px;">
+        <div style="position:absolute;top:-30%;right:-15%;width:70%;height:140%;background:radial-gradient(circle,rgba(201,169,97,0.15) 0%,transparent 60%);pointer-events:none;"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;position:relative;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;opacity:0.6;margin-bottom:4px;">Total</div>
+            <div style="font-family:var(--serif);font-size:30px;font-weight:300;letter-spacing:-0.02em;line-height:1;font-variant-numeric:tabular-nums;">
+              <span style="font-size:14px;color:var(--gold);font-style:italic;margin-right:6px;" id="esimTotalCcy">SGD</span><span id="esimTotalAmt">0.00</span>
+            </div>
+            <div style="font-size:11px;opacity:0.7;margin-top:6px;font-family:var(--mono);letter-spacing:0.05em;" id="esimRateNote">SGD 0.99 / day · unlimited data</div>
+          </div>
+          <div style="text-align:right;">
+            <div id="esimDaysLabel" style="font-family:var(--serif);font-size:24px;font-weight:300;font-style:italic;color:var(--gold);line-height:1;">7</div>
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;opacity:0.6;margin-top:4px;">days</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:11px;color:var(--muted);line-height:1.5;text-align:center;" id="esimPayFromLine">Charges to your primary account</div>
     </div>
     <div class="sheet-foot">
-      <button class="btn btn-primary" id="esimBuyBtn" onclick="confirmEsim()" disabled>Select a plan</button>
+      <button class="btn btn-primary" id="esimBuyBtn" onclick="confirmEsim()">Buy eSIM</button>
     </div>
   </div>
 
@@ -3891,6 +3973,76 @@
     </div>
     <div class="sheet-foot">
       <button class="btn btn-primary" onclick="closeSheet(); goTo(17);">View card</button>
+    </div>
+  </div>
+
+  <!-- ACCOUNT DETAIL SHEET -->
+  <div class="sheet" id="sheet-account-detail">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
+        <div class="currency-mark" id="acctDetailMark" style="width:38px;height:38px;font-size:12px;">SGD</div>
+        <div style="min-width:0;flex:1;">
+          <div class="sheet-title" id="acctDetailTitle"><em>Account</em></div>
+          <div style="font-size:11px;color:var(--muted);font-family:var(--mono);letter-spacing:0.05em;" id="acctDetailType">Primary · virtual account</div>
+        </div>
+      </div>
+      <button class="sheet-close" onclick="closeSheet()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <!-- Balance card -->
+      <div style="background:var(--ink);color:var(--paper);padding:18px 20px;border-radius:var(--radius);position:relative;overflow:hidden;margin-bottom:16px;">
+        <div style="position:absolute;top:-30%;right:-15%;width:70%;height:140%;background:radial-gradient(circle,rgba(201,169,97,0.15) 0%,transparent 60%);pointer-events:none;"></div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;opacity:0.6;margin-bottom:4px;position:relative;">Available balance</div>
+        <div style="font-family:var(--serif);font-size:34px;font-weight:300;letter-spacing:-0.02em;line-height:1;font-variant-numeric:tabular-nums;position:relative;">
+          <span style="font-size:16px;color:var(--gold);font-style:italic;margin-right:6px;" id="acctDetailCcy">SGD</span><span id="acctDetailBal">0.00</span>
+        </div>
+      </div>
+
+      <!-- Account details -->
+      <div style="border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);">
+          <span style="font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:0.05em;text-transform:uppercase;">Account number</span>
+          <span style="font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.05em;" id="acctDetailNumber">SG-FYN-0000-0000-0000</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);">
+          <span style="font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:0.05em;text-transform:uppercase;">Swift / BIC</span>
+          <span style="font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.05em;" id="acctDetailSwift">FYNCSGSG</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);">
+          <span style="font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:0.05em;text-transform:uppercase;">Currency</span>
+          <span style="font-family:var(--serif);font-size:13px;font-weight:500;" id="acctDetailCurrencyName">Singapore Dollar</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
+          <span style="font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:0.05em;text-transform:uppercase;">Status</span>
+          <span class="badge gold" style="font-size:9px;padding:3px 8px;">Active</span>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px;">
+        <button class="qa-btn" style="background:var(--paper);border:1px solid var(--line);" onclick="closeSheet();openSheet('topup');">
+          <div class="qa-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+          <span class="qa-label">Top up</span>
+        </button>
+        <button class="qa-btn" style="background:var(--paper);border:1px solid var(--line);" onclick="copyAccountNumber()">
+          <div class="qa-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></div>
+          <span class="qa-label">Copy</span>
+        </button>
+        <button class="qa-btn" style="background:var(--paper);border:1px solid var(--line);" onclick="closeSheet();openSheet('send');">
+          <div class="qa-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
+          <span class="qa-label">Send</span>
+        </button>
+      </div>
+
+      <!-- History header -->
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+        <div style="font-family:var(--serif);font-size:16px;font-weight:500;letter-spacing:-0.01em;">Recent activity</div>
+        <button style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:none;border:none;cursor:pointer;" onclick="closeSheet();goTo(16);">See all</button>
+      </div>
+      <div id="acctDetailHistory"></div>
     </div>
   </div>
 
@@ -4942,12 +5094,12 @@ function renderDashboard() {
 
   // Wallets
   document.getElementById('walletList').innerHTML = Object.entries(state.wallets).map(([code, w]) => `
-    <div class="wallet-row" onclick="setActiveCcy('${code}')">
+    <div class="wallet-row" onclick="openAccountDetail('${code}')">
       <div class="wallet-left">
         <div class="currency-mark">${code}</div>
         <div>
           <div class="wallet-name">${w.name}</div>
-          <div class="wallet-sub">${w.primary ? 'Primary · ' : ''}Virtual account</div>
+          <div class="wallet-sub">${w.primary ? 'Primary · ' : ''}Account</div>
         </div>
       </div>
       <div class="wallet-right">
@@ -5045,7 +5197,7 @@ function renderCardsScreen() {
               <div class="card-slide-tier">Fynco · ${tierLabel(c.tier)}</div>
               ${isDefault ? `<div style="font-family:var(--mono);font-size:8px;letter-spacing:0.1em;color:var(--gold);margin-top:2px;">DEFAULT CARD</div>` : ''}
             </div>
-            <div class="card-chip"></div>
+            <div class="card-chip-group"><div class="card-chip"></div><span class="card-contactless"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8a14 14 0 010 8"/><path d="M9.5 6.5a18 18 0 010 11"/><path d="M14 5a22 22 0 010 14"/></svg></span></div>
           </div>
           <div>
             <div class="card-detail-num">${num}</div>
@@ -5176,6 +5328,78 @@ function addCardToWallet(provider) {
   } else {
     alert(`Add to Google Wallet\n\nCard: Fynco ${tierLabel(card.tier)}\n•••• ${card.last4}\n\nIn production, this opens the Google Pay add-card flow.`);
   }
+}
+
+// ============ ACCOUNT DETAIL ============
+let activeAccountCcy = null;
+function openAccountDetail(ccy) {
+  if (!state.wallets[ccy]) return;
+  activeAccountCcy = ccy;
+  // Switch the dashboard active currency too
+  setActiveCcy(ccy);
+  const w = state.wallets[ccy];
+
+  document.getElementById('acctDetailMark').textContent = ccy;
+  document.getElementById('acctDetailTitle').innerHTML = `<em>${getCurrencyName(ccy)}</em>`;
+  document.getElementById('acctDetailType').textContent = w.primary ? 'Primary · virtual account' : 'Secondary · virtual account';
+  document.getElementById('acctDetailCcy').textContent = ccy;
+  document.getElementById('acctDetailBal').textContent = formatMoney(w.balance);
+  document.getElementById('acctDetailNumber').textContent = generateAccountNumber(ccy);
+  document.getElementById('acctDetailSwift').textContent = generateSwift(ccy);
+  document.getElementById('acctDetailCurrencyName').textContent = getCurrencyName(ccy);
+
+  // History
+  const hist = state.txns.filter(t => t.ccy === ccy).slice(0, 8);
+  const histEl = document.getElementById('acctDetailHistory');
+  if (hist.length === 0) {
+    histEl.innerHTML = `<div style="text-align:center;padding:24px 0;font-size:13px;color:var(--muted);font-style:italic;">No activity yet</div>`;
+  } else {
+    histEl.innerHTML = hist.map(renderTxnRow).join('');
+  }
+
+  openSheet('account-detail');
+}
+
+// Persistent account number per currency, generated once per session
+const accountNumbers = {};
+function generateAccountNumber(ccy) {
+  if (accountNumbers[ccy]) return accountNumbers[ccy];
+  const country = state.residence?.code || 'SG';
+  const blocks = [
+    String(Math.floor(1000 + Math.random() * 9000)),
+    String(Math.floor(1000 + Math.random() * 9000)),
+    String(Math.floor(1000 + Math.random() * 9000)),
+  ];
+  accountNumbers[ccy] = `${country}-FYN-${blocks.join('-')}`;
+  return accountNumbers[ccy];
+}
+
+function generateSwift(ccy) {
+  // FYNC + country + branch (simulated)
+  const country = state.residence?.code || 'SG';
+  return `FYNC${country}${country.slice(0,2)}`;
+}
+
+function copyAccountNumber() {
+  const num = document.getElementById('acctDetailNumber').textContent;
+  navigator.clipboard?.writeText(num).then(
+    () => { showCopyToast('Account number copied'); },
+    () => { showCopyToast('Tap and hold the number to copy'); }
+  );
+}
+
+function showCopyToast(msg) {
+  let t = document.getElementById('copyToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'copyToast';
+    t.style.cssText = 'position:absolute;left:50%;bottom:120px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-size:12px;font-family:var(--mono);letter-spacing:0.05em;z-index:100;opacity:0;transition:opacity 0.25s;pointer-events:none;';
+    document.querySelector('.app').appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 1800);
 }
 
 // ============ APPLY CARD ============
@@ -5344,18 +5568,42 @@ function closeSheet(silent) {
 
 // ============ TOP UP ============
 function resetTopup() {
-  state.topup = { source: 'va', amount: '0', sourceCcy: state.activeCcy };
+  // Top-up "to" currency starts as the active dashboard currency
+  state.topup = { source: 'va', amount: '0', sourceCcy: state.activeCcy, targetCcy: state.activeCcy };
   document.querySelectorAll('#sheet-topup .source-tab').forEach(t => t.classList.toggle('active', t.dataset.src === 'va'));
   document.getElementById('topupSourceVA').style.display = 'flex';
   document.getElementById('topupSourceCC').style.display = 'none';
-  document.getElementById('topupAmtCcy').textContent = state.activeCcy;
+
+  // Render target currency tabs
+  const tabsEl = document.getElementById('topupTargetTabs');
+  tabsEl.innerHTML = Object.keys(state.wallets).map(ccy =>
+    `<button class="ccy-tab ccy-tab-light ${ccy === state.topup.targetCcy ? 'active' : ''}" onclick="setTopupTargetCcy('${ccy}')">${ccy} card</button>`
+  ).join('');
+
+  refreshTopupCcyDisplay();
   document.getElementById('topupAmtVal').textContent = '0.00';
   document.getElementById('topupAmtDisplay').classList.add('empty');
   document.getElementById('topupConfirmBtn').disabled = true;
-  // Default source wallet
-  document.getElementById('topupSrcMark').textContent = state.activeCcy;
-  document.getElementById('topupSrcName').textContent = `${getCurrencyName(state.activeCcy)} wallet`;
-  document.getElementById('topupSrcBal').textContent = `Available: ${state.activeCcy} ${formatMoney(state.wallets[state.activeCcy]?.balance || 0)}`;
+}
+
+function setTopupTargetCcy(ccy) {
+  state.topup.targetCcy = ccy;
+  // Also auto-switch source to same currency if user hasn't customized
+  if (state.wallets[ccy]) state.topup.sourceCcy = ccy;
+  document.querySelectorAll('#topupTargetTabs .ccy-tab').forEach(t => {
+    t.classList.toggle('active', t.textContent === `${ccy} card`);
+  });
+  refreshTopupCcyDisplay();
+  refreshTopupDisplay();
+}
+
+function refreshTopupCcyDisplay() {
+  const ccy = state.topup.targetCcy;
+  const srcCcy = state.topup.sourceCcy || ccy;
+  document.getElementById('topupAmtCcy').textContent = ccy;
+  document.getElementById('topupSrcMark').textContent = srcCcy;
+  document.getElementById('topupSrcName').textContent = `${getCurrencyName(srcCcy)} account`;
+  document.getElementById('topupSrcBal').textContent = `Available: ${srcCcy} ${formatMoney(state.wallets[srcCcy]?.balance || 0)}`;
 }
 
 function pickTopupSource(el) {
@@ -5364,7 +5612,7 @@ function pickTopupSource(el) {
   document.querySelectorAll('#sheet-topup .source-tab').forEach(t => t.classList.toggle('active', t === el));
   document.getElementById('topupSourceVA').style.display = src === 'va' ? 'flex' : 'none';
   document.getElementById('topupSourceCC').style.display = src === 'cc' ? 'block' : 'none';
-  document.getElementById('topupHint').textContent = src === 'va' ? 'From your virtual account wallet' : 'From a credit/debit card';
+  document.getElementById('topupHint').textContent = src === 'va' ? 'From your virtual account' : 'From a credit/debit card';
 }
 
 function cycleTopupWallet() {
@@ -5374,7 +5622,7 @@ function cycleTopupWallet() {
   const nxt = codes[(idx + 1) % codes.length];
   state.topup.sourceCcy = nxt;
   document.getElementById('topupSrcMark').textContent = nxt;
-  document.getElementById('topupSrcName').textContent = `${getCurrencyName(nxt)} wallet`;
+  document.getElementById('topupSrcName').textContent = `${getCurrencyName(nxt)} account`;
   document.getElementById('topupSrcBal').textContent = `Available: ${nxt} ${formatMoney(state.wallets[nxt].balance)}`;
 }
 
@@ -5386,8 +5634,9 @@ function setTopupAmt(n) {
 function refreshTopupDisplay() {
   const v = parseFloat(state.topup.amount) || 0;
   const el = document.getElementById('topupAmtDisplay');
+  const ccy = state.topup.targetCcy || state.activeCcy;
   document.getElementById('topupAmtVal').textContent = formatMoney(v);
-  document.getElementById('topupAmtCcy').textContent = state.activeCcy;
+  document.getElementById('topupAmtCcy').textContent = ccy;
   if (v > 0) el.classList.remove('empty'); else el.classList.add('empty');
   document.getElementById('topupConfirmBtn').disabled = v <= 0;
 }
@@ -5395,7 +5644,7 @@ function refreshTopupDisplay() {
 function confirmTopup() {
   const amt = parseFloat(state.topup.amount) || 0;
   if (amt <= 0) return;
-  const ccy = state.activeCcy;
+  const ccy = state.topup.targetCcy || state.activeCcy;
   const ref = 'TXN-' + Math.floor(100000 + Math.random() * 900000);
 
   // Effects
@@ -5403,30 +5652,42 @@ function confirmTopup() {
   let fromLabel = '';
   if (state.topup.source === 'va') {
     const srcCcy = state.topup.sourceCcy || ccy;
-    state.wallets[srcCcy].balance -= amt; // simplified — same currency
-    fromLabel = `${srcCcy} wallet`;
+    if (!state.wallets[srcCcy]) {
+      alert('Source account not found.');
+      return;
+    }
+    if (state.wallets[srcCcy].balance < amt) {
+      alert(`Insufficient ${srcCcy} balance.\n\nNeeded: ${srcCcy} ${formatMoney(amt)}\nAvailable: ${srcCcy} ${formatMoney(state.wallets[srcCcy].balance)}`);
+      return;
+    }
+    state.wallets[srcCcy].balance -= amt; // simplified — same currency assumed
+    fromLabel = `${srcCcy} account`;
   } else {
     fromLabel = 'Credit card';
   }
 
   state.txns.unshift({
     merchant: 'Card top up', meta: `From ${fromLabel} · just now`,
-    amt, ccy, dir: 'in', ts: Date.now()
+    amt, ccy, dir: 'in', ts: Date.now(), cat: 'card'
   });
   if (state.topup.source === 'va') {
     state.txns.unshift({
-      merchant: 'Wallet to card transfer', meta: `Outgoing · just now`,
+      merchant: 'Account to card transfer', meta: `Outgoing · just now`,
       amt, ccy: state.topup.sourceCcy, dir: 'out', ts: Date.now()
     });
   }
 
-  // Update result sheet
+  // Update active dashboard ccy to match if user chose a different one
+  state.activeCcy = ccy;
+
   document.getElementById('topupResultAmt').textContent = `${ccy} ${formatMoney(amt)}`;
   document.getElementById('topupResultFrom').textContent = fromLabel;
   document.getElementById('topupResultRef').textContent = ref;
 
   renderDashboard();
-  // Switch sheet
+  document.querySelectorAll('.ccy-tab').forEach(t => {
+    t.classList.toggle('active', t.textContent === ccy);
+  });
   document.getElementById('sheet-topup').classList.remove('open');
   setTimeout(() => {
     document.getElementById('sheet-topup-result').classList.add('open');
@@ -5546,60 +5807,171 @@ function confirmScanPay() {
 }
 
 // ============ ESIM ============
-const esimPlans = [
-  { id: 'sg-3gb', flag: '🇸🇬', region: 'Singapore', meta: '3 GB · 7 days', price: 8 },
-  { id: 'sg-10gb', flag: '🇸🇬', region: 'Singapore', meta: '10 GB · 30 days', price: 18 },
-  { id: 'asia-5gb', flag: '🌏', region: 'Asia 13 countries', meta: '5 GB · 15 days', price: 22 },
-  { id: 'global-3gb', flag: '🌐', region: 'Global 100+ countries', meta: '3 GB · 10 days', price: 35 },
-  { id: 'jp-5gb', flag: '🇯🇵', region: 'Japan', meta: '5 GB · 14 days', price: 16 },
-  { id: 'eu-10gb', flag: '🇪🇺', region: 'Europe 30 countries', meta: '10 GB · 30 days', price: 28 },
+// Indicative FX rates from SGD as base (for demo only)
+const FX_FROM_SGD = {
+  SGD: 1.0,
+  MYR: 3.50,
+  IDR: 12000,
+  PHP: 43.5,
+  THB: 27.0,
+  VND: 18800,
+  HKD: 5.85,
+  JPY: 117,
+  KRW: 1050,
+  INR: 65.5,
+  AUD: 1.13,
+  NZD: 1.24,
+  GBP: 0.58,
+  USD: 0.74,
+  CAD: 1.02,
+  EUR: 0.69,
+  AED: 2.72,
+};
+
+const ESIM_DAILY_RATE_SGD = 0.99; // SGD 0.99/day unlimited data
+
+const esimRegions = [
+  { id: 'sg', flag: '🇸🇬', name: 'Singapore' },
+  { id: 'asia', flag: '🌏', name: 'Asia (13 countries)' },
+  { id: 'global', flag: '🌐', name: 'Global (100+)' },
+  { id: 'jp', flag: '🇯🇵', name: 'Japan' },
+  { id: 'eu', flag: '🇪🇺', name: 'Europe (30)' },
+  { id: 'us', flag: '🇺🇸', name: 'USA' },
 ];
 
+// Region multipliers — global/premium regions cost more per day
+const ESIM_REGION_MULTIPLIER = {
+  sg: 1.0, asia: 1.4, global: 2.2, jp: 1.6, eu: 1.8, us: 1.7
+};
+
 function initEsim() {
-  state.esimSelected = null;
-  const list = document.getElementById('esimPlanList');
-  list.innerHTML = esimPlans.map(p => `
-    <div class="esim-plan" data-id="${p.id}" onclick="selectEsim('${p.id}')">
-      <div class="esim-flag">${p.flag}</div>
-      <div class="esim-plan-info">
-        <div class="esim-plan-region">${p.region}</div>
-        <div class="esim-plan-meta">${p.meta}</div>
-      </div>
-      <div class="esim-plan-price">
-        <div>SGD ${p.price}</div>
-        <div class="esim-plan-price-sub">${state.activeCcy === 'SGD' ? 'Card' : 'auto-FX'}</div>
-      </div>
-    </div>
-  `).join('');
-  document.getElementById('esimBuyBtn').disabled = true;
-  document.getElementById('esimBuyBtn').textContent = 'Select a plan';
+  state.esimSelected = state.esimSelected || { region: 'sg', days: 7, custom: false };
+
+  // Render region tabs
+  const tabsEl = document.getElementById('esimRegionTabs');
+  tabsEl.innerHTML = esimRegions.map(r => {
+    const active = r.id === state.esimSelected.region ? 'active' : '';
+    return `<button class="ccy-tab ccy-tab-light ${active}" onclick="setEsimRegion('${r.id}')">${r.flag} ${r.name}</button>`;
+  }).join('');
+
+  // Reset day pills active state
+  document.querySelectorAll('.day-pill').forEach(p => p.classList.remove('active'));
+  if (state.esimSelected.custom) {
+    document.querySelector('.day-pill[data-d="custom"]')?.classList.add('active');
+    document.getElementById('esimCustomDayWrap').style.display = 'block';
+    document.getElementById('esimCustomDayInput').value = state.esimSelected.days;
+  } else {
+    document.querySelector(`.day-pill[data-d="${state.esimSelected.days}"]`)?.classList.add('active');
+    document.getElementById('esimCustomDayWrap').style.display = 'none';
+  }
+
+  refreshEsimTotal();
 }
 
-function selectEsim(id) {
-  state.esimSelected = id;
-  document.querySelectorAll('.esim-plan').forEach(el => el.classList.toggle('selected', el.dataset.id === id));
-  const plan = esimPlans.find(p => p.id === id);
-  document.getElementById('esimBuyBtn').disabled = false;
-  document.getElementById('esimBuyBtn').textContent = `Buy for SGD ${plan.price}`;
+function setEsimRegion(id) {
+  state.esimSelected.region = id;
+  document.querySelectorAll('#esimRegionTabs .ccy-tab').forEach(t => t.classList.remove('active'));
+  event?.currentTarget?.classList?.add('active');
+  refreshEsimTotal();
+}
+
+function setEsimDays(d) {
+  state.esimSelected.days = d;
+  state.esimSelected.custom = false;
+  document.querySelectorAll('.day-pill').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.day-pill[data-d="${d}"]`)?.classList.add('active');
+  document.getElementById('esimCustomDayWrap').style.display = 'none';
+  refreshEsimTotal();
+}
+
+function setEsimCustomDays() {
+  state.esimSelected.custom = true;
+  document.querySelectorAll('.day-pill').forEach(p => p.classList.remove('active'));
+  document.querySelector('.day-pill[data-d="custom"]')?.classList.add('active');
+  const wrap = document.getElementById('esimCustomDayWrap');
+  wrap.style.display = 'block';
+  const input = document.getElementById('esimCustomDayInput');
+  if (!input.value) input.value = state.esimSelected.days || 7;
+  state.esimSelected.days = parseInt(input.value) || 1;
+  setTimeout(() => input.focus(), 100);
+  refreshEsimTotal();
+}
+
+function onEsimCustomDayInput() {
+  const v = parseInt(document.getElementById('esimCustomDayInput').value) || 0;
+  state.esimSelected.days = Math.max(1, Math.min(365, v));
+  refreshEsimTotal();
+}
+
+function refreshEsimTotal() {
+  const days = state.esimSelected.days || 1;
+  const region = state.esimSelected.region || 'sg';
+  const multiplier = ESIM_REGION_MULTIPLIER[region] || 1;
+  const sgdTotal = ESIM_DAILY_RATE_SGD * multiplier * days;
+
+  // Display in primary account currency
+  const primaryCcy = getPrimaryCcy();
+  const fx = FX_FROM_SGD[primaryCcy] || 1;
+  const localTotal = sgdTotal * fx;
+  const dailyLocal = ESIM_DAILY_RATE_SGD * multiplier * fx;
+
+  document.getElementById('esimTotalCcy').textContent = primaryCcy;
+  document.getElementById('esimTotalAmt').textContent = formatMoney(localTotal);
+  document.getElementById('esimDaysLabel').textContent = days;
+
+  // Rate note
+  const rateNoteEl = document.getElementById('esimRateNote');
+  if (primaryCcy === 'SGD') {
+    rateNoteEl.textContent = `SGD ${formatMoney(dailyLocal)} / day · unlimited data`;
+  } else {
+    rateNoteEl.textContent = `${primaryCcy} ${formatMoney(dailyLocal)} / day · unlimited · SGD ${formatMoney(ESIM_DAILY_RATE_SGD * multiplier)} base`;
+  }
+
+  // Pay from line
+  document.getElementById('esimPayFromLine').textContent = `Charges to your ${getCurrencyName(primaryCcy)} account`;
+
+  // Buy button
+  const btn = document.getElementById('esimBuyBtn');
+  btn.disabled = days < 1;
+  btn.textContent = `Buy eSIM · ${primaryCcy} ${formatMoney(localTotal)}`;
+}
+
+function getPrimaryCcy() {
+  // Find the primary wallet (the one flagged primary)
+  for (const [ccy, w] of Object.entries(state.wallets)) {
+    if (w.primary) return ccy;
+  }
+  return state.activeCcy || 'SGD';
+}
+
+function getEsimRegionName(id) {
+  const r = esimRegions.find(x => x.id === id);
+  return r ? `${r.flag} ${r.name}` : 'Region';
 }
 
 function confirmEsim() {
-  const plan = esimPlans.find(p => p.id === state.esimSelected);
-  if (!plan) return;
-  // Deduct from SGD wallet (or local if SGD wallet absent)
-  const payCcy = state.wallets['SGD'] ? 'SGD' : Object.keys(state.wallets)[0];
-  if ((state.wallets[payCcy]?.balance || 0) < plan.price) {
-    alert(`Insufficient ${payCcy} wallet balance.\n\nNeeded: ${payCcy} ${plan.price}\nAvailable: ${payCcy} ${formatMoney(state.wallets[payCcy]?.balance || 0)}`);
+  const days = state.esimSelected.days;
+  const region = state.esimSelected.region;
+  const multiplier = ESIM_REGION_MULTIPLIER[region] || 1;
+  const sgdTotal = ESIM_DAILY_RATE_SGD * multiplier * days;
+  const primaryCcy = getPrimaryCcy();
+  const fx = FX_FROM_SGD[primaryCcy] || 1;
+  const localTotal = sgdTotal * fx;
+
+  if ((state.wallets[primaryCcy]?.balance || 0) < localTotal) {
+    alert(`Insufficient balance.\n\nNeeded: ${primaryCcy} ${formatMoney(localTotal)}\nAvailable: ${primaryCcy} ${formatMoney(state.wallets[primaryCcy]?.balance || 0)}`);
     return;
   }
-  state.wallets[payCcy].balance -= plan.price;
+  state.wallets[primaryCcy].balance -= localTotal;
   const ref = 'ESM-' + Math.floor(100000 + Math.random() * 900000);
+  const regionName = getEsimRegionName(region);
   state.txns.unshift({
-    merchant: `eSIM · ${plan.region}`, meta: `${plan.meta} · just now`,
-    amt: plan.price, ccy: payCcy, dir: 'out', ts: Date.now()
+    merchant: `eSIM · ${regionName}`,
+    meta: `${days} day${days > 1 ? 's' : ''} unlimited · just now`,
+    amt: localTotal, ccy: primaryCcy, dir: 'out', ts: Date.now(), cat: 'esim'
   });
-  document.getElementById('esimResultPlan').textContent = `${plan.region} · ${plan.meta}`;
-  document.getElementById('esimResultAmt').textContent = `${payCcy} ${formatMoney(plan.price)}`;
+  document.getElementById('esimResultPlan').textContent = `${regionName} · ${days} days unlimited`;
+  document.getElementById('esimResultAmt').textContent = `${primaryCcy} ${formatMoney(localTotal)}`;
   document.getElementById('esimResultRef').textContent = ref;
   generateQR(ref);
   renderDashboard();
