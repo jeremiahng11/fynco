@@ -4517,6 +4517,13 @@
       <!-- Account details -->
       <div style="border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;">
         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);gap:8px;">
+          <span style="font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:0.05em;text-transform:uppercase;flex-shrink:0;">Account holder</span>
+          <div style="display:flex;align-items:center;gap:6px;min-width:0;">
+            <span style="font-family:var(--serif);font-size:13px;font-weight:500;text-align:right;" id="acctDetailHolder">—</span>
+            <span class="badge" id="acctDetailHolderBadge" style="font-size:8px;padding:3px 6px;flex-shrink:0;">Personal</span>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);gap:8px;">
           <span style="font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:0.05em;text-transform:uppercase;flex-shrink:0;">Account number</span>
           <div style="display:flex;align-items:center;gap:8px;min-width:0;">
             <span style="font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:0.05em;text-align:right;" id="acctDetailNumber">SG-FYN-0000-0000-0000</span>
@@ -6265,6 +6272,21 @@ function ensureProfilesInit() {
     delete state.profiles.consumer;
   }
   if (state.activeProfile === 'consumer') state.activeProfile = 'personal';
+
+  // Stamp legal holder names onto the profile slots if missing, so
+  // account-detail and other downstream views can recover them across
+  // profile switches.
+  const bizInput = document.getElementById('bizName');
+  if (state.profiles.business && !state.profiles.business._bizName) {
+    const v = bizInput?.value?.trim();
+    if (v) state.profiles.business._bizName = v;
+  }
+  if (state.profiles.personal && !state.profiles.personal._fullName) {
+    const fn = (document.getElementById('firstName')?.value || '').trim();
+    const ln = (document.getElementById('lastName')?.value || '').trim();
+    const full = `${fn} ${ln}`.trim();
+    if (full) state.profiles.personal._fullName = full;
+  }
 }
 
 function snapshotProfile() {
@@ -6292,6 +6314,12 @@ function switchToProfile(type) {
   loadProfile(state.profiles[type]);
   state.activeProfile = type;
   state.accountType = type;
+  // Restore the bizName DOM input from the profile snapshot, so the
+  // dashboard greeting and any downstream readers see the right value.
+  const bizInput = document.getElementById('bizName');
+  if (bizInput) {
+    bizInput.value = type === 'business' ? (state.profiles.business?._bizName || bizInput.value || '') : '';
+  }
   // Re-render dashboard
   closeSheet();
   // Force full re-render including ccy tabs
@@ -6905,9 +6933,13 @@ function provisionApplyAccountType() {
   state.activeProfile = type;
   state.accountType = type;
 
-  // If business, sync the bizName field so dashboard greeting picks it up
+  // Stamp the registered name onto the profile slot so account-detail and
+  // greeting screens can recover it across profile switches.
   if (type === 'business' && state._applyData.bizName) {
+    state.profiles.business._bizName = state._applyData.bizName;
     document.getElementById('bizName').value = state._applyData.bizName;
+  } else if (type === 'personal' && state._applyData.fullName) {
+    state.profiles.personal._fullName = state._applyData.fullName;
   }
 
   // No starter card — the user must apply for a Visa card explicitly
@@ -7356,15 +7388,26 @@ function openAccountDetail(ccy) {
   // Switch the dashboard active currency too
   setActiveCcy(ccy);
   const w = state.wallets[ccy];
+  const profile = state.activeProfile || 'personal';
 
   document.getElementById('acctDetailMark').textContent = ccy;
   document.getElementById('acctDetailTitle').innerHTML = `<em>${getCurrencyName(ccy)}</em>`;
-  document.getElementById('acctDetailType').textContent = w.primary ? 'Primary · virtual account' : 'Secondary · virtual account';
+  document.getElementById('acctDetailType').textContent = `${w.primary ? 'Primary' : 'Secondary'} · ${profile === 'business' ? 'business' : 'personal'} VA`;
   document.getElementById('acctDetailCcy').textContent = ccy;
   document.getElementById('acctDetailBal').textContent = formatMoney(w.balance);
-  document.getElementById('acctDetailNumber').textContent = generateAccountNumber(ccy);
-  document.getElementById('acctDetailSwift').textContent = generateSwift(ccy);
+  document.getElementById('acctDetailNumber').textContent = generateAccountNumber(ccy, profile);
+  document.getElementById('acctDetailSwift').textContent = generateSwift(ccy, profile);
   document.getElementById('acctDetailCurrencyName').textContent = getCurrencyName(ccy);
+
+  // Holder + badge
+  const holderEl = document.getElementById('acctDetailHolder');
+  const holderBadgeEl = document.getElementById('acctDetailHolderBadge');
+  if (holderEl) holderEl.textContent = getProfileHolderName(profile);
+  if (holderBadgeEl) {
+    const isBiz = profile === 'business';
+    holderBadgeEl.textContent = isBiz ? 'Business' : 'Personal';
+    holderBadgeEl.classList.toggle('gold', isBiz);
+  }
 
   // History
   const hist = state.txns.filter(t => t.ccy === ccy).slice(0, 8);
@@ -7378,24 +7421,48 @@ function openAccountDetail(ccy) {
   openSheet('account-detail');
 }
 
-// Persistent account number per currency, generated once per session
+// Returns the legal/registered holder name for a given profile.
+// Personal profiles use the user's full name; Business profiles use the
+// registered business name captured during the apply flow (or onboarding).
+function getProfileHolderName(profile) {
+  if (profile === 'business') {
+    const applyName = state.profiles?.business?._bizName;
+    if (applyName) return applyName;
+    const onboardingBiz = document.getElementById('bizName')?.value?.trim();
+    if (onboardingBiz) return onboardingBiz;
+    return 'Business account';
+  }
+  // Personal — prefer stamped fullName, fall back to the form inputs.
+  const stamped = state.profiles?.personal?._fullName;
+  if (stamped) return stamped;
+  const fn = (document.getElementById('firstName')?.value || 'Jeremiah').trim();
+  const ln = (document.getElementById('lastName')?.value || 'Ng').trim();
+  return `${fn} ${ln}`.trim();
+}
+
+// Persistent account numbers, scoped per (profile, currency) so Personal
+// and Business accounts on the same currency get different VA numbers.
 const accountNumbers = {};
-function generateAccountNumber(ccy) {
-  if (accountNumbers[ccy]) return accountNumbers[ccy];
+function generateAccountNumber(ccy, profile) {
+  profile = profile || state.activeProfile || 'personal';
+  const key = `${profile}:${ccy}`;
+  if (accountNumbers[key]) return accountNumbers[key];
   const country = state.residence?.code || 'SG';
+  const prefix = profile === 'business' ? 'BIZ' : 'FYN';
   const blocks = [
     String(Math.floor(1000 + Math.random() * 9000)),
     String(Math.floor(1000 + Math.random() * 9000)),
     String(Math.floor(1000 + Math.random() * 9000)),
   ];
-  accountNumbers[ccy] = `${country}-FYN-${blocks.join('-')}`;
-  return accountNumbers[ccy];
+  accountNumbers[key] = `${country}-${prefix}-${blocks.join('-')}`;
+  return accountNumbers[key];
 }
 
-function generateSwift(ccy) {
-  // FYNC + country + branch (simulated)
+function generateSwift(ccy, profile) {
+  profile = profile || state.activeProfile || 'personal';
   const country = state.residence?.code || 'SG';
-  return `FYNC${country}${country.slice(0,2)}`;
+  // Business profiles route through the corporate sub-branch (suffix XXX→BIZ)
+  return profile === 'business' ? `FYNC${country}${country.slice(0,2)}BIZ` : `FYNC${country}${country.slice(0,2)}`;
 }
 
 function copyText(elementId, toastMsg) {
