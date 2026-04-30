@@ -768,6 +768,177 @@
     border: 2px dashed var(--gold);
     animation: spin 20s linear infinite;
   }
+  /* ============ REWARDS UI ============ */
+  .rewards-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .rewards-tab.active {
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+    font-weight: 600;
+  }
+  .rewards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .reward-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    text-align: left;
+    padding: 0;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+  }
+  .reward-card:hover { border-color: var(--ink); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(10,22,40,0.08); }
+  .reward-card.reward-disabled { opacity: 0.55; }
+  .reward-card.reward-disabled:hover { transform: none; box-shadow: none; border-color: var(--line); }
+  .reward-art {
+    aspect-ratio: 1.4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+  }
+  .reward-meta { padding: 10px 12px 12px; }
+  .reward-name {
+    font-family: var(--serif);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.25;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .reward-sub {
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.4;
+    margin-bottom: 8px;
+    min-height: 28px;
+  }
+  .reward-cost {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--ink);
+    color: var(--gold);
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  .reward-cost.unaffordable { background: var(--paper-2); color: var(--muted); }
+
+  .voucher-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .voucher-row:last-child { border-bottom: none; }
+  .voucher-art {
+    width: 48px; height: 48px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    overflow: hidden;
+  }
+  .voucher-art > svg { width: 32px; height: 32px; }
+  .voucher-badge {
+    background: var(--paper-2);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .voucher-badge.gold { background: var(--gold); color: var(--ink); }
+
+  /* eSIM voucher selector inside the buy flow */
+  .esim-voucher-card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--paper);
+  }
+  .esim-voucher-card:hover { background: var(--paper-2); }
+  .esim-voucher-card.selected {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .esim-voucher-card.selected .esim-voucher-name { color: var(--paper); }
+  .esim-voucher-card.selected .esim-voucher-meta { color: rgba(247,244,237,0.6); }
+  .esim-voucher-card.selected .esim-voucher-badge { background: var(--gold); color: var(--ink); }
+  .esim-voucher-name {
+    font-family: var(--serif);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .esim-voucher-meta {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+    font-family: var(--mono);
+    letter-spacing: 0.03em;
+  }
+  .esim-voucher-badge {
+    background: var(--paper-2);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .esim-days-input {
+    width: 50px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 6px 8px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .esim-days-input:focus { outline: none; border-color: var(--ink); }
+
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes successPop {
     0% { transform: scale(0.4); opacity: 0; }
@@ -1418,6 +1589,85 @@
   }
   .qa-btn:hover { background: var(--paper-2); }
   .qa-btn:active { transform: scale(0.96); }
+
+  /* ============ DASHBOARD REWARDS BANNER ============ */
+  .dash-rewards-banner {
+    margin: 16px 16px 4px;
+    width: calc(100% - 32px);
+    background: linear-gradient(135deg, #1a2a44 0%, #0a1628 70%);
+    color: var(--paper);
+    border: none;
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(10, 22, 40, 0.12);
+    transition: transform 0.15s;
+  }
+  .dash-rewards-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 100% 0%, rgba(201, 169, 97, 0.2), transparent 60%);
+    pointer-events: none;
+  }
+  .dash-rewards-banner:active { transform: scale(0.99); }
+  .dash-rewards-icon {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: rgba(201, 169, 97, 0.16);
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .dash-rewards-info { flex: 1; min-width: 0; text-align: left; position: relative; }
+  .dash-rewards-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 2px;
+  }
+  .dash-rewards-balance {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--gold);
+    font-variant-numeric: tabular-nums;
+  }
+  .dash-rewards-pts {
+    font-size: 11px;
+    font-family: var(--mono);
+    letter-spacing: 0.1em;
+    color: var(--paper);
+    opacity: 0.55;
+    margin-left: 6px;
+    font-style: normal;
+  }
+  .dash-rewards-cta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    flex-shrink: 0;
+    padding: 6px 10px;
+    border: 1px solid rgba(201, 169, 97, 0.3);
+    border-radius: 999px;
+    position: relative;
+  }
   .qa-icon {
     width: 36px; height: 36px;
     border-radius: 50%;
@@ -3631,6 +3881,21 @@
         </button>
       </div>
 
+      <!-- Rewards banner -->
+      <button class="dash-rewards-banner" onclick="openSheet('rewards')">
+        <div class="dash-rewards-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="dash-rewards-info">
+          <div class="dash-rewards-label">Rewards</div>
+          <div class="dash-rewards-balance"><span id="dashPointsBalance">0</span><span class="dash-rewards-pts">pts</span></div>
+        </div>
+        <div class="dash-rewards-cta">
+          <span>Redeem</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </button>
+
       <div class="dash-section">
         <div class="dash-section-head">
           <div class="dash-section-title">Accounts</div>
@@ -4122,6 +4387,21 @@
           <input type="number" min="1" max="365" class="input" id="esimCustomDayInput" placeholder="Enter number of days (1–365)" oninput="onEsimCustomDayInput()">
         </div>
 
+        <!-- eSIM voucher selector — appears only if user has an active eSIM voucher -->
+        <div id="esimVoucherSection" style="display:none;margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Apply voucher</div>
+            <button id="esimClearVoucherBtn" onclick="clearEsimVoucher()" style="display:none;background:none;border:none;color:var(--muted);font-family:var(--mono);font-size:9px;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;padding:2px 6px;">Clear</button>
+          </div>
+          <div id="esimVoucherList"></div>
+          <div id="esimVoucherDaysWrap" style="display:none;align-items:center;gap:10px;padding:10px 14px;background:var(--paper-2);border-radius:var(--radius);margin-top:8px;">
+            <span style="font-family:var(--mono);font-size:10px;letter-spacing:0.05em;color:var(--muted);text-transform:uppercase;flex:1;">Days from voucher</span>
+            <button onclick="adjustVoucherDays(-1)" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--line-strong);background:var(--paper);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+            <input type="number" min="0" class="esim-days-input" id="esimVoucherDays" value="0" oninput="onVoucherDaysInput()">
+            <button onclick="adjustVoucherDays(1)" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--line-strong);background:var(--paper);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><line x1="12" y1="5" x2="12" y2="19"/></svg></button>
+          </div>
+        </div>
+
         <!-- Price card -->
         <div style="background:var(--ink);color:var(--paper);padding:18px 20px;border-radius:var(--radius);position:relative;overflow:hidden;margin-bottom:14px;">
           <div style="position:absolute;top:-30%;right:-15%;width:70%;height:140%;background:radial-gradient(circle,rgba(201,169,97,0.15) 0%,transparent 60%);pointer-events:none;"></div>
@@ -4130,6 +4410,9 @@
               <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;opacity:0.6;margin-bottom:4px;">Total</div>
               <div style="font-family:var(--serif);font-size:30px;font-weight:300;letter-spacing:-0.02em;line-height:1;font-variant-numeric:tabular-nums;">
                 <span style="font-size:14px;color:var(--gold);font-style:italic;margin-right:6px;" id="esimTotalCcy">SGD</span><span id="esimTotalAmt">0.00</span>
+              </div>
+              <div id="esimVoucherDiscountLine" style="display:none;font-size:11px;margin-top:6px;color:var(--gold);font-family:var(--mono);letter-spacing:0.04em;">
+                <span id="esimVoucherDiscountText">— voucher: 0 days free</span>
               </div>
               <div style="font-size:11px;opacity:0.7;margin-top:6px;font-family:var(--mono);letter-spacing:0.05em;" id="esimRateNote">SGD 0.99 / day · unlimited data</div>
             </div>
@@ -4490,6 +4773,77 @@
   </div>
 
   <!-- ACCOUNT DETAIL SHEET -->
+  <!-- REWARDS SHEET -->
+  <div class="sheet" id="sheet-rewards">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div style="flex:1;min-width:0;">
+        <div class="sheet-title">Fynco <em>Rewards</em></div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:2px;">1 point per SGD spent on card</div>
+      </div>
+      <button class="sheet-close" onclick="closeSheet()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="sheet-body">
+      <!-- Points hero -->
+      <div style="background:var(--ink);color:var(--paper);padding:18px 20px;border-radius:var(--radius);position:relative;overflow:hidden;margin-bottom:16px;">
+        <div style="position:absolute;top:-30%;right:-15%;width:70%;height:140%;background:radial-gradient(circle,rgba(201,169,97,0.18) 0%,transparent 60%);pointer-events:none;"></div>
+        <div style="position:relative;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;opacity:0.6;margin-bottom:6px;">Available points</div>
+          <div style="font-family:var(--serif);font-size:36px;font-weight:300;letter-spacing:-0.02em;line-height:1;font-variant-numeric:tabular-nums;color:var(--gold);">
+            <span id="rewardsPointsBalance">0</span>
+            <span style="font-size:14px;font-family:var(--mono);letter-spacing:0.1em;color:var(--paper);opacity:0.55;margin-left:8px;font-style:normal;">pts</span>
+          </div>
+          <div style="margin-top:10px;display:flex;gap:14px;font-size:11px;">
+            <div><span style="opacity:0.55;font-family:var(--mono);letter-spacing:0.05em;text-transform:uppercase;font-size:9px;">Earned this year</span> <span id="rewardsEarnedYTD" style="color:var(--gold);font-weight:500;margin-left:4px;font-variant-numeric:tabular-nums;">—</span></div>
+            <div><span style="opacity:0.55;font-family:var(--mono);letter-spacing:0.05em;text-transform:uppercase;font-size:9px;">Vouchers</span> <span id="rewardsActiveVouchers" style="color:var(--gold);font-weight:500;margin-left:4px;">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div style="display:flex;border-bottom:1px solid var(--line);margin-bottom:14px;">
+        <button class="rewards-tab active" data-tab="catalog" onclick="switchRewardsTab('catalog')">Catalogue</button>
+        <button class="rewards-tab" data-tab="vouchers" onclick="switchRewardsTab('vouchers')">My vouchers</button>
+        <button class="rewards-tab" data-tab="history" onclick="switchRewardsTab('history')">History</button>
+      </div>
+
+      <div id="rewardsTabCatalog">
+        <div id="rewardsCatPills" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
+        <div id="rewardsItemGrid"></div>
+      </div>
+      <div id="rewardsTabVouchers" style="display:none;"></div>
+      <div id="rewardsTabHistory" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- REWARDS REDEEM CONFIRM SHEET -->
+  <div class="sheet" id="sheet-rewards-confirm">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div class="sheet-title">Confirm <em>redemption</em></div>
+      <button class="sheet-close" onclick="closeRewardsConfirm()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body" id="rewardsConfirmBody"></div>
+    <div class="sheet-foot" style="display:flex;gap:8px;">
+      <button class="btn btn-ghost" onclick="closeRewardsConfirm()" style="flex:1;">Cancel</button>
+      <button class="btn btn-primary" id="rewardsConfirmBtn" onclick="confirmRedeem()" style="flex:1.5;">Redeem</button>
+    </div>
+  </div>
+
+  <!-- REWARDS REDEEM RESULT SHEET -->
+  <div class="sheet" id="sheet-rewards-result">
+    <div class="sheet-handle"></div>
+    <div class="sheet-body" style="text-align:center;padding-top:32px;" id="rewardsResultBody"></div>
+    <div class="sheet-foot">
+      <button class="btn btn-primary" onclick="closeSheet()" style="width:100%;">Done</button>
+    </div>
+  </div>
+
   <div class="sheet" id="sheet-account-detail">
     <div class="sheet-handle"></div>
     <div class="sheet-head">
@@ -4621,6 +4975,10 @@ const state = {
   // eSIM
   esimSelected: null,
   esimHistory: [],
+  // Rewards
+  points: 0, // accrued rewards points (1 point per local-currency unit spent)
+  rewardsHistory: [], // [{itemId, name, ts, cost, granted}]
+  userVouchers: [], // [{id, type:'esim'|'voucher'|'product-shipped', ...}]
   // Card detail screen state
   visibleCardId: null, // which card carousel index in detail view
   cardSensitiveVisible: false,
@@ -5488,7 +5846,15 @@ function initDashboard() {
     state.txns = [
       { merchant: 'Welcome bonus', meta: 'Card · today', amt: 250.00, ccy: localCcy, dir: 'in', ts: Date.now(), cat: 'card' },
     ];
+    // Seed rewards: a starter balance so the rewards page is meaningful in demo
+    state.points = 4500;
+    state.rewardsHistory = [];
+    state.userVouchers = [];
   }
+  // Defensive: ensure rewards fields exist on existing wallets too
+  if (typeof state.points !== 'number') state.points = 0;
+  if (!Array.isArray(state.rewardsHistory)) state.rewardsHistory = [];
+  if (!Array.isArray(state.userVouchers)) state.userVouchers = [];
 
   // Cards are intentionally not auto-created here.
   // The user may have skipped the card application from the Approved screen.
@@ -5963,6 +6329,10 @@ function renderDashboard() {
     document.getElementById('dashCardBalance').textContent = formatMoney(w?.balance || 0);
   }
 
+  // Points balance on the rewards banner
+  const ptsEl = document.getElementById('dashPointsBalance');
+  if (ptsEl) ptsEl.textContent = formatPoints(state.points || 0);
+
   // Wallets
   document.getElementById('walletList').innerHTML = Object.entries(state.wallets).map(([code, w]) => `
     <div class="wallet-row" onclick="openAccountDetail('${code}')">
@@ -6246,7 +6616,7 @@ let activeAccountCcy = null;
 // ============ ACCOUNT TYPE SWITCHING (Personal / Business) ============
 // Each profile holds its own slice of state. We snapshot when switching out
 // and swap in the saved snapshot when switching back.
-const PROFILE_FIELDS = ['wallets', 'cards', 'defaultCardId', 'visibleCardId', 'cardSensitiveVisible', 'cardFrozen', 'cardBalance', 'activeCcy', 'txns', 'esimHistory', 'dashCardReveal'];
+const PROFILE_FIELDS = ['wallets', 'cards', 'defaultCardId', 'visibleCardId', 'cardSensitiveVisible', 'cardFrozen', 'cardBalance', 'activeCcy', 'txns', 'esimHistory', 'dashCardReveal', 'points', 'rewardsHistory', 'userVouchers'];
 
 // Normalise legacy 'consumer' label (used in onboarding pickers) to 'personal'.
 // This way the profile system, switcher pill, and apply flow all share one vocabulary.
@@ -6917,6 +7287,9 @@ function provisionApplyAccountType() {
     txns: [],
     esimHistory: [],
     dashCardReveal: {},
+    points: type === 'business' ? 12000 : 1500, // business gets a higher starter
+    rewardsHistory: [],
+    userVouchers: [],
   };
   fresh.wallets[localCcy] = { name: getCurrencyName(localCcy), balance: type === 'business' ? 25000 : 5000, primary: true };
   if (localCcy !== 'SGD') {
@@ -7878,6 +8251,7 @@ function openSheet(name) {
   if (name === 'apply-account-ccy') initApplyAccountCcy();
   if (name === 'apply-card') initApplyCardSheet();
   if (name === 'activate-card') renderActivateCardStep();
+  if (name === 'rewards') initRewards();
 }
 function closeSheet(silent) {
   document.querySelectorAll('.sheet').forEach(s => s.classList.remove('open'));
@@ -8115,8 +8489,10 @@ function confirmScanPay() {
   }
   state.cardBalance[ccy] -= amt;
   const ref = 'PAY-' + Math.floor(100000 + Math.random() * 900000);
+  // Award points for the spend
+  const pts = earnPointsForSpend(amt, ccy);
   state.txns.unshift({
-    merchant, meta: `Card · just now · QR`,
+    merchant, meta: `Card · just now · QR${pts ? ` · +${pts} pts` : ''}`,
     amt, ccy, dir: 'out', ts: Date.now()
   });
   document.getElementById('scanResultMerchant').textContent = merchant;
@@ -8125,6 +8501,319 @@ function confirmScanPay() {
   renderDashboard();
   document.getElementById('sheet-scan-pay').classList.remove('open');
   setTimeout(() => document.getElementById('sheet-scan-result').classList.add('open'), 150);
+}
+
+// ============ REWARDS UI ============
+let rewardsActiveTab = 'catalog';
+let rewardsActiveCategory = 'all';
+
+function initRewards() {
+  rewardsActiveTab = 'catalog';
+  rewardsActiveCategory = 'all';
+  renderRewardsHero();
+  renderRewardsCategories();
+  renderRewardsCatalog();
+  // Reset tab visibility
+  document.querySelectorAll('.rewards-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'catalog'));
+  document.getElementById('rewardsTabCatalog').style.display = '';
+  document.getElementById('rewardsTabVouchers').style.display = 'none';
+  document.getElementById('rewardsTabHistory').style.display = 'none';
+}
+
+function renderRewardsHero() {
+  document.getElementById('rewardsPointsBalance').textContent = formatPoints(state.points || 0);
+  // Approximate "earned this year" from history + starting balance
+  const earned = (state.rewardsHistory || []).reduce((s, h) => s + (h.cost || 0), 0) + (state.points || 0);
+  document.getElementById('rewardsEarnedYTD').textContent = formatPoints(earned);
+  document.getElementById('rewardsActiveVouchers').textContent = (state.userVouchers || []).filter(v => isVoucherActive(v)).length;
+}
+
+function renderRewardsCategories() {
+  document.getElementById('rewardsCatPills').innerHTML = REWARDS_CATEGORIES.map(c => `
+    <button class="apply-pill ${rewardsActiveCategory === c.id ? 'active' : ''}" onclick="setRewardsCategory('${c.id}')">${c.label}</button>
+  `).join('');
+}
+
+function setRewardsCategory(id) {
+  rewardsActiveCategory = id;
+  renderRewardsCategories();
+  renderRewardsCatalog();
+}
+
+function renderRewardsCatalog() {
+  const grid = document.getElementById('rewardsItemGrid');
+  const items = REWARDS_CATALOG.filter(it => rewardsActiveCategory === 'all' || it.category === rewardsActiveCategory);
+  if (items.length === 0) {
+    grid.innerHTML = `<div style="padding:24px 0;text-align:center;font-size:13px;color:var(--muted);font-style:italic;">No items in this category yet.</div>`;
+    return;
+  }
+  const points = state.points || 0;
+  grid.innerHTML = `<div class="rewards-grid">${items.map(it => {
+    const affordable = points >= it.cost;
+    return `
+      <button class="reward-card ${affordable ? '' : 'reward-disabled'}" onclick="openRedeemConfirm('${it.id}')">
+        <div class="reward-art" style="background:${it.bg};">
+          ${it.art}
+        </div>
+        <div class="reward-meta">
+          <div class="reward-name">${it.name}</div>
+          <div class="reward-sub">${it.sub}</div>
+          <div class="reward-cost ${affordable ? '' : 'unaffordable'}">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>${formatPoints(it.cost)} pts</span>
+          </div>
+        </div>
+      </button>
+    `;
+  }).join('')}</div>`;
+}
+
+function switchRewardsTab(tab) {
+  rewardsActiveTab = tab;
+  document.querySelectorAll('.rewards-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.getElementById('rewardsTabCatalog').style.display = tab === 'catalog' ? '' : 'none';
+  document.getElementById('rewardsTabVouchers').style.display = tab === 'vouchers' ? '' : 'none';
+  document.getElementById('rewardsTabHistory').style.display = tab === 'history' ? '' : 'none';
+  if (tab === 'vouchers') renderMyVouchers();
+  if (tab === 'history') renderRewardsHistory();
+}
+
+function isVoucherActive(v) {
+  if (!v) return false;
+  if (v.expiresAt && v.expiresAt < Date.now()) return false;
+  if (v.type === 'esim' && (v.daysRemaining || 0) <= 0) return false;
+  if (v.type === 'voucher' && v.used) return false;
+  if (v.type === 'product-shipped') return false; // products are shipped, not "active"
+  return true;
+}
+
+function renderMyVouchers() {
+  const wrap = document.getElementById('rewardsTabVouchers');
+  const vouchers = (state.userVouchers || []).slice().sort((a, b) => b.redeemedAt - a.redeemedAt);
+  const active = vouchers.filter(isVoucherActive);
+  const inactive = vouchers.filter(v => !isVoucherActive(v));
+
+  if (vouchers.length === 0) {
+    wrap.innerHTML = `
+      <div style="text-align:center;padding:30px 16px;">
+        <div style="width:48px;height:48px;border-radius:50%;background:var(--paper-2);color:var(--muted);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9V7a2 2 0 012-2h16a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 100-4z"/><line x1="11" y1="6" x2="11" y2="9"/><line x1="11" y1="13" x2="11" y2="16"/></svg>
+        </div>
+        <div style="font-family:var(--serif);font-size:16px;font-weight:500;margin-bottom:4px;">No vouchers yet</div>
+        <div style="font-size:12px;color:var(--muted);max-width:240px;margin:0 auto;line-height:1.5;">Redeem points from the Catalogue to start collecting.</div>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  if (active.length > 0) {
+    html += `<div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:4px 0 8px;">Active · ${active.length}</div>`;
+    html += active.map(renderVoucherRow).join('');
+  }
+  if (inactive.length > 0) {
+    html += `<div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px;">Used / expired · ${inactive.length}</div>`;
+    html += inactive.map(renderVoucherRow).join('');
+  }
+  wrap.innerHTML = html;
+}
+
+function renderVoucherRow(v) {
+  const isActive = isVoucherActive(v);
+  const opacity = isActive ? '' : 'opacity:0.5;';
+  let badge = '';
+  let detail = '';
+  if (v.type === 'esim') {
+    badge = `<span class="voucher-badge gold">${v.daysRemaining}/${v.daysTotal} days</span>`;
+    detail = `Stackable · ${v.daysRemaining > 0 ? `${v.daysRemaining} day${v.daysRemaining === 1 ? '' : 's'} left` : 'fully used'}`;
+  } else if (v.type === 'voucher') {
+    badge = `<span class="voucher-badge">${v.ccy} ${v.value}</span>`;
+    detail = v.used ? `Used` : `Code: ${v.code}`;
+  } else if (v.type === 'product-shipped') {
+    badge = `<span class="voucher-badge">Shipped</span>`;
+    detail = `Order ${v.orderRef}`;
+  }
+  const expiry = v.expiresAt ? `Expires ${formatExpiry(v.expiresAt)}` : '';
+  return `
+    <div class="voucher-row" style="${opacity}">
+      <div class="voucher-art" style="background:${v.bg || 'var(--paper-2)'};">${v.art || ''}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:var(--serif);font-size:14px;font-weight:500;line-height:1.2;">${v.name}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${detail}</div>
+        ${expiry ? `<div style="font-size:10px;color:var(--muted);margin-top:2px;font-family:var(--mono);letter-spacing:0.03em;">${expiry}</div>` : ''}
+      </div>
+      ${badge}
+    </div>
+  `;
+}
+
+function renderRewardsHistory() {
+  const wrap = document.getElementById('rewardsTabHistory');
+  const hist = (state.rewardsHistory || []).slice().sort((a, b) => b.ts - a.ts);
+  if (hist.length === 0) {
+    wrap.innerHTML = `<div style="text-align:center;padding:30px 16px;font-size:13px;color:var(--muted);font-style:italic;">No redemption history yet.</div>`;
+    return;
+  }
+  wrap.innerHTML = hist.map(h => `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);">
+      <div style="width:34px;height:34px;border-radius:50%;background:var(--paper-2);display:flex;align-items:center;justify-content:center;color:var(--gold);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:500;">${h.name}</div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--mono);letter-spacing:0.03em;">${new Date(h.ts).toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'})} · ${h.granted || 'Redeemed'}</div>
+      </div>
+      <div style="font-size:13px;color:var(--rust);font-variant-numeric:tabular-nums;font-weight:500;">−${formatPoints(h.cost)} pts</div>
+    </div>
+  `).join('');
+}
+
+// ============ REDEMPTION ============
+let redeemPendingId = null;
+
+function openRedeemConfirm(itemId) {
+  const item = getRewardItem(itemId);
+  if (!item) return;
+  if ((state.points || 0) < item.cost) {
+    alert(`Not enough points.\n\nYou need ${formatPoints(item.cost)} but have ${formatPoints(state.points || 0)}.`);
+    return;
+  }
+  redeemPendingId = itemId;
+  const body = document.getElementById('rewardsConfirmBody');
+  let detailLines = '';
+  if (item.category === 'esim') {
+    detailLines = `<li>Adds <strong>${item.days} day${item.days === 1 ? '' : 's'}</strong> to your eSIM voucher pool.</li>
+                   <li>Stackable: claim only the days you need; the rest stays on the voucher.</li>
+                   <li>Apply at checkout in <strong>eSIM &gt; Buy</strong>.</li>
+                   <li>Voucher expires <strong>${formatExpiry(Date.now() + VOUCHER_VALIDITY_MS)}</strong>.</li>`;
+  } else if (item.category === 'voucher') {
+    detailLines = `<li>${item.ccy} ${item.value} store credit.</li>
+                   <li>Single use · code shown after redemption.</li>
+                   <li>Voucher expires <strong>${formatExpiry(Date.now() + VOUCHER_VALIDITY_MS)}</strong>.</li>`;
+  } else if (item.category === 'product') {
+    detailLines = `<li>Ships to your address on file in 5–10 business days.</li>
+                   <li>One per customer · while stocks last.</li>`;
+  }
+  body.innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:14px;border:1px solid var(--line);border-radius:var(--radius);">
+      <div class="reward-art" style="background:${item.bg};width:64px;height:64px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${item.art}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:var(--serif);font-size:16px;font-weight:500;line-height:1.2;">${item.name}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;">${item.sub}</div>
+        <div style="display:inline-flex;align-items:center;gap:4px;background:var(--ink);color:var(--gold);padding:4px 8px;border-radius:999px;font-family:var(--mono);font-size:10px;letter-spacing:0.05em;margin-top:6px;font-weight:600;">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          ${formatPoints(item.cost)} pts
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--paper-2);border-radius:var(--radius);padding:14px;margin-bottom:14px;">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">What you'll get</div>
+      <ul style="margin:0;padding-left:18px;font-size:12px;line-height:1.6;color:var(--ink);">${detailLines}</ul>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;padding:8px 4px;">
+      <span style="color:var(--muted);">Points balance after</span>
+      <span style="font-variant-numeric:tabular-nums;font-weight:500;">${formatPoints((state.points || 0) - item.cost)} pts</span>
+    </div>
+  `;
+  // Open the confirm sheet over the rewards sheet (don't close rewards)
+  document.getElementById('sheet-rewards-confirm').classList.add('open');
+}
+
+function closeRewardsConfirm() {
+  redeemPendingId = null;
+  document.getElementById('sheet-rewards-confirm').classList.remove('open');
+}
+
+function confirmRedeem() {
+  const item = getRewardItem(redeemPendingId);
+  if (!item) { closeRewardsConfirm(); return; }
+  if ((state.points || 0) < item.cost) { closeRewardsConfirm(); return; }
+  state.points -= item.cost;
+  const ts = Date.now();
+  let granted = '';
+  let voucherSummary = '';
+  if (item.category === 'esim') {
+    const v = {
+      id: 'v-' + Math.random().toString(36).slice(2, 9),
+      type: 'esim',
+      name: item.name,
+      art: item.art,
+      bg: item.bg,
+      daysTotal: item.days,
+      daysRemaining: item.days,
+      redeemedAt: ts,
+      expiresAt: ts + VOUCHER_VALIDITY_MS,
+    };
+    state.userVouchers.unshift(v);
+    granted = `+${item.days} eSIM days`;
+    voucherSummary = `${item.days}-day eSIM voucher added. Apply at checkout in eSIM &gt; Buy.`;
+  } else if (item.category === 'voucher') {
+    const code = generateVoucherCode();
+    const v = {
+      id: 'v-' + Math.random().toString(36).slice(2, 9),
+      type: 'voucher',
+      name: item.name,
+      art: item.art,
+      bg: item.bg,
+      value: item.value,
+      ccy: item.ccy,
+      code,
+      used: false,
+      redeemedAt: ts,
+      expiresAt: ts + VOUCHER_VALIDITY_MS,
+    };
+    state.userVouchers.unshift(v);
+    granted = `${item.ccy} ${item.value} voucher`;
+    voucherSummary = `Code <strong style="font-family:var(--mono);">${code}</strong> sent to your registered email.`;
+  } else if (item.category === 'product') {
+    const orderRef = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+    const v = {
+      id: 'v-' + Math.random().toString(36).slice(2, 9),
+      type: 'product-shipped',
+      name: item.name,
+      art: item.art,
+      bg: item.bg,
+      orderRef,
+      redeemedAt: ts,
+    };
+    state.userVouchers.unshift(v);
+    granted = `Order placed`;
+    voucherSummary = `Order <strong style="font-family:var(--mono);">${orderRef}</strong> · ships in 5–10 days.`;
+  }
+
+  state.rewardsHistory.unshift({
+    itemId: item.id,
+    name: item.name,
+    cost: item.cost,
+    granted,
+    ts,
+  });
+
+  // Close confirm, show result
+  closeRewardsConfirm();
+  document.getElementById('rewardsResultBody').innerHTML = `
+    <div style="width:64px;height:64px;border-radius:50%;background:var(--success);color:var(--paper);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;animation:successPop 0.5s cubic-bezier(0.34,1.56,0.64,1);">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div style="font-family:var(--serif);font-size:22px;font-weight:500;margin-bottom:6px;letter-spacing:-0.01em;">Redeemed</div>
+    <div style="font-size:13px;color:var(--muted);max-width:280px;margin:0 auto 16px;line-height:1.5;">${item.name}<br><span style="font-size:12px;">${voucherSummary}</span></div>
+    <div style="display:inline-flex;align-items:center;gap:6px;background:var(--paper-2);padding:8px 14px;border-radius:999px;font-family:var(--mono);font-size:10px;letter-spacing:0.08em;">
+      <span style="color:var(--muted);">REMAINING</span>
+      <span style="color:var(--gold);font-weight:600;">${formatPoints(state.points)} pts</span>
+    </div>
+  `;
+  // Hide the rewards sheet too — show result
+  document.getElementById('sheet-rewards').classList.remove('open');
+  setTimeout(() => document.getElementById('sheet-rewards-result').classList.add('open'), 150);
+  // Refresh dashboard banner
+  renderDashboard();
+}
+
+function generateVoucherCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return 'FYN-' + Array.from({length: 8}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
 
 // ============ ESIM ============
@@ -8197,8 +8886,205 @@ function getEsimRegionById(id) {
   return esimRegions.find(r => r.id === id);
 }
 
+// ============ REWARDS CATALOG ============
+// Each item has an inline SVG illustration so the simulation has rich visuals
+// without relying on external images. Items belong to one of three categories:
+// 'voucher' (retail/dining/travel store credit), 'esim' (free eSIM days that
+// stack & partial-redeem), and 'product' (physical merchandise).
+const REWARDS_CATALOG = [
+  // ===== eSIM vouchers =====
+  {
+    id: 'esim-1d',
+    category: 'esim',
+    name: '1-Day eSIM',
+    sub: 'Unlimited data · any region',
+    cost: 350,
+    days: 1,
+    bg: 'linear-gradient(135deg,#0a1628,#1a2a44)',
+    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#c9a961" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="32"/><ellipse cx="50" cy="50" rx="14" ry="32"/><line x1="18" y1="50" x2="82" y2="50"/><circle cx="50" cy="50" r="2.5" fill="#c9a961" stroke="none"/></svg>`,
+  },
+  {
+    id: 'esim-3d',
+    category: 'esim',
+    name: '3-Day eSIM',
+    sub: 'Unlimited data · 3 calendar days',
+    cost: 950,
+    days: 3,
+    bg: 'linear-gradient(135deg,#0a1628,#1a2a44)',
+    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#c9a961" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="32"/><ellipse cx="50" cy="50" rx="14" ry="32"/><line x1="18" y1="50" x2="82" y2="50"/><circle cx="50" cy="50" r="2.5" fill="#c9a961" stroke="none"/></svg>`,
+  },
+  {
+    id: 'esim-5d',
+    category: 'esim',
+    name: '5-Day eSIM',
+    sub: 'Unlimited data · stackable',
+    cost: 1500,
+    days: 5,
+    bg: 'linear-gradient(135deg,#0a1628,#1a2a44)',
+    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#c9a961" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="32"/><ellipse cx="50" cy="50" rx="14" ry="32"/><line x1="18" y1="50" x2="82" y2="50"/><circle cx="50" cy="50" r="2.5" fill="#c9a961" stroke="none"/></svg>`,
+  },
+  {
+    id: 'esim-10d',
+    category: 'esim',
+    name: '10-Day eSIM',
+    sub: 'Unlimited data · split as you like',
+    cost: 2800,
+    days: 10,
+    bg: 'linear-gradient(135deg,#0a1628,#1a2a44)',
+    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#c9a961" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="32"/><ellipse cx="50" cy="50" rx="14" ry="32"/><line x1="18" y1="50" x2="82" y2="50"/><circle cx="50" cy="50" r="2.5" fill="#c9a961" stroke="none"/></svg>`,
+  },
+  {
+    id: 'esim-30d',
+    category: 'esim',
+    name: '30-Day eSIM',
+    sub: 'Unlimited data · best value',
+    cost: 7500,
+    days: 30,
+    bg: 'linear-gradient(135deg,#0a1628,#1a2a44)',
+    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#c9a961" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="32"/><ellipse cx="50" cy="50" rx="14" ry="32"/><line x1="18" y1="50" x2="82" y2="50"/><circle cx="50" cy="50" r="2.5" fill="#c9a961" stroke="none"/></svg>`,
+  },
+
+  // ===== Vouchers =====
+  {
+    id: 'vch-coffee-10',
+    category: 'voucher',
+    name: 'Specialty Coffee · SGD 10',
+    sub: 'Common Man Coffee Roasters',
+    cost: 800,
+    value: 10, ccy: 'SGD',
+    bg: 'linear-gradient(135deg,#3d2317,#2a180f)',
+    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#d4a574" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 38h48l-4 38a8 8 0 01-8 7H34a8 8 0 01-8-7l-4-38z"/><path d="M70 46h6a8 8 0 010 16h-7"/><path d="M36 22c0 4 4 4 4 8M48 18c0 4 4 4 4 8M60 22c0 4 4 4 4 8" opacity="0.6"/></svg>`,
+  },
+  {
+    id: 'vch-dining-25',
+    category: 'voucher',
+    name: 'Fine Dining · SGD 25',
+    sub: 'Open Door Policy / Burnt Ends / etc.',
+    cost: 2000,
+    value: 25, ccy: 'SGD',
+    bg: 'linear-gradient(135deg,#4a2c2a,#2d1a17)',
+    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#e8a87c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M28 22v36a8 8 0 008 8v18M36 22v22"/><path d="M68 22c-4 0-7 4-7 12s3 12 7 12v34"/></svg>`,
+  },
+  {
+    id: 'vch-grab-15',
+    category: 'voucher',
+    name: 'Ride Credit · SGD 15',
+    sub: 'Grab / Gojek · single use',
+    cost: 1200,
+    value: 15, ccy: 'SGD',
+    bg: 'linear-gradient(135deg,#0d4f3c,#062619)',
+    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#4ade80" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 60l8-22a6 6 0 016-4h28a6 6 0 016 4l8 22"/><path d="M18 60h64v14a4 4 0 01-4 4h-6a4 4 0 01-4-4v-2H32v2a4 4 0 01-4 4h-6a4 4 0 01-4-4V60z"/><circle cx="32" cy="68" r="2.5" fill="#4ade80" stroke="none"/><circle cx="68" cy="68" r="2.5" fill="#4ade80" stroke="none"/></svg>`,
+  },
+  {
+    id: 'vch-amazon-50',
+    category: 'voucher',
+    name: 'Online Shopping · SGD 50',
+    sub: 'Lazada / Shopee / Amazon',
+    cost: 4000,
+    value: 50, ccy: 'SGD',
+    bg: 'linear-gradient(135deg,#7a4500,#3d2300)',
+    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M24 28h12l8 36h32l6-26H42"/><circle cx="44" cy="74" r="5"/><circle cx="74" cy="74" r="5"/></svg>`,
+  },
+  {
+    id: 'vch-hotel-100',
+    category: 'voucher',
+    name: 'Hotel Stay · SGD 100',
+    sub: 'Agoda / Booking · valid 1 year',
+    cost: 7500,
+    value: 100, ccy: 'SGD',
+    bg: 'linear-gradient(135deg,#1e3a5f,#0f1d30)',
+    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#7dd3fc" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 78V32l34-14 34 14v46"/><path d="M16 78h68"/><rect x="32" y="48" width="10" height="14"/><rect x="58" y="48" width="10" height="14"/><path d="M44 78V64h12v14"/></svg>`,
+  },
+
+  // ===== Products =====
+  {
+    id: 'prod-tote',
+    category: 'product',
+    name: 'Fynco Canvas Tote',
+    sub: 'Heavyweight cotton · ink/gold',
+    cost: 1800,
+    bg: 'linear-gradient(135deg,#d6c9a3,#b8a472)',
+    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#3d2817" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M24 36h52l-4 44a4 4 0 01-4 4H32a4 4 0 01-4-4l-4-44z"/><path d="M38 36V24a12 12 0 0124 0v12"/></svg>`,
+  },
+  {
+    id: 'prod-mug',
+    category: 'product',
+    name: 'Enamel Travel Mug',
+    sub: '350ml · navy · gold rim',
+    cost: 2500,
+    bg: 'linear-gradient(135deg,#0a1628,#1a2a44)',
+    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#c9a961" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="22" y="28" width="44" height="50" rx="3"/><path d="M66 40h8a8 8 0 010 16h-8"/><line x1="22" y1="36" x2="66" y2="36"/></svg>`,
+  },
+  {
+    id: 'prod-buds',
+    category: 'product',
+    name: 'Wireless Earbuds',
+    sub: 'ANC · 24h battery · USB-C',
+    cost: 12000,
+    bg: 'linear-gradient(135deg,#1a1a2e,#0f0f1a)',
+    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#a78bfa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M30 30c-8 0-12 6-12 14s4 14 12 14V40h6v18M70 30c8 0 12 6 12 14s-4 14-12 14V40h-6v18"/></svg>`,
+  },
+  {
+    id: 'prod-card-holder',
+    category: 'product',
+    name: 'Italian Leather Card Holder',
+    sub: 'Top-grain · holds 6 cards',
+    cost: 6500,
+    bg: 'linear-gradient(135deg,#5c3a2e,#3a241c)',
+    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#e8b486" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="32" width="60" height="42" rx="4"/><path d="M20 44h60"/><line x1="36" y1="58" x2="64" y2="58"/></svg>`,
+  },
+  {
+    id: 'prod-bottle',
+    category: 'product',
+    name: 'Insulated Water Bottle',
+    sub: '750ml · 24h cold · 12h hot',
+    cost: 3500,
+    bg: 'linear-gradient(135deg,#164e63,#083344)',
+    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#67e8f9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="38" y="14" width="24" height="8" rx="2"/><path d="M34 22h32l-2 60a4 4 0 01-4 4H40a4 4 0 01-4-4l-2-60z"/><line x1="34" y1="36" x2="66" y2="36"/></svg>`,
+  },
+];
+
+const REWARDS_CATEGORIES = [
+  { id: 'all', label: 'All' },
+  { id: 'esim', label: 'eSIM' },
+  { id: 'voucher', label: 'Vouchers' },
+  { id: 'product', label: 'Products' },
+];
+
+const VOUCHER_VALIDITY_MS = 365 * 24 * 60 * 60 * 1000; // 1 year
+
+function formatPoints(n) {
+  return Math.round(n).toLocaleString();
+}
+
+function getRewardItem(id) {
+  return REWARDS_CATALOG.find(r => r.id === id);
+}
+
+function formatExpiry(ts) {
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// ============ EARN POINTS ============
+// Award points for spend in a card txn. 1 point per local-currency unit
+// (using activeCcy → SGD FX so foreign spend earns proportionally).
+function earnPointsForSpend(amount, ccy) {
+  if (!amount || amount <= 0) return 0;
+  const fx = FX_FROM_SGD[ccy] || 1; // ccy units per 1 SGD
+  const sgdEquiv = amount / fx;
+  const pts = Math.round(sgdEquiv); // 1pt per SGD spent
+  if (pts > 0) {
+    state.points = (state.points || 0) + pts;
+  }
+  return pts;
+}
+
 function initEsim() {
   state.esimSelected = state.esimSelected || { region: 'sg', days: 7, custom: false };
+  // Reset voucher selection when opening fresh
+  state._esimVoucherId = null;
+  state._esimVoucherDays = 0;
   // Reset to Buy tab
   switchEsimTab('buy');
   // Render selected region pill
@@ -8230,6 +9116,92 @@ function switchEsimTab(tab) {
   // Hide footer (buy button) on history tab
   document.getElementById('esimFooter').style.display = tab === 'buy' ? 'block' : 'none';
   if (tab === 'history') renderEsimHistory();
+  if (tab === 'buy') renderEsimVoucherSection();
+}
+
+// ============ ESIM VOUCHER SELECTION ============
+// Renders the voucher picker if the user has any active eSIM-day vouchers,
+// then keeps the price card and Buy button in sync as the user adjusts
+// how many days to apply.
+function renderEsimVoucherSection() {
+  const section = document.getElementById('esimVoucherSection');
+  const list = document.getElementById('esimVoucherList');
+  if (!section || !list) return;
+  const vouchers = (state.userVouchers || []).filter(v => v.type === 'esim' && isVoucherActive(v));
+  if (vouchers.length === 0) {
+    section.style.display = 'none';
+    state._esimVoucherId = null;
+    state._esimVoucherDays = 0;
+    refreshEsimTotal();
+    return;
+  }
+  section.style.display = 'block';
+  list.innerHTML = vouchers.map(v => {
+    const selected = state._esimVoucherId === v.id;
+    return `
+      <div class="esim-voucher-card ${selected ? 'selected' : ''}" onclick="pickEsimVoucher('${v.id}')">
+        <div style="flex:1;min-width:0;">
+          <div class="esim-voucher-name">${v.name}</div>
+          <div class="esim-voucher-meta">${v.daysRemaining} of ${v.daysTotal} days left · expires ${formatExpiry(v.expiresAt)}</div>
+        </div>
+        <span class="esim-voucher-badge">${v.daysRemaining} days</span>
+      </div>
+    `;
+  }).join('');
+
+  // Days input visibility
+  const daysWrap = document.getElementById('esimVoucherDaysWrap');
+  const clearBtn = document.getElementById('esimClearVoucherBtn');
+  if (state._esimVoucherId) {
+    daysWrap.style.display = 'flex';
+    clearBtn.style.display = 'inline-block';
+    document.getElementById('esimVoucherDays').value = state._esimVoucherDays || 0;
+  } else {
+    daysWrap.style.display = 'none';
+    clearBtn.style.display = 'none';
+  }
+  refreshEsimTotal();
+}
+
+function pickEsimVoucher(id) {
+  const v = (state.userVouchers || []).find(x => x.id === id);
+  if (!v) return;
+  state._esimVoucherId = id;
+  // Default to applying max applicable days (capped at plan length & voucher remaining)
+  const planDays = state.esimSelected?.days || 0;
+  state._esimVoucherDays = Math.min(planDays, v.daysRemaining);
+  renderEsimVoucherSection();
+}
+
+function clearEsimVoucher() {
+  state._esimVoucherId = null;
+  state._esimVoucherDays = 0;
+  renderEsimVoucherSection();
+}
+
+function adjustVoucherDays(delta) {
+  const v = (state.userVouchers || []).find(x => x.id === state._esimVoucherId);
+  if (!v) return;
+  const planDays = state.esimSelected?.days || 0;
+  const cur = state._esimVoucherDays || 0;
+  const max = Math.min(planDays, v.daysRemaining);
+  state._esimVoucherDays = Math.max(0, Math.min(max, cur + delta));
+  document.getElementById('esimVoucherDays').value = state._esimVoucherDays;
+  refreshEsimTotal();
+}
+
+function onVoucherDaysInput() {
+  const el = document.getElementById('esimVoucherDays');
+  const v = (state.userVouchers || []).find(x => x.id === state._esimVoucherId);
+  if (!v) return;
+  const planDays = state.esimSelected?.days || 0;
+  const max = Math.min(planDays, v.daysRemaining);
+  let val = parseInt(el.value, 10);
+  if (isNaN(val) || val < 0) val = 0;
+  if (val > max) val = max;
+  state._esimVoucherDays = val;
+  el.value = val;
+  refreshEsimTotal();
 }
 
 function renderEsimSelectedRegion() {
@@ -8375,7 +9347,22 @@ function refreshEsimTotal() {
   const region = state.esimSelected.region || 'sg';
   const r = getEsimRegionById(region);
   const multiplier = r ? r.mult : 1;
-  const sgdTotal = ESIM_DAILY_RATE_SGD * multiplier * days;
+
+  // Voucher application
+  const v = (state.userVouchers || []).find(x => x.id === state._esimVoucherId);
+  let voucherDays = state._esimVoucherDays || 0;
+  if (!v) voucherDays = 0;
+  // Cap voucher days at plan length and voucher remaining
+  if (v) voucherDays = Math.max(0, Math.min(voucherDays, days, v.daysRemaining));
+  state._esimVoucherDays = voucherDays;
+  const billableDays = Math.max(0, days - voucherDays);
+  // Sync the days input if it's visible
+  const daysInputEl = document.getElementById('esimVoucherDays');
+  if (daysInputEl && document.getElementById('esimVoucherDaysWrap').style.display !== 'none') {
+    daysInputEl.value = voucherDays;
+  }
+
+  const sgdTotal = ESIM_DAILY_RATE_SGD * multiplier * billableDays;
 
   // Display in primary account currency
   const primaryCcy = getPrimaryCcy();
@@ -8387,21 +9374,41 @@ function refreshEsimTotal() {
   document.getElementById('esimTotalAmt').textContent = formatMoney(localTotal);
   document.getElementById('esimDaysLabel').textContent = days;
 
+  // Voucher discount line
+  const discEl = document.getElementById('esimVoucherDiscountLine');
+  const discText = document.getElementById('esimVoucherDiscountText');
+  if (voucherDays > 0 && v) {
+    discEl.style.display = 'block';
+    const remainAfter = v.daysRemaining - voucherDays;
+    discText.textContent = `Voucher: ${voucherDays} day${voucherDays === 1 ? '' : 's'} free · ${remainAfter} day${remainAfter === 1 ? '' : 's'} would remain`;
+  } else {
+    discEl.style.display = 'none';
+  }
+
   // Rate note
   const rateNoteEl = document.getElementById('esimRateNote');
   if (primaryCcy === 'SGD') {
-    rateNoteEl.textContent = `SGD ${formatMoney(dailyLocal)} / day · unlimited data`;
+    rateNoteEl.textContent = `SGD ${formatMoney(dailyLocal)} / day · ${billableDays} day${billableDays === 1 ? '' : 's'} billable`;
   } else {
-    rateNoteEl.textContent = `${primaryCcy} ${formatMoney(dailyLocal)} / day · unlimited · SGD ${formatMoney(ESIM_DAILY_RATE_SGD * multiplier)} base`;
+    rateNoteEl.textContent = `${primaryCcy} ${formatMoney(dailyLocal)} / day · ${billableDays} billable`;
   }
 
   // Pay from line
-  document.getElementById('esimPayFromLine').textContent = `Charges to your ${getCurrencyName(primaryCcy)} account`;
+  const payFromEl = document.getElementById('esimPayFromLine');
+  if (billableDays === 0 && voucherDays > 0) {
+    payFromEl.innerHTML = `<span style="color:var(--success);">Fully covered by voucher · no charge</span>`;
+  } else {
+    payFromEl.textContent = `Charges to your ${getCurrencyName(primaryCcy)} account`;
+  }
 
   // Buy button
   const btn = document.getElementById('esimBuyBtn');
   btn.disabled = days < 1;
-  btn.textContent = `Buy eSIM · ${primaryCcy} ${formatMoney(localTotal)}`;
+  if (billableDays === 0 && voucherDays > 0) {
+    btn.textContent = `Activate eSIM · free`;
+  } else {
+    btn.textContent = `Buy eSIM · ${primaryCcy} ${formatMoney(localTotal)}`;
+  }
 }
 
 function getPrimaryCcy() {
@@ -8417,24 +9424,48 @@ function confirmEsim() {
   const r = getEsimRegionById(region);
   if (!r) return;
   const multiplier = r.mult;
-  const sgdTotal = ESIM_DAILY_RATE_SGD * multiplier * days;
+
+  // Voucher pull
+  const voucher = (state.userVouchers || []).find(x => x.id === state._esimVoucherId);
+  let voucherDays = state._esimVoucherDays || 0;
+  if (!voucher) voucherDays = 0;
+  voucherDays = Math.max(0, Math.min(voucherDays, days, voucher ? voucher.daysRemaining : 0));
+  const billableDays = Math.max(0, days - voucherDays);
+
+  const sgdTotal = ESIM_DAILY_RATE_SGD * multiplier * billableDays;
   const primaryCcy = getPrimaryCcy();
   const fx = FX_FROM_SGD[primaryCcy] || 1;
   const localTotal = sgdTotal * fx;
 
-  if ((state.wallets[primaryCcy]?.balance || 0) < localTotal) {
+  if (billableDays > 0 && (state.wallets[primaryCcy]?.balance || 0) < localTotal) {
     alert(`Insufficient balance.\n\nNeeded: ${primaryCcy} ${formatMoney(localTotal)}\nAvailable: ${primaryCcy} ${formatMoney(state.wallets[primaryCcy]?.balance || 0)}`);
     return;
   }
-  state.wallets[primaryCcy].balance -= localTotal;
+  if (billableDays > 0) {
+    state.wallets[primaryCcy].balance -= localTotal;
+  }
+
+  // Consume voucher days
+  if (voucher && voucherDays > 0) {
+    voucher.daysRemaining -= voucherDays;
+    // Don't delete the voucher entry — keep it for history visibility, isVoucherActive
+    // will return false once daysRemaining hits 0.
+  }
+
   const ref = 'ESM-' + Math.floor(100000 + Math.random() * 900000);
   const regionName = `${r.flag} ${r.name}`;
   const now = Date.now();
   const expiresAt = now + days * 86400000;
 
+  // Award points only on billable spend
+  const pts = billableDays > 0 ? earnPointsForSpend(localTotal, primaryCcy) : 0;
+  let metaSuffix = `${days} day${days > 1 ? 's' : ''} unlimited · just now`;
+  if (voucherDays > 0) metaSuffix += ` · ${voucherDays}d from voucher`;
+  if (pts) metaSuffix += ` · +${pts} pts`;
+
   state.txns.unshift({
     merchant: `eSIM · ${regionName}`,
-    meta: `${days} day${days > 1 ? 's' : ''} unlimited · just now`,
+    meta: metaSuffix,
     amt: localTotal, ccy: primaryCcy, dir: 'out', ts: now, cat: 'esim'
   });
 
@@ -8444,14 +9475,23 @@ function confirmEsim() {
     ref,
     region,
     days,
+    voucherDays,
     amount: localTotal,
     payCcy: primaryCcy,
     purchasedAt: now,
     expiresAt,
   });
 
-  document.getElementById('esimResultPlan').textContent = `${regionName} · ${days} days unlimited`;
-  document.getElementById('esimResultAmt').textContent = `${primaryCcy} ${formatMoney(localTotal)}`;
+  // Reset voucher selection
+  state._esimVoucherId = null;
+  state._esimVoucherDays = 0;
+
+  document.getElementById('esimResultPlan').textContent = voucherDays > 0
+    ? `${regionName} · ${days} days unlimited (${voucherDays} from voucher)`
+    : `${regionName} · ${days} days unlimited`;
+  document.getElementById('esimResultAmt').textContent = billableDays === 0
+    ? `${primaryCcy} 0.00 · voucher applied`
+    : `${primaryCcy} ${formatMoney(localTotal)}`;
   document.getElementById('esimResultRef').textContent = ref;
   generateQR(ref);
   renderDashboard();
