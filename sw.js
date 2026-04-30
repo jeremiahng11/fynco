@@ -1,5 +1,5 @@
 // Fynco service worker — bump CACHE on content change to force refresh
-const CACHE = 'fynco-v18';
+const CACHE = 'fynco-v20';
 const ASSETS = [
   '/',
   '/index.html',
@@ -23,8 +23,14 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(
+        // Delete every cache that isn't the current one — including ones
+        // from older naming schemes — so users always get the fresh build.
+        keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))
+      ))
       .then(() => self.clients.claim())
+      .then(() => self.clients.matchAll({ type: 'window' }))
+      .then((clients) => clients.forEach((c) => c.postMessage({ type: 'sw-updated', cache: CACHE })))
   );
 });
 

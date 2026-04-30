@@ -3088,6 +3088,7 @@
   <button onclick="goTo(16)">→ Activity</button>
   <button onclick="goTo(18)">→ Settings</button>
   <button onclick="resetAll()" style="background:var(--rust);margin-top:6px;">↺ Reset</button>
+  <div style="margin-top:8px;padding:6px 8px;font-family:var(--mono);font-size:9px;letter-spacing:0.05em;color:var(--muted);text-align:center;border-top:1px solid var(--line);">build v20 · rewards + vouchers</div>
 </div>
 
 <div class="app">
@@ -5650,6 +5651,14 @@ function populateCardIssued() {
     state.defaultCardId = c.id;
   }
   const card = state.cards[0];
+  // Capture the PIN entered on screen 13 (apply-for-card) if a valid 6-digit
+  // value is present. Otherwise leave card.pin undefined — the activate flow
+  // will prompt the user to set one.
+  const pinInput = document.getElementById('cardPin');
+  if (pinInput && /^\d{6}$/.test(pinInput.value || '')) {
+    card.pin = pinInput.value;
+  }
+
   document.getElementById('cardNumberFull').textContent = card.number;
   document.getElementById('cardExpDisplay').textContent = `${card.expMonth}/${card.expYear}`;
 
@@ -5720,6 +5729,13 @@ function resetAll() {
     esimHistory: [],
     notifications: { transactions: true, marketing: false, security: true },
     biometric: false,
+    // Rewards & profile state cleared too so a reset really starts fresh
+    points: 0,
+    rewardsHistory: [],
+    userVouchers: [],
+    profiles: null,
+    activeProfile: null,
+    dashCardReveal: {},
   });
   // reset uploads visually
   ['idFront','idBack','addrDoc'].forEach(id => {
@@ -5815,6 +5831,15 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch((err) => {
       console.log('Service worker registration failed:', err);
+    });
+    // When a new SW activates, it posts a message with the new cache version.
+    // Reload the page so the user sees the fresh build immediately.
+    let didReload = false;
+    navigator.serviceWorker.addEventListener('message', (e) => {
+      if (e.data && e.data.type === 'sw-updated' && !didReload) {
+        didReload = true;
+        window.location.reload();
+      }
     });
   });
 }
@@ -6050,6 +6075,13 @@ function openActivateSheet(cardId) {
   openSheet('activate-card');
 }
 
+// True if a card already has a 6-digit PIN saved (e.g. set during the
+// onboarding card application flow). When true, the activate sheet
+// should skip the "set PIN" step entirely.
+function cardHasPin(card) {
+  return !!(card && typeof card.pin === 'string' && /^\d{6}$/.test(card.pin));
+}
+
 function activateCardBack() {
   if (!state._activateStep || state._activateStep <= 1) {
     state._activatingCardId = null;
@@ -6065,9 +6097,16 @@ function activateCardBack() {
 
 function activateCardNext() {
   const step = state._activateStep || 1;
+  const card = state.cards.find(c => c.id === state._activatingCardId);
   if (step === 1) {
-    state._activateStep = 2;
-    renderActivateCardStep();
+    // If a PIN is already on the card, skip step 2 entirely and go
+    // straight to activation processing. Otherwise advance to PIN entry.
+    if (cardHasPin(card)) {
+      submitActivateCard();
+    } else {
+      state._activateStep = 2;
+      renderActivateCardStep();
+    }
     return;
   }
   if (step === 2) {
@@ -6103,7 +6142,8 @@ function renderActivateCardStep() {
   nextBtn.disabled = false;
 
   if (step === 1) {
-    nextBtn.textContent = 'Set PIN & activate';
+    // Button label depends on whether a PIN is already set
+    nextBtn.textContent = cardHasPin(card) ? 'Activate card' : 'Set PIN & activate';
     body.innerHTML = renderActivateConfirm(card);
   } else if (step === 2) {
     nextBtn.textContent = 'Activate card';
@@ -6119,6 +6159,10 @@ function renderActivateCardStep() {
 
 function renderActivateConfirm(card) {
   const isBusiness = card.profileType === 'business';
+  const hasPin = cardHasPin(card);
+  const pinBullet = hasPin
+    ? `<span>Use your existing 6-digit PIN for ATM withdrawals and high-value transactions</span>`
+    : `<span>Set a 6-digit PIN for ATM withdrawals and high-value transactions</span>`;
   return `
     <div style="background:linear-gradient(135deg,#1a2a44,#0a1628);color:var(--paper);padding:18px 20px;border-radius:var(--radius);position:relative;overflow:hidden;margin-bottom:16px;box-shadow:0 12px 32px rgba(10,22,40,0.18);">
       <div style="position:absolute;top:-30%;right:-15%;width:70%;height:140%;background:radial-gradient(circle,rgba(201,169,97,0.2) 0%,transparent 60%);pointer-events:none;"></div>
@@ -6154,7 +6198,7 @@ function renderActivateConfirm(card) {
       </div>
       <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.4;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--success);flex-shrink:0;margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg>
-        <span>Set a 6-digit PIN for ATM withdrawals and high-value transactions</span>
+        ${pinBullet}
       </div>
     </div>
 
@@ -6266,7 +6310,12 @@ function submitActivateCard() {
 
   setTimeout(() => {
     card.active = true;
-    card.pin = state._activatePin; // simulated
+    // Only write the PIN if the user actually entered one in this flow.
+    // If they had set it earlier (during onboarding) the existing card.pin
+    // is preserved.
+    if (state._activatePin && /^\d{6}$/.test(state._activatePin)) {
+      card.pin = state._activatePin;
+    }
     card.activatedAt = Date.now();
 
     // Approval txn
