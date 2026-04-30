@@ -814,6 +814,14 @@
     align-items: center;
     justify-content: center;
     color: var(--gold);
+    overflow: hidden;
+    position: relative;
+  }
+  .reward-art > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
   .reward-meta { padding: 10px 12px 12px; }
   .reward-name {
@@ -865,6 +873,12 @@
     overflow: hidden;
   }
   .voucher-art > svg { width: 32px; height: 32px; }
+  .voucher-art > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
   .voucher-badge {
     background: var(--paper-2);
     color: var(--ink);
@@ -3088,7 +3102,7 @@
   <button onclick="goTo(16)">→ Activity</button>
   <button onclick="goTo(18)">→ Settings</button>
   <button onclick="resetAll()" style="background:var(--rust);margin-top:6px;">↺ Reset</button>
-  <div style="margin-top:8px;padding:6px 8px;font-family:var(--mono);font-size:9px;letter-spacing:0.05em;color:var(--muted);text-align:center;border-top:1px solid var(--line);">build v20 · rewards + vouchers</div>
+  <div style="margin-top:8px;padding:6px 8px;font-family:var(--mono);font-size:9px;letter-spacing:0.05em;color:var(--muted);text-align:center;border-top:1px solid var(--line);">build v21 · real product photos</div>
 </div>
 
 <div class="app">
@@ -8745,7 +8759,7 @@ function openRedeemConfirm(itemId) {
   }
   body.innerHTML = `
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:14px;border:1px solid var(--line);border-radius:var(--radius);">
-      <div class="reward-art" style="background:${item.bg};width:64px;height:64px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${item.art}</div>
+      <div class="reward-art" style="background:${item.bg};width:64px;height:64px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">${item.art}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-family:var(--serif);font-size:16px;font-weight:500;line-height:1.2;">${item.name}</div>
         <div style="font-size:12px;color:var(--muted);margin-top:2px;">${item.sub}</div>
@@ -9046,14 +9060,15 @@ const REWARDS_CATALOG = [
   },
 
   // ===== Products =====
+  // Photos from Pexels (license-free, no attribution required). Direct CDN URLs.
   {
     id: 'prod-tote',
     category: 'product',
     name: 'Fynco Canvas Tote',
     sub: 'Heavyweight cotton · ink/gold',
     cost: 1800,
-    bg: 'linear-gradient(135deg,#d6c9a3,#b8a472)',
-    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#3d2817" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M24 36h52l-4 44a4 4 0 01-4 4H32a4 4 0 01-4-4l-4-44z"/><path d="M38 36V24a12 12 0 0124 0v12"/></svg>`,
+    bg: '#f5f1e8',
+    art: `<img src="https://images.pexels.com/photos/1214212/pexels-photo-1214212.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="Canvas tote bag" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">`,
   },
   {
     id: 'prod-mug',
@@ -9061,8 +9076,8 @@ const REWARDS_CATALOG = [
     name: 'Enamel Travel Mug',
     sub: '350ml · navy · gold rim',
     cost: 2500,
-    bg: 'linear-gradient(135deg,#0a1628,#1a2a44)',
-    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#c9a961" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="22" y="28" width="44" height="50" rx="3"/><path d="M66 40h8a8 8 0 010 16h-8"/><line x1="22" y1="36" x2="66" y2="36"/></svg>`,
+    bg: '#f5f1e8',
+    art: `<img src="https://images.pexels.com/photos/4264049/pexels-photo-4264049.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="Travel mug" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">`,
   },
   {
     id: 'prod-buds',
@@ -9070,8 +9085,8 @@ const REWARDS_CATALOG = [
     name: 'Wireless Earbuds',
     sub: 'ANC · 24h battery · USB-C',
     cost: 12000,
-    bg: 'linear-gradient(135deg,#1a1a2e,#0f0f1a)',
-    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#a78bfa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M30 30c-8 0-12 6-12 14s4 14 12 14V40h6v18M70 30c8 0 12 6 12 14s-4 14-12 14V40h-6v18"/></svg>`,
+    bg: '#f5f1e8',
+    art: `<img src="https://images.pexels.com/photos/7723389/pexels-photo-7723389.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="Wireless earbuds" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">`,
   },
   {
     id: 'prod-card-holder',
@@ -9079,8 +9094,8 @@ const REWARDS_CATALOG = [
     name: 'Italian Leather Card Holder',
     sub: 'Top-grain · holds 6 cards',
     cost: 6500,
-    bg: 'linear-gradient(135deg,#5c3a2e,#3a241c)',
-    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#e8b486" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="32" width="60" height="42" rx="4"/><path d="M20 44h60"/><line x1="36" y1="58" x2="64" y2="58"/></svg>`,
+    bg: '#f5f1e8',
+    art: `<img src="https://images.pexels.com/photos/28028264/pexels-photo-28028264.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="Leather card holder" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">`,
   },
   {
     id: 'prod-bottle',
@@ -9088,8 +9103,8 @@ const REWARDS_CATALOG = [
     name: 'Insulated Water Bottle',
     sub: '750ml · 24h cold · 12h hot',
     cost: 3500,
-    bg: 'linear-gradient(135deg,#164e63,#083344)',
-    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#67e8f9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="38" y="14" width="24" height="8" rx="2"/><path d="M34 22h32l-2 60a4 4 0 01-4 4H40a4 4 0 01-4-4l-2-60z"/><line x1="34" y1="36" x2="66" y2="36"/></svg>`,
+    bg: '#f5f1e8',
+    art: `<img src="https://images.pexels.com/photos/4542855/pexels-photo-4542855.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="Insulated water bottle" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">`,
   },
 ];
 
