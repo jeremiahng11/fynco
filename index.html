@@ -3102,7 +3102,7 @@
   <button onclick="goTo(16)">→ Activity</button>
   <button onclick="goTo(18)">→ Settings</button>
   <button onclick="resetAll()" style="background:var(--rust);margin-top:6px;">↺ Reset</button>
-  <div style="margin-top:8px;padding:6px 8px;font-family:var(--mono);font-size:9px;letter-spacing:0.05em;color:var(--muted);text-align:center;border-top:1px solid var(--line);">build v21 · real product photos</div>
+  <div style="margin-top:8px;padding:6px 8px;font-family:var(--mono);font-size:9px;letter-spacing:0.05em;color:var(--muted);text-align:center;border-top:1px solid var(--line);">build v22 · all photos</div>
 </div>
 
 <div class="app">
@@ -8950,10 +8950,9 @@ function getEsimRegionById(id) {
 }
 
 // ============ REWARDS CATALOG ============
-// Each item has an inline SVG illustration so the simulation has rich visuals
-// without relying on external images. Items belong to one of three categories:
-// 'voucher' (retail/dining/travel store credit), 'esim' (free eSIM days that
-// stack & partial-redeem), and 'product' (physical merchandise).
+// Real product/lifestyle photos from Pexels (license-free, no attribution
+// required). Direct CDN URLs. eSIM tier cards share the same connectivity
+// photo since they're the same product at different durations.
 const REWARDS_CATALOG = [
   // ===== eSIM vouchers =====
   {
@@ -8963,8 +8962,8 @@ const REWARDS_CATALOG = [
     sub: 'Unlimited data · any region',
     cost: 350,
     days: 1,
-    bg: 'linear-gradient(135deg,#0a1628,#1a2a44)',
-    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#c9a961" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="32"/><ellipse cx="50" cy="50" rx="14" ry="32"/><line x1="18" y1="50" x2="82" y2="50"/><circle cx="50" cy="50" r="2.5" fill="#c9a961" stroke="none"/></svg>`,
+    bg: '#f5f1e8',
+    art: `<img src="https://images.pexels.com/photos/8830667/pexels-photo-8830667.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="eSIM connectivity" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">`,
   },
   {
     id: 'esim-3d',
@@ -8973,8 +8972,8 @@ const REWARDS_CATALOG = [
     sub: 'Unlimited data · 3 calendar days',
     cost: 950,
     days: 3,
-    bg: 'linear-gradient(135deg,#0a1628,#1a2a44)',
-    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#c9a961" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="32"/><ellipse cx="50" cy="50" rx="14" ry="32"/><line x1="18" y1="50" x2="82" y2="50"/><circle cx="50" cy="50" r="2.5" fill="#c9a961" stroke="none"/></svg>`,
+    bg: '#f5f1e8',
+    art: `<img src="https://images.pexels.com/photos/8830667/pexels-photo-8830667.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="eSIM connectivity" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">`,
   },
   {
     id: 'esim-5d',
@@ -8983,8 +8982,8 @@ const REWARDS_CATALOG = [
     sub: 'Unlimited data · stackable',
     cost: 1500,
     days: 5,
-    bg: 'linear-gradient(135deg,#0a1628,#1a2a44)',
-    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#c9a961" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="32"/><ellipse cx="50" cy="50" rx="14" ry="32"/><line x1="18" y1="50" x2="82" y2="50"/><circle cx="50" cy="50" r="2.5" fill="#c9a961" stroke="none"/></svg>`,
+    bg: '#f5f1e8',
+    art: `<img src="https://images.pexels.com/photos/8830667/pexels-photo-8830667.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="eSIM connectivity" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">`,
   },
   {
     id: 'esim-10d',
@@ -8993,8 +8992,8 @@ const REWARDS_CATALOG = [
     sub: 'Unlimited data · split as you like',
     cost: 2800,
     days: 10,
-    bg: 'linear-gradient(135deg,#0a1628,#1a2a44)',
-    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#c9a961" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="32"/><ellipse cx="50" cy="50" rx="14" ry="32"/><line x1="18" y1="50" x2="82" y2="50"/><circle cx="50" cy="50" r="2.5" fill="#c9a961" stroke="none"/></svg>`,
+    bg: '#f5f1e8',
+    art: `<img src="https://images.pexels.com/photos/8830667/pexels-photo-8830667.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="eSIM connectivity" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">`,
   },
   {
     id: 'esim-30d',
@@ -9003,8 +9002,8 @@ const REWARDS_CATALOG = [
     sub: 'Unlimited data · best value',
     cost: 7500,
     days: 30,
-    bg: 'linear-gradient(135deg,#0a1628,#1a2a44)',
-    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#c9a961" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="50" r="32"/><ellipse cx="50" cy="50" rx="14" ry="32"/><line x1="18" y1="50" x2="82" y2="50"/><circle cx="50" cy="50" r="2.5" fill="#c9a961" stroke="none"/></svg>`,
+    bg: '#f5f1e8',
+    art: `<img src="https://images.pexels.com/photos/8830667/pexels-photo-8830667.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="eSIM connectivity" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">`,
   },
 
   // ===== Vouchers =====
@@ -9015,8 +9014,8 @@ const REWARDS_CATALOG = [
     sub: 'Common Man Coffee Roasters',
     cost: 800,
     value: 10, ccy: 'SGD',
-    bg: 'linear-gradient(135deg,#3d2317,#2a180f)',
-    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#d4a574" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 38h48l-4 38a8 8 0 01-8 7H34a8 8 0 01-8-7l-4-38z"/><path d="M70 46h6a8 8 0 010 16h-7"/><path d="M36 22c0 4 4 4 4 8M48 18c0 4 4 4 4 8M60 22c0 4 4 4 4 8" opacity="0.6"/></svg>`,
+    bg: '#f5f1e8',
+    art: `<img src="https://images.pexels.com/photos/2159156/pexels-photo-2159156.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="Specialty coffee" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">`,
   },
   {
     id: 'vch-dining-25',
@@ -9025,8 +9024,8 @@ const REWARDS_CATALOG = [
     sub: 'Open Door Policy / Burnt Ends / etc.',
     cost: 2000,
     value: 25, ccy: 'SGD',
-    bg: 'linear-gradient(135deg,#4a2c2a,#2d1a17)',
-    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#e8a87c" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M28 22v36a8 8 0 008 8v18M36 22v22"/><path d="M68 22c-4 0-7 4-7 12s3 12 7 12v34"/></svg>`,
+    bg: '#f5f1e8',
+    art: `<img src="https://images.pexels.com/photos/30507463/pexels-photo-30507463.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="Fine dining" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">`,
   },
   {
     id: 'vch-grab-15',
@@ -9035,8 +9034,8 @@ const REWARDS_CATALOG = [
     sub: 'Grab / Gojek · single use',
     cost: 1200,
     value: 15, ccy: 'SGD',
-    bg: 'linear-gradient(135deg,#0d4f3c,#062619)',
-    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#4ade80" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 60l8-22a6 6 0 016-4h28a6 6 0 016 4l8 22"/><path d="M18 60h64v14a4 4 0 01-4 4h-6a4 4 0 01-4-4v-2H32v2a4 4 0 01-4 4h-6a4 4 0 01-4-4V60z"/><circle cx="32" cy="68" r="2.5" fill="#4ade80" stroke="none"/><circle cx="68" cy="68" r="2.5" fill="#4ade80" stroke="none"/></svg>`,
+    bg: '#f5f1e8',
+    art: `<img src="https://images.pexels.com/photos/7263902/pexels-photo-7263902.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="Ride share" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">`,
   },
   {
     id: 'vch-amazon-50',
@@ -9045,8 +9044,8 @@ const REWARDS_CATALOG = [
     sub: 'Lazada / Shopee / Amazon',
     cost: 4000,
     value: 50, ccy: 'SGD',
-    bg: 'linear-gradient(135deg,#7a4500,#3d2300)',
-    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M24 28h12l8 36h32l6-26H42"/><circle cx="44" cy="74" r="5"/><circle cx="74" cy="74" r="5"/></svg>`,
+    bg: '#f5f1e8',
+    art: `<img src="https://images.pexels.com/photos/8788617/pexels-photo-8788617.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="Online shopping" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">`,
   },
   {
     id: 'vch-hotel-100',
@@ -9055,8 +9054,8 @@ const REWARDS_CATALOG = [
     sub: 'Agoda / Booking · valid 1 year',
     cost: 7500,
     value: 100, ccy: 'SGD',
-    bg: 'linear-gradient(135deg,#1e3a5f,#0f1d30)',
-    art: `<svg viewBox="0 0 100 100" width="56" height="56" fill="none" stroke="#7dd3fc" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 78V32l34-14 34 14v46"/><path d="M16 78h68"/><rect x="32" y="48" width="10" height="14"/><rect x="58" y="48" width="10" height="14"/><path d="M44 78V64h12v14"/></svg>`,
+    bg: '#f5f1e8',
+    art: `<img src="https://images.pexels.com/photos/34672504/pexels-photo-34672504.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop" alt="Luxury hotel" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;">`,
   },
 
   // ===== Products =====
