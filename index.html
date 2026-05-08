@@ -16,6 +16,8 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.pexels.com">
+<link rel="dns-prefetch" href="https://images.pexels.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -454,6 +456,42 @@
     background: #fff;
   }
   .input::placeholder { color: var(--muted-2); }
+
+  /* ============ ACCESSIBILITY ============
+     A keyboard-only focus ring on every interactive element. Uses
+     :focus-visible so it's hidden when users click but appears when they
+     tab. Works for buttons, anchors, custom-role elements, and inputs that
+     don't already have their own focus styling. */
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible,
+  [tabindex]:focus-visible,
+  .qa-btn:focus-visible,
+  .card-action:focus-visible,
+  .reward-card:focus-visible,
+  .acct-switcher:focus-visible,
+  .nav-btn:focus-visible,
+  .sheet-close:focus-visible,
+  .day-pill:focus-visible,
+  .apply-pill:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  /* Skip outline-offset for circular buttons so the ring hugs the shape */
+  .sheet-close:focus-visible,
+  .add-card-btn:focus-visible {
+    outline-offset: 0;
+  }
+  /* Visually-hidden helper for SR-only labels on icon-only controls */
+  .sr-only {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
 
   .select {
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1L6 6L11 1' stroke='%230a1628' stroke-width='1.5' fill='none' stroke-linecap='round'/></svg>");
@@ -953,11 +991,59 @@
   }
   .esim-days-input:focus { outline: none; border-color: var(--ink); }
 
+  /* Inline spinner used inside primary buttons during processing states. */
+  .btn-spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+  }
+
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes successPop {
     0% { transform: scale(0.4); opacity: 0; }
     60% { transform: scale(1.08); opacity: 1; }
     100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* ============ TOAST ============ */
+  /* Lightweight transient notification, used for profile switches,
+     points earned, copied-to-clipboard, etc. Slides in from the bottom,
+     auto-dismisses after ~2.5s. */
+  .fynco-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 88px; /* above bottom nav */
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    box-shadow: 0 8px 24px rgba(10, 22, 40, 0.32);
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: calc(100% - 32px);
+  }
+  .fynco-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .fynco-toast.gold { color: var(--gold); }
+  .fynco-toast .toast-icon {
+    width: 16px; height: 16px;
+    color: var(--gold);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* PIN entry row used in card activation flow */
@@ -1348,10 +1434,11 @@
     cursor: pointer;
     opacity: 0.4;
     transition: opacity 0.2s;
-    display: flex;
+    display: none; /* Hidden by default. Enable via ?dev=1 URL param or 4-tap unlock. */
     align-items: center;
     gap: 6px;
   }
+  body.dev-mode .dev-bar { display: flex; }
   .dev-bar:hover { opacity: 1; }
   .dev-bar-dot {
     width: 6px; height: 6px;
@@ -1726,7 +1813,9 @@
     border: none;
   }
 
-  /* VA wallet cards */
+  /* Multi-currency account row in dashboard list and Manage sheet.
+     Class name kept as .wallet-row for backward compatibility with
+     existing markup; user-facing copy says "account" everywhere. */
   .wallet-row {
     display: flex;
     align-items: center;
@@ -3102,7 +3191,7 @@
   <button onclick="goTo(16)">→ Activity</button>
   <button onclick="goTo(18)">→ Settings</button>
   <button onclick="resetAll()" style="background:var(--rust);margin-top:6px;">↺ Reset</button>
-  <div style="margin-top:8px;padding:6px 8px;font-family:var(--mono);font-size:9px;letter-spacing:0.05em;color:var(--muted);text-align:center;border-top:1px solid var(--line);">build v22 · all photos</div>
+  <div style="margin-top:8px;padding:6px 8px;font-family:var(--mono);font-size:9px;letter-spacing:0.05em;color:var(--muted);text-align:center;border-top:1px solid var(--line);">build v23 · polish pass</div>
 </div>
 
 <div class="app">
@@ -3780,7 +3869,7 @@
       <div class="field">
         <label class="label">Set a 6-digit card PIN</label>
         <div class="input-prefix">
-          <input class="input" id="cardPin" type="password" inputmode="numeric" maxlength="6" placeholder="● ● ● ● ● ●" style="letter-spacing:0.4em;font-family:var(--mono);">
+          <input class="input" id="cardPin" type="password" inputmode="numeric" maxlength="6" placeholder="● ● ● ● ● ●" style="letter-spacing:0.4em;font-family:var(--mono);" aria-label="6-digit card PIN">  
         </div>
         <div class="field-help">You'll use this for ATM withdrawals and high-value transactions.</div>
       </div>
@@ -4179,32 +4268,32 @@
   </main>
 
   <!-- ============ BOTTOM NAV (dashboard only) ============ -->
-  <div class="botnav" id="botnav" style="display:none;">
-    <button class="botnav-item" data-nav="15" onclick="goTo(15)">
-      <div class="botnav-icon">
+  <nav class="botnav" id="botnav" style="display:none;" aria-label="Main navigation">
+    <button class="botnav-item" data-nav="15" onclick="goTo(15)" aria-label="Home">
+      <div class="botnav-icon" aria-hidden="true">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
       </div>
       <span class="botnav-label">Home</span>
     </button>
-    <button class="botnav-item" data-nav="17" onclick="goTo(17)">
-      <div class="botnav-icon">
+    <button class="botnav-item" data-nav="17" onclick="goTo(17)" aria-label="Cards">
+      <div class="botnav-icon" aria-hidden="true">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><line x1="2" y1="11" x2="22" y2="11"/></svg>
       </div>
       <span class="botnav-label">Cards</span>
     </button>
-    <button class="botnav-item" data-nav="16" onclick="goTo(16)">
-      <div class="botnav-icon">
+    <button class="botnav-item" data-nav="16" onclick="goTo(16)" aria-label="Activity">
+      <div class="botnav-icon" aria-hidden="true">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
       </div>
       <span class="botnav-label">Activity</span>
     </button>
-    <button class="botnav-item" data-nav="18" onclick="goTo(18)">
-      <div class="botnav-icon">
+    <button class="botnav-item" data-nav="18" onclick="goTo(18)" aria-label="Settings">
+      <div class="botnav-icon" aria-hidden="true">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       </div>
       <span class="botnav-label">Settings</span>
     </button>
-  </div>
+  </nav>
 
   <!-- ============ SHEETS ============ -->
   <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeSheet()"></div>
@@ -4214,7 +4303,7 @@
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <div class="sheet-title">Top up <em>card</em></div>
-      <button class="sheet-close" onclick="closeSheet()">
+      <button class="sheet-close" onclick="closeSheet()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4291,7 +4380,7 @@
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <div class="sheet-title"><em>Scan</em> to pay</div>
-      <button class="sheet-close" onclick="closeSheet()">
+      <button class="sheet-close" onclick="closeSheet()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4312,7 +4401,7 @@
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <div class="sheet-title">Confirm <em>payment</em></div>
-      <button class="sheet-close" onclick="closeSheet()">
+      <button class="sheet-close" onclick="closeSheet()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4365,7 +4454,7 @@
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <div class="sheet-title"><em>eSIM</em> unlimited data</div>
-      <button class="sheet-close" onclick="closeSheet()">
+      <button class="sheet-close" onclick="closeSheet()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4482,7 +4571,7 @@
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <div class="sheet-title">Send <em>money</em></div>
-      <button class="sheet-close" onclick="closeSheet()">
+      <button class="sheet-close" onclick="closeSheet()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4511,7 +4600,7 @@
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <div class="sheet-title">Send <em>local</em></div>
-      <button class="sheet-close" onclick="closeSheet()">
+      <button class="sheet-close" onclick="closeSheet()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4547,7 +4636,7 @@
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <div class="sheet-title">Send <em>overseas</em></div>
-      <button class="sheet-close" onclick="closeSheet()">
+      <button class="sheet-close" onclick="closeSheet()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4613,7 +4702,7 @@
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <div class="sheet-title">Activate <em>card</em></div>
-      <button class="sheet-close" onclick="closeSheet()">
+      <button class="sheet-close" onclick="closeSheet()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4629,7 +4718,7 @@
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <div class="sheet-title" id="applyCardTitle">Apply for a <em>card</em></div>
-      <button class="sheet-close" onclick="closeSheet()">
+      <button class="sheet-close" onclick="closeSheet()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4694,7 +4783,7 @@
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <div class="sheet-title">Switch <em>account</em></div>
-      <button class="sheet-close" onclick="closeSheet()">
+      <button class="sheet-close" onclick="closeSheet()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4712,7 +4801,7 @@
         <div class="sheet-title">Apply for a <em id="applyAcctTitle">Business</em> account</div>
         <div id="applyStepCounter" style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:2px;">Step 1 of 4</div>
       </div>
-      <button class="sheet-close" onclick="cancelApplyAccountType()">
+      <button class="sheet-close" onclick="cancelApplyAccountType()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4738,7 +4827,7 @@
         <div class="sheet-title">Open an <em id="applyCcyTitle">USD</em> account</div>
         <div id="applyCcyStepCounter" style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:2px;">Step 1 of 3</div>
       </div>
-      <button class="sheet-close" onclick="cancelApplyAccountCcy()">
+      <button class="sheet-close" onclick="cancelApplyAccountCcy()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4760,12 +4849,12 @@
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <div class="sheet-title">Manage <em>accounts</em></div>
-      <button class="sheet-close" onclick="closeSheet()">
+      <button class="sheet-close" onclick="closeSheet()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
     <div class="sheet-body">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;">View and manage your virtual accounts. New currency accounts go through a brief application before opening. Your local currency and SGD are locked as defaults.</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;">View and manage your multi-currency accounts. Each account holds money in one currency. New currencies go through a brief application before opening; your local currency and SGD are locked as defaults.</p>
 
       <!-- Aggregate net worth -->
       <div style="background:var(--ink);color:var(--paper);padding:16px 18px;border-radius:var(--radius);position:relative;overflow:hidden;margin-bottom:18px;">
@@ -4796,7 +4885,7 @@
         <div class="sheet-title">Fynco <em>Rewards</em></div>
         <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:2px;">1 point per SGD spent on card</div>
       </div>
-      <button class="sheet-close" onclick="closeSheet()">
+      <button class="sheet-close" onclick="closeSheet()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4839,7 +4928,7 @@
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <div class="sheet-title">Confirm <em>redemption</em></div>
-      <button class="sheet-close" onclick="closeRewardsConfirm()">
+      <button class="sheet-close" onclick="closeRewardsConfirm()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -4869,7 +4958,7 @@
           <div style="font-size:11px;color:var(--muted);font-family:var(--mono);letter-spacing:0.05em;" id="acctDetailType">Primary · virtual account</div>
         </div>
       </div>
-      <button class="sheet-close" onclick="closeSheet()">
+      <button class="sheet-close" onclick="closeSheet()" aria-label="Close">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -5723,6 +5812,30 @@ function activateIssuedCard() {
 }
 
 // ============ DEV BAR ============
+// Hidden by default. Two ways to unlock for testing/demos:
+// 1) Append ?dev=1 to the URL
+// 2) Tap the top-right corner of the screen 5 times within 2 seconds
+(function initDevBar() {
+  const params = new URLSearchParams(location.search);
+  if (params.get('dev') === '1') {
+    document.body.classList.add('dev-mode');
+  }
+  // 5-tap secret in the top-right 60x60 corner
+  let taps = [];
+  document.addEventListener('click', (e) => {
+    if (document.body.classList.contains('dev-mode')) return;
+    const x = e.clientX, y = e.clientY;
+    if (x < window.innerWidth - 60 || y > 60) return;
+    const now = Date.now();
+    taps = taps.filter(t => now - t < 2000);
+    taps.push(now);
+    if (taps.length >= 5) {
+      document.body.classList.add('dev-mode');
+      taps = [];
+    }
+  }, { passive: true });
+})();
+
 document.getElementById('devBar').addEventListener('click', () => {
   document.getElementById('devPanel').classList.toggle('open');
 });
@@ -5918,6 +6031,37 @@ function initDashboard() {
   renderDashboard();
   renderDashCardCarousel();
   updateBotNav(15);
+  // Warm the browser cache for rewards images so the rewards sheet opens
+  // with photos already loaded. Runs once per session in idle time so it
+  // doesn't compete with the dashboard's initial render.
+  preloadRewardsImagesOnce();
+}
+
+// One-shot, idle-time preloader for the Pexels photos used in the rewards
+// catalog. Without this, the first time the user opens the Rewards sheet
+// 11 cross-origin images race to load and the page feels janky for ~1s.
+let _rewardsImgsPreloaded = false;
+function preloadRewardsImagesOnce() {
+  if (_rewardsImgsPreloaded) return;
+  _rewardsImgsPreloaded = true;
+  const run = () => {
+    if (typeof REWARDS_CATALOG === 'undefined' || !Array.isArray(REWARDS_CATALOG)) return;
+    const seen = new Set();
+    REWARDS_CATALOG.forEach(item => {
+      if (!item.art) return;
+      const m = item.art.match(/src="([^"]+)"/);
+      if (!m || seen.has(m[1])) return;
+      seen.add(m[1]);
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = m[1];
+    });
+  };
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(run, { timeout: 2500 });
+  } else {
+    setTimeout(run, 1500);
+  }
 }
 
 function getCardholderName() {
@@ -6223,9 +6367,9 @@ function renderActivateConfirm(card) {
 function renderActivatePinEntry(card) {
   const pin = state._activatePin || '';
   const conf = state._activatePinConfirm || '';
-  const cells = (val, idPrefix) => Array.from({length:6}, (_,i) => {
+  const cells = (val, idPrefix, fieldName) => Array.from({length:6}, (_,i) => {
     const ch = val[i] || '';
-    return `<input class="pin-cell" type="password" inputmode="numeric" maxlength="1" data-i="${i}" id="${idPrefix}-${i}" value="${ch}" oninput="onActivatePinInput(event,'${idPrefix}')" onkeydown="onActivatePinKey(event,'${idPrefix}')" autocomplete="off">`;
+    return `<input class="pin-cell" type="password" inputmode="numeric" maxlength="1" data-i="${i}" id="${idPrefix}-${i}" value="${ch}" oninput="onActivatePinInput(event,'${idPrefix}')" onkeydown="onActivatePinKey(event,'${idPrefix}')" autocomplete="off" aria-label="${fieldName} digit ${i+1} of 6">`;
   }).join('');
   return `
     <div style="margin-bottom:18px;display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--paper-2);border-radius:var(--radius);">
@@ -6238,13 +6382,13 @@ function renderActivatePinEntry(card) {
 
     <div class="field" style="margin-bottom:14px;">
       <label class="label">Set a 6-digit PIN</label>
-      <div class="pin-row" id="activatePinSet">${cells(pin, 'apin')}</div>
+      <div class="pin-row" id="activatePinSet">${cells(pin, 'apin', 'PIN')}</div>
       <div class="field-help">Used for ATM withdrawals and contactless transactions over the floor limit.</div>
     </div>
 
     <div class="field">
       <label class="label">Confirm PIN</label>
-      <div class="pin-row" id="activatePinConfirm">${cells(conf, 'apin2')}</div>
+      <div class="pin-row" id="activatePinConfirm">${cells(conf, 'apin2', 'Confirm PIN')}</div>
       <div id="activatePinError" style="display:none;font-size:11px;color:var(--rust);margin-top:6px;"></div>
     </div>
 
@@ -6416,7 +6560,11 @@ function renderDashboard() {
   const filtered = state.txns.filter(t => t.ccy === ccy);
   const list = document.getElementById('txnList');
   if (filtered.length === 0) {
-    list.innerHTML = `<div style="text-align:center;padding:24px 0;font-size:13px;color:var(--muted);font-style:italic;">No activity in ${ccy} yet</div>`;
+    list.innerHTML = emptyStateMarkup({
+      icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`,
+      title: `No ${ccy} activity yet`,
+      sub: 'Top up or send money to see transactions here.',
+    });
   } else {
     list.innerHTML = filtered.slice(0, 5).map(renderTxnRow).join('');
   }
@@ -6772,13 +6920,9 @@ function refreshAcctSwitcherLabel() {
 // Otherwise open the picker sheet so the user can choose / apply.
 function onAcctSwitcherTap() {
   ensureProfilesInit();
-  const personalExists = profileExists('personal');
-  const businessExists = profileExists('business');
-  if (personalExists && businessExists) {
-    const target = state.activeProfile === 'business' ? 'personal' : 'business';
-    switchToProfile(target);
-    return;
-  }
+  // Always open the picker sheet so the active profile is visible and the
+  // switch is a deliberate action. Silent same-gesture-different-outcome
+  // switching makes it too easy to land on the wrong account by accident.
   openSheet('switch-account');
 }
 
@@ -7828,7 +7972,7 @@ function openAccountDetail(ccy) {
 
   document.getElementById('acctDetailMark').textContent = ccy;
   document.getElementById('acctDetailTitle').innerHTML = `<em>${getCurrencyName(ccy)}</em>`;
-  document.getElementById('acctDetailType').textContent = `${w.primary ? 'Primary' : 'Secondary'} · ${profile === 'business' ? 'business' : 'personal'} VA`;
+  document.getElementById('acctDetailType').textContent = `${w.primary ? 'Primary' : 'Secondary'} · ${profile === 'business' ? 'business' : 'personal'} account`;
   document.getElementById('acctDetailCcy').textContent = ccy;
   document.getElementById('acctDetailBal').textContent = formatMoney(w.balance);
   document.getElementById('acctDetailNumber').textContent = generateAccountNumber(ccy, profile);
@@ -7849,7 +7993,11 @@ function openAccountDetail(ccy) {
   const hist = state.txns.filter(t => t.ccy === ccy).slice(0, 8);
   const histEl = document.getElementById('acctDetailHistory');
   if (hist.length === 0) {
-    histEl.innerHTML = `<div style="text-align:center;padding:24px 0;font-size:13px;color:var(--muted);font-style:italic;">No activity yet</div>`;
+    histEl.innerHTML = emptyStateMarkup({
+      icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`,
+      title: 'No activity yet',
+      sub: `Transactions in your ${ccy} account will appear here.`,
+    });
   } else {
     histEl.innerHTML = hist.map(renderTxnRow).join('');
   }
@@ -7915,18 +8063,10 @@ function copyAccountNumber() {
   copyText('acctDetailNumber', 'Account number copied');
 }
 
+// Legacy alias maintained for existing callers. Routes through the unified
+// showToast helper. Prefer calling showToast() directly in new code.
 function showCopyToast(msg) {
-  let t = document.getElementById('copyToast');
-  if (!t) {
-    t = document.createElement('div');
-    t.id = 'copyToast';
-    t.style.cssText = 'position:absolute;left:50%;bottom:120px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-size:12px;font-family:var(--mono);letter-spacing:0.05em;z-index:100;opacity:0;transition:opacity 0.25s;pointer-events:none;';
-    document.querySelector('.app').appendChild(t);
-  }
-  t.textContent = msg;
-  t.style.opacity = '1';
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 1800);
+  showToast(msg, { duration: 1800 });
 }
 
 // ============ SEND LOCAL ============
@@ -7972,20 +8112,32 @@ function confirmSendLocal() {
     alert(`Insufficient balance.\n\nAvailable: ${ccy} ${formatMoney(w?.balance || 0)}\nNeeded: ${ccy} ${formatMoney(amt)}`);
     return;
   }
-  w.balance -= amt;
-  const refNum = 'TRF-' + Math.floor(100000 + Math.random() * 900000);
-  state.txns.unshift({
-    merchant: name,
-    meta: `Local · ${acc}${ref ? ' · ' + ref : ''} · just now`,
-    amt, ccy, dir: 'out', ts: Date.now(), cat: 'transfer'
-  });
-  document.getElementById('sendResultName').textContent = name;
-  document.getElementById('sendResultAmt').textContent = `${ccy} ${formatMoney(amt)}`;
-  document.getElementById('sendResultRef').textContent = refNum;
-  document.getElementById('sendResultSub').textContent = 'Local transfer · arrives in seconds.';
-  renderDashboard();
-  document.getElementById('sheet-send-local').classList.remove('open');
-  setTimeout(() => document.getElementById('sheet-send-result').classList.add('open'), 150);
+  const btn = document.getElementById('sendLocalBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.dataset.origLabel = btn.textContent;
+    btn.innerHTML = `<span class="btn-spinner" aria-hidden="true"></span><span style="margin-left:8px;">Sending…</span>`;
+  }
+  setTimeout(() => {
+    w.balance -= amt;
+    const refNum = 'TRF-' + Math.floor(100000 + Math.random() * 900000);
+    state.txns.unshift({
+      merchant: name,
+      meta: `Local · ${acc}${ref ? ' · ' + ref : ''} · just now`,
+      amt, ccy, dir: 'out', ts: Date.now(), cat: 'transfer'
+    });
+    document.getElementById('sendResultName').textContent = name;
+    document.getElementById('sendResultAmt').textContent = `${ccy} ${formatMoney(amt)}`;
+    document.getElementById('sendResultRef').textContent = refNum;
+    document.getElementById('sendResultSub').textContent = 'Local transfer · arrives in seconds.';
+    renderDashboard();
+    document.getElementById('sheet-send-local').classList.remove('open');
+    setTimeout(() => document.getElementById('sheet-send-result').classList.add('open'), 150);
+    if (btn) {
+      btn.disabled = false;
+      if (btn.dataset.origLabel) btn.textContent = btn.dataset.origLabel;
+    }
+  }, 900);
 }
 
 // ============ SEND OVERSEAS ============
@@ -8099,20 +8251,32 @@ function confirmSendOverseas() {
     alert(`Insufficient balance.\n\nNeeded: ${ccy} ${formatMoney(totalDeduct)} (incl. ${ccy} ${formatMoney(fxFee)} fee)\nAvailable: ${ccy} ${formatMoney(w?.balance || 0)}`);
     return;
   }
-  w.balance -= totalDeduct;
-  const refNum = 'INT-' + Math.floor(100000 + Math.random() * 900000);
-  state.txns.unshift({
-    merchant: name,
-    meta: `${sendOverseasCountry.flag} ${sendOverseasCountry.name} · ${iban.slice(-6)} · just now`,
-    amt: totalDeduct, ccy, dir: 'out', ts: Date.now(), cat: 'transfer'
-  });
-  document.getElementById('sendResultName').textContent = `${name} · ${sendOverseasCountry.flag} ${sendOverseasCountry.name}`;
-  document.getElementById('sendResultAmt').textContent = `${ccy} ${formatMoney(totalDeduct)}`;
-  document.getElementById('sendResultRef').textContent = refNum;
-  document.getElementById('sendResultSub').textContent = 'International transfer · arrives in 1-2 business days.';
-  renderDashboard();
-  document.getElementById('sheet-send-overseas').classList.remove('open');
-  setTimeout(() => document.getElementById('sheet-send-result').classList.add('open'), 150);
+  const btn = document.getElementById('sendOverseasBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.dataset.origLabel = btn.textContent;
+    btn.innerHTML = `<span class="btn-spinner" aria-hidden="true"></span><span style="margin-left:8px;">Sending…</span>`;
+  }
+  setTimeout(() => {
+    w.balance -= totalDeduct;
+    const refNum = 'INT-' + Math.floor(100000 + Math.random() * 900000);
+    state.txns.unshift({
+      merchant: name,
+      meta: `${sendOverseasCountry.flag} ${sendOverseasCountry.name} · ${iban.slice(-6)} · just now`,
+      amt: totalDeduct, ccy, dir: 'out', ts: Date.now(), cat: 'transfer'
+    });
+    document.getElementById('sendResultName').textContent = `${name} · ${sendOverseasCountry.flag} ${sendOverseasCountry.name}`;
+    document.getElementById('sendResultAmt').textContent = `${ccy} ${formatMoney(totalDeduct)}`;
+    document.getElementById('sendResultRef').textContent = refNum;
+    document.getElementById('sendResultSub').textContent = 'International transfer · arrives in 1–2 business days.';
+    renderDashboard();
+    document.getElementById('sheet-send-overseas').classList.remove('open');
+    setTimeout(() => document.getElementById('sheet-send-result').classList.add('open'), 150);
+    if (btn) {
+      btn.disabled = false;
+      if (btn.dataset.origLabel) btn.textContent = btn.dataset.origLabel;
+    }
+  }, 1100);
 }
 
 // ============ APPLY CARD ============
@@ -8222,7 +8386,11 @@ function renderActivity() {
   else if (activityFilter === 'esim') txns = txns.filter(t => t.merchant && t.merchant.toLowerCase().includes('esim'));
 
   if (txns.length === 0) {
-    list.innerHTML = `<div style="text-align:center;padding:60px 24px;font-size:13px;color:var(--muted);font-style:italic;">No transactions match this filter.</div>`;
+    list.innerHTML = emptyStateMarkup({
+      icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>`,
+      title: 'Nothing matches',
+      sub: 'Try a different filter to see more transactions.',
+    });
     return;
   }
 
@@ -8405,9 +8573,8 @@ function confirmTopup() {
   const ccy = state.topup.targetCcy || state.activeCcy;
   const ref = 'TXN-' + Math.floor(100000 + Math.random() * 900000);
 
-  // Effects
-  state.cardBalance[ccy] = (state.cardBalance[ccy] || 0) + amt;
-  let fromLabel = '';
+  // Pre-validate before showing the processing state, so we don't fake a
+  // long wait just to surface an error
   if (state.topup.source === 'va') {
     const srcCcy = state.topup.sourceCcy || ccy;
     if (!state.wallets[srcCcy]) {
@@ -8418,38 +8585,58 @@ function confirmTopup() {
       alert(`Insufficient ${srcCcy} balance.\n\nNeeded: ${srcCcy} ${formatMoney(amt)}\nAvailable: ${srcCcy} ${formatMoney(state.wallets[srcCcy].balance)}`);
       return;
     }
-    state.wallets[srcCcy].balance -= amt; // simplified — same currency assumed
-    fromLabel = `${srcCcy} account`;
-  } else {
-    fromLabel = 'Credit card';
   }
 
-  state.txns.unshift({
-    merchant: 'Card top up', meta: `From ${fromLabel} · just now`,
-    amt, ccy, dir: 'in', ts: Date.now(), cat: 'card'
-  });
-  if (state.topup.source === 'va') {
-    state.txns.unshift({
-      merchant: 'Account to card transfer', meta: `Outgoing · just now`,
-      amt, ccy: state.topup.sourceCcy, dir: 'out', ts: Date.now()
-    });
+  const btn = document.getElementById('topupConfirmBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.dataset.origLabel = btn.textContent;
+    btn.innerHTML = `<span class="btn-spinner" aria-hidden="true"></span><span style="margin-left:8px;">Processing top up…</span>`;
   }
 
-  // Update active dashboard ccy to match if user chose a different one
-  state.activeCcy = ccy;
-
-  document.getElementById('topupResultAmt').textContent = `${ccy} ${formatMoney(amt)}`;
-  document.getElementById('topupResultFrom').textContent = fromLabel;
-  document.getElementById('topupResultRef').textContent = ref;
-
-  renderDashboard();
-  document.querySelectorAll('.ccy-tab').forEach(t => {
-    t.classList.toggle('active', t.textContent === ccy);
-  });
-  document.getElementById('sheet-topup').classList.remove('open');
   setTimeout(() => {
-    document.getElementById('sheet-topup-result').classList.add('open');
-  }, 150);
+    // Apply effects
+    state.cardBalance[ccy] = (state.cardBalance[ccy] || 0) + amt;
+    let fromLabel = '';
+    if (state.topup.source === 'va') {
+      const srcCcy = state.topup.sourceCcy || ccy;
+      state.wallets[srcCcy].balance -= amt; // simplified — same-currency
+      fromLabel = `${srcCcy} account`;
+    } else {
+      fromLabel = 'Credit card';
+    }
+
+    state.txns.unshift({
+      merchant: 'Card top up', meta: `From ${fromLabel} · just now`,
+      amt, ccy, dir: 'in', ts: Date.now(), cat: 'card'
+    });
+    if (state.topup.source === 'va') {
+      state.txns.unshift({
+        merchant: 'Account to card transfer', meta: `Outgoing · just now`,
+        amt, ccy: state.topup.sourceCcy, dir: 'out', ts: Date.now()
+      });
+    }
+
+    state.activeCcy = ccy;
+
+    document.getElementById('topupResultAmt').textContent = `${ccy} ${formatMoney(amt)}`;
+    document.getElementById('topupResultFrom').textContent = fromLabel;
+    document.getElementById('topupResultRef').textContent = ref;
+
+    renderDashboard();
+    document.querySelectorAll('.ccy-tab').forEach(t => {
+      t.classList.toggle('active', t.textContent === ccy);
+    });
+    document.getElementById('sheet-topup').classList.remove('open');
+    setTimeout(() => {
+      document.getElementById('sheet-topup-result').classList.add('open');
+    }, 150);
+
+    if (btn) {
+      btn.disabled = false;
+      if (btn.dataset.origLabel) btn.textContent = btn.dataset.origLabel;
+    }
+  }, 1000);
 }
 
 function formatCC(input) {
@@ -8550,20 +8737,40 @@ function confirmScanPay() {
     alert(`Insufficient card balance. Top up first.\n\nAvailable: ${ccy} ${formatMoney(state.cardBalance[ccy] || 0)}\nNeeded: ${ccy} ${formatMoney(amt)}`);
     return;
   }
-  state.cardBalance[ccy] -= amt;
-  const ref = 'PAY-' + Math.floor(100000 + Math.random() * 900000);
-  // Award points for the spend
-  const pts = earnPointsForSpend(amt, ccy);
-  state.txns.unshift({
-    merchant, meta: `Card · just now · QR${pts ? ` · +${pts} pts` : ''}`,
-    amt, ccy, dir: 'out', ts: Date.now()
-  });
-  document.getElementById('scanResultMerchant').textContent = merchant;
-  document.getElementById('scanResultAmt').textContent = `${ccy} ${formatMoney(amt)}`;
-  document.getElementById('scanResultRef').textContent = ref;
-  renderDashboard();
-  document.getElementById('sheet-scan-pay').classList.remove('open');
-  setTimeout(() => document.getElementById('sheet-scan-result').classList.add('open'), 150);
+  // Show processing state on the pay button so the action feels real
+  const payBtn = document.getElementById('scanPayBtn');
+  if (payBtn) {
+    payBtn.disabled = true;
+    payBtn.dataset.origLabel = payBtn.textContent;
+    payBtn.innerHTML = `<span class="btn-spinner" aria-hidden="true"></span><span style="margin-left:8px;">Processing…</span>`;
+  }
+  setTimeout(() => {
+    state.cardBalance[ccy] -= amt;
+    const ref = 'PAY-' + Math.floor(100000 + Math.random() * 900000);
+    const pts = earnPointsForSpend(amt, ccy);
+    state.txns.unshift({
+      merchant, meta: `Card · just now · QR${pts ? ` · +${pts} pts` : ''}`,
+      amt, ccy, dir: 'out', ts: Date.now()
+    });
+    document.getElementById('scanResultMerchant').textContent = merchant;
+    document.getElementById('scanResultAmt').textContent = `${ccy} ${formatMoney(amt)}`;
+    document.getElementById('scanResultRef').textContent = ref;
+    renderDashboard();
+    document.getElementById('sheet-scan-pay').classList.remove('open');
+    setTimeout(() => document.getElementById('sheet-scan-result').classList.add('open'), 150);
+    if (payBtn) {
+      payBtn.disabled = false;
+      if (payBtn.dataset.origLabel) payBtn.textContent = payBtn.dataset.origLabel;
+    }
+    if (pts > 0) {
+      setTimeout(() => {
+        showToast(`+${formatPoints(pts)} points earned`, {
+          gold: true,
+          icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+        });
+      }, 700);
+    }
+  }, 800);
 }
 
 // ============ REWARDS UI ============
@@ -8607,7 +8814,10 @@ function renderRewardsCatalog() {
   const grid = document.getElementById('rewardsItemGrid');
   const items = REWARDS_CATALOG.filter(it => rewardsActiveCategory === 'all' || it.category === rewardsActiveCategory);
   if (items.length === 0) {
-    grid.innerHTML = `<div style="padding:24px 0;text-align:center;font-size:13px;color:var(--muted);font-style:italic;">No items in this category yet.</div>`;
+    grid.innerHTML = emptyStateMarkup({
+      title: 'Nothing here yet',
+      sub: 'Try a different category — there are eSIM credits, vouchers, and merchandise available.',
+    });
     return;
   }
   const points = state.points || 0;
@@ -8657,15 +8867,11 @@ function renderMyVouchers() {
   const inactive = vouchers.filter(v => !isVoucherActive(v));
 
   if (vouchers.length === 0) {
-    wrap.innerHTML = `
-      <div style="text-align:center;padding:30px 16px;">
-        <div style="width:48px;height:48px;border-radius:50%;background:var(--paper-2);color:var(--muted);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9V7a2 2 0 012-2h16a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 100-4z"/><line x1="11" y1="6" x2="11" y2="9"/><line x1="11" y1="13" x2="11" y2="16"/></svg>
-        </div>
-        <div style="font-family:var(--serif);font-size:16px;font-weight:500;margin-bottom:4px;">No vouchers yet</div>
-        <div style="font-size:12px;color:var(--muted);max-width:240px;margin:0 auto;line-height:1.5;">Redeem points from the Catalogue to start collecting.</div>
-      </div>
-    `;
+    wrap.innerHTML = emptyStateMarkup({
+      icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9V7a2 2 0 012-2h16a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 100-4z"/><line x1="11" y1="6" x2="11" y2="9"/><line x1="11" y1="13" x2="11" y2="16"/></svg>`,
+      title: 'No vouchers yet',
+      sub: 'Redeem points from the Catalogue to start collecting.',
+    });
     return;
   }
 
@@ -8714,7 +8920,11 @@ function renderRewardsHistory() {
   const wrap = document.getElementById('rewardsTabHistory');
   const hist = (state.rewardsHistory || []).slice().sort((a, b) => b.ts - a.ts);
   if (hist.length === 0) {
-    wrap.innerHTML = `<div style="text-align:center;padding:30px 16px;font-size:13px;color:var(--muted);font-style:italic;">No redemption history yet.</div>`;
+    wrap.innerHTML = emptyStateMarkup({
+      icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+      title: 'No history yet',
+      sub: 'Your past redemptions will appear here.',
+    });
     return;
   }
   wrap.innerHTML = hist.map(h => `
@@ -9116,6 +9326,54 @@ const REWARDS_CATEGORIES = [
 
 const VOUCHER_VALIDITY_MS = 365 * 24 * 60 * 60 * 1000; // 1 year
 
+// ============ TOAST ============
+// Singleton transient notification at the bottom of the screen. Used for
+// quick confirmation events like profile switches and points earned.
+let _fyncoToastTimer = null;
+function showToast(message, opts) {
+  opts = opts || {};
+  const existing = document.getElementById('fyncoToast');
+  if (existing) existing.remove();
+  if (_fyncoToastTimer) { clearTimeout(_fyncoToastTimer); _fyncoToastTimer = null; }
+
+  const toast = document.createElement('div');
+  toast.id = 'fyncoToast';
+  toast.className = 'fynco-toast' + (opts.gold ? ' gold' : '');
+  toast.setAttribute('role', 'status');
+  toast.setAttribute('aria-live', 'polite');
+  if (opts.icon) {
+    const ic = document.createElement('span');
+    ic.className = 'toast-icon';
+    ic.innerHTML = opts.icon;
+    toast.appendChild(ic);
+  }
+  const txt = document.createElement('span');
+  txt.textContent = message;
+  toast.appendChild(txt);
+  document.body.appendChild(toast);
+  // Trigger animation in next frame
+  requestAnimationFrame(() => toast.classList.add('show'));
+  _fyncoToastTimer = setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 250);
+    _fyncoToastTimer = null;
+  }, opts.duration || 2500);
+}
+
+// Generic empty state used across tabs and lists. Standardizes on a small
+// circular icon, a serif headline, and muted sub-text — matching the
+// pattern already used in My Vouchers.
+function emptyStateMarkup({ icon, title, sub }) {
+  const svg = icon || `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+  return `
+    <div style="text-align:center;padding:30px 16px;">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--paper-2);color:var(--muted);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">${svg}</div>
+      <div style="font-family:var(--serif);font-size:16px;font-weight:500;margin-bottom:4px;">${title}</div>
+      ${sub ? `<div style="font-size:12px;color:var(--muted);max-width:240px;margin:0 auto;line-height:1.5;">${sub}</div>` : ''}
+    </div>
+  `;
+}
+
 function formatPoints(n) {
   return Math.round(n).toLocaleString();
 }
@@ -9504,62 +9762,75 @@ function confirmEsim() {
     alert(`Insufficient balance.\n\nNeeded: ${primaryCcy} ${formatMoney(localTotal)}\nAvailable: ${primaryCcy} ${formatMoney(state.wallets[primaryCcy]?.balance || 0)}`);
     return;
   }
-  if (billableDays > 0) {
-    state.wallets[primaryCcy].balance -= localTotal;
+
+  const btn = document.getElementById('esimBuyBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.dataset.origLabel = btn.textContent;
+    btn.innerHTML = `<span class="btn-spinner" aria-hidden="true"></span><span style="margin-left:8px;">${billableDays === 0 ? 'Activating eSIM…' : 'Processing…'}</span>`;
   }
 
-  // Consume voucher days
-  if (voucher && voucherDays > 0) {
-    voucher.daysRemaining -= voucherDays;
-    // Don't delete the voucher entry — keep it for history visibility, isVoucherActive
-    // will return false once daysRemaining hits 0.
-  }
+  setTimeout(() => {
+    if (billableDays > 0) {
+      state.wallets[primaryCcy].balance -= localTotal;
+    }
 
-  const ref = 'ESM-' + Math.floor(100000 + Math.random() * 900000);
-  const regionName = `${r.flag} ${r.name}`;
-  const now = Date.now();
-  const expiresAt = now + days * 86400000;
+    // Consume voucher days
+    if (voucher && voucherDays > 0) {
+      voucher.daysRemaining -= voucherDays;
+    }
 
-  // Award points only on billable spend
-  const pts = billableDays > 0 ? earnPointsForSpend(localTotal, primaryCcy) : 0;
-  let metaSuffix = `${days} day${days > 1 ? 's' : ''} unlimited · just now`;
-  if (voucherDays > 0) metaSuffix += ` · ${voucherDays}d from voucher`;
-  if (pts) metaSuffix += ` · +${pts} pts`;
+    const ref = 'ESM-' + Math.floor(100000 + Math.random() * 900000);
+    const regionName = `${r.flag} ${r.name}`;
+    const now = Date.now();
+    const expiresAt = now + days * 86400000;
 
-  state.txns.unshift({
-    merchant: `eSIM · ${regionName}`,
-    meta: metaSuffix,
-    amt: localTotal, ccy: primaryCcy, dir: 'out', ts: now, cat: 'esim'
-  });
+    const pts = billableDays > 0 ? earnPointsForSpend(localTotal, primaryCcy) : 0;
+    let metaSuffix = `${days} day${days > 1 ? 's' : ''} unlimited · just now`;
+    if (voucherDays > 0) metaSuffix += ` · ${voucherDays}d from voucher`;
+    if (pts) metaSuffix += ` · +${pts} pts`;
 
-  // Push to eSIM purchase history
-  if (!state.esimHistory) state.esimHistory = [];
-  state.esimHistory.push({
-    ref,
-    region,
-    days,
-    voucherDays,
-    amount: localTotal,
-    payCcy: primaryCcy,
-    purchasedAt: now,
-    expiresAt,
-  });
+    state.txns.unshift({
+      merchant: `eSIM · ${regionName}`,
+      meta: metaSuffix,
+      amt: localTotal, ccy: primaryCcy, dir: 'out', ts: now, cat: 'esim'
+    });
 
-  // Reset voucher selection
-  state._esimVoucherId = null;
-  state._esimVoucherDays = 0;
+    if (!state.esimHistory) state.esimHistory = [];
+    state.esimHistory.push({
+      ref, region, days, voucherDays,
+      amount: localTotal, payCcy: primaryCcy,
+      purchasedAt: now, expiresAt,
+    });
 
-  document.getElementById('esimResultPlan').textContent = voucherDays > 0
-    ? `${regionName} · ${days} days unlimited (${voucherDays} from voucher)`
-    : `${regionName} · ${days} days unlimited`;
-  document.getElementById('esimResultAmt').textContent = billableDays === 0
-    ? `${primaryCcy} 0.00 · voucher applied`
-    : `${primaryCcy} ${formatMoney(localTotal)}`;
-  document.getElementById('esimResultRef').textContent = ref;
-  generateQR(ref);
-  renderDashboard();
-  document.getElementById('sheet-esim').classList.remove('open');
-  setTimeout(() => document.getElementById('sheet-esim-result').classList.add('open'), 150);
+    state._esimVoucherId = null;
+    state._esimVoucherDays = 0;
+
+    document.getElementById('esimResultPlan').textContent = voucherDays > 0
+      ? `${regionName} · ${days} days unlimited (${voucherDays} from voucher)`
+      : `${regionName} · ${days} days unlimited`;
+    document.getElementById('esimResultAmt').textContent = billableDays === 0
+      ? `${primaryCcy} 0.00 · voucher applied`
+      : `${primaryCcy} ${formatMoney(localTotal)}`;
+    document.getElementById('esimResultRef').textContent = ref;
+    generateQR(ref);
+    renderDashboard();
+    document.getElementById('sheet-esim').classList.remove('open');
+    setTimeout(() => document.getElementById('sheet-esim-result').classList.add('open'), 150);
+
+    if (btn) {
+      btn.disabled = false;
+      if (btn.dataset.origLabel) btn.textContent = btn.dataset.origLabel;
+    }
+    if (pts > 0) {
+      setTimeout(() => {
+        showToast(`+${formatPoints(pts)} points earned`, {
+          gold: true,
+          icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+        });
+      }, 700);
+    }
+  }, 1100);
 }
 
 function generateQR(seed) {
