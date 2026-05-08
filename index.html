@@ -3228,7 +3228,7 @@
   <button onclick="goTo(16)">→ Activity</button>
   <button onclick="goTo(18)">→ Settings</button>
   <button onclick="resetAll()" style="background:var(--rust);margin-top:6px;">↺ Reset</button>
-  <div style="margin-top:8px;padding:6px 8px;font-family:var(--mono);font-size:9px;letter-spacing:0.05em;color:var(--muted);text-align:center;border-top:1px solid var(--line);">build v24 · per-card balance</div>
+  <div style="margin-top:8px;padding:6px 8px;font-family:var(--mono);font-size:9px;letter-spacing:0.05em;color:var(--muted);text-align:center;border-top:1px solid var(--line);">build v25 · pin enforcement</div>
 </div>
 
 <div class="app">
@@ -3906,7 +3906,7 @@
       <div class="field">
         <label class="label">Set a 6-digit card PIN</label>
         <div class="input-prefix">
-          <input class="input" id="cardPin" type="password" inputmode="numeric" maxlength="6" placeholder="● ● ● ● ● ●" style="letter-spacing:0.4em;font-family:var(--mono);" aria-label="6-digit card PIN">  
+          <input class="input" id="cardPin" type="password" inputmode="numeric" maxlength="6" placeholder="● ● ● ● ● ●" style="letter-spacing:0.4em;font-family:var(--mono);" aria-label="6-digit card PIN" oninput="updateActions()">
         </div>
         <div class="field-help">You'll use this for ATM withdrawals and high-value transactions.</div>
       </div>
@@ -5442,6 +5442,11 @@ function canAdvance() {
     case 9: return state.addrDocDone;
     case 10: return document.getElementById('checkTos').classList.contains('checked') &&
                     document.getElementById('checkAcc').classList.contains('checked');
+    case 13: {
+      // PIN is mandatory before issuing a card. Must be exactly 6 digits.
+      const pinEl = document.getElementById('cardPin');
+      return !!(pinEl && /^\d{6}$/.test(pinEl.value || ''));
+    }
     default: return true;
   }
 }
@@ -5515,7 +5520,21 @@ function updateActions() {
     case 10: txt.textContent = 'Submit application'; meta.innerHTML = '<span style="opacity:0.7;">By submitting, you agree to a soft credit check</span>'; break;
     case 11: actions.style.display = 'none'; break;
     case 12: txt.textContent = 'Apply for Visa card'; meta.innerHTML = '<a href="#" onclick="event.preventDefault();goTo(15);">Skip for now — go to dashboard</a>'; break;
-    case 13: txt.textContent = 'Issue my card'; meta.innerHTML = '<span style="opacity:0.7;">Virtual card ready in 60 seconds</span>'; break;
+    case 13: {
+      txt.textContent = 'Issue my card';
+      const pinEl = document.getElementById('cardPin');
+      const pinLen = (pinEl?.value || '').replace(/\D/g, '').length;
+      if (pinLen === 0) {
+        meta.innerHTML = '<span style="opacity:0.7;">Set a 6-digit PIN to continue</span>';
+      } else if (pinLen < 6) {
+        meta.innerHTML = `<span style="opacity:0.7;">PIN: ${pinLen} of 6 digits</span>`;
+      } else if (!/^\d{6}$/.test(pinEl.value)) {
+        meta.innerHTML = '<span style="color:var(--rust);">PIN must be 6 digits</span>';
+      } else {
+        meta.innerHTML = '<span style="opacity:0.7;">Virtual card ready in 60 seconds</span>';
+      }
+      break;
+    }
     case 14: {
       const card = state.cards[0];
       if (card && card.active) {
@@ -5863,18 +5882,15 @@ function reflectIssuedCardState(card) {
   }
 }
 
+// Triggered from the screen-14 "Activate card" button after the card is first
+// issued. Routes through the same validated activate-card sheet used elsewhere
+// so a 6-digit PIN is always required before activation completes. Previously
+// this short-circuited the activation and let users land on the dashboard
+// with an unset card PIN.
 function activateIssuedCard() {
   const card = state.cards[0];
   if (!card) return;
-  const btn = document.getElementById('activateCardBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="animation:spin 0.8s linear infinite;"><path d="M21 12a9 9 0 11-6.22-8.56"/></svg> Activating…';
-  setTimeout(() => {
-    card.active = true;
-    reflectIssuedCardState(card);
-    // Update the action bar copy from "Open dashboard" to "Continue to dashboard"
-    if (state.step === 14) updateActions();
-  }, 1100);
+  openActivateSheet(card.id);
 }
 
 // ============ DEV BAR ============
@@ -6627,6 +6643,13 @@ function submitActivateCard() {
       renderDashCardCarousel();
       // Cards screen if it's been initialized
       if (document.getElementById('cardsPager')?.children.length) renderCardsScreen();
+      // If the user activated from the screen-14 "Card issued" screen, update
+      // its inline status so the badge flips to CARD LIVE and the action bar
+      // copy updates from "Open dashboard" to "Continue to dashboard".
+      if (state.step === 14) {
+        reflectIssuedCardState(card);
+        if (typeof updateActions === 'function') updateActions();
+      }
       showCopyToast('Card activated');
     }, 1100);
   }, 1500);
