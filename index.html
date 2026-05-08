@@ -1009,6 +1009,43 @@
     100% { transform: scale(1); opacity: 1; }
   }
 
+  /* ============ CARD MINI PILL ============
+     Compact card selector used in flows where multiple cards are options
+     (top-up target, scan-pay source, eSIM source). Each pill shows tier
+     and last-4 only — matches the existing apply-pill aesthetic. */
+  .card-mini-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    transition: all 0.15s;
+  }
+  .card-mini-pill:hover { background: var(--paper-2); }
+  .card-mini-pill.active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .card-mini-pill.active .card-mini-tier { color: var(--gold); }
+  .card-mini-tier {
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--gold);
+  }
+  .card-mini-last4 {
+    color: inherit;
+    opacity: 0.85;
+  }
+  .card-mini-pill.active .card-mini-last4 { opacity: 1; }
+
   /* ============ TOAST ============ */
   /* Lightweight transient notification, used for profile switches,
      points earned, copied-to-clipboard, etc. Slides in from the bottom,
@@ -3191,7 +3228,7 @@
   <button onclick="goTo(16)">→ Activity</button>
   <button onclick="goTo(18)">→ Settings</button>
   <button onclick="resetAll()" style="background:var(--rust);margin-top:6px;">↺ Reset</button>
-  <div style="margin-top:8px;padding:6px 8px;font-family:var(--mono);font-size:9px;letter-spacing:0.05em;color:var(--muted);text-align:center;border-top:1px solid var(--line);">build v23 · polish pass</div>
+  <div style="margin-top:8px;padding:6px 8px;font-family:var(--mono);font-size:9px;letter-spacing:0.05em;color:var(--muted);text-align:center;border-top:1px solid var(--line);">build v24 · per-card balance</div>
 </div>
 
 <div class="app">
@@ -4308,6 +4345,12 @@
       </button>
     </div>
     <div class="sheet-body" id="topupBody">
+      <!-- Target card picker — visible only if user has 2+ cards -->
+      <div id="topupCardPickerWrap" style="display:none;margin-bottom:14px;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Top up which card</div>
+        <div id="topupCardPicker" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      </div>
+
       <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Top up to</div>
       <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;" id="topupTargetTabs"></div>
 
@@ -4417,6 +4460,12 @@
         </div>
         <div class="amount-source-hint">Paying from Card balance</div>
       </div>
+      <!-- Card picker — shown only if user has 2+ cards -->
+      <div id="scanPayCardPickerWrap" style="display:none;margin-top:16px;">
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Pay with</div>
+        <div id="scanPayCardPicker" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+      </div>
+
       <div class="result-detail-card" style="margin-top:24px;">
         <div class="result-detail-row"><span class="result-detail-key">Card</span><span class="result-detail-val">VISA •••• <span id="scanCardLast4">2810</span></span></div>
         <div class="result-detail-row"><span class="result-detail-key">Available</span><span class="result-detail-val" id="scanAvail">SGD 0.00</span></div>
@@ -4504,6 +4553,12 @@
             <input type="number" min="0" class="esim-days-input" id="esimVoucherDays" value="0" oninput="onVoucherDaysInput()">
             <button onclick="adjustVoucherDays(1)" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--line-strong);background:var(--paper);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><line x1="12" y1="5" x2="12" y2="19"/></svg></button>
           </div>
+        </div>
+
+        <!-- Card picker — shown only if user has 2+ cards. Default = first card. -->
+        <div id="esimCardPickerWrap" style="display:none;margin-bottom:14px;">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Pay with card</div>
+          <div id="esimCardPicker" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
         </div>
 
         <!-- Price card -->
@@ -5752,6 +5807,17 @@ function populateCardIssued() {
     const c = makeCard('standard');
     state.cards.push(c);
     state.defaultCardId = c.id;
+    // Seed a welcome top-up onto this newly issued card so the demo dashboard
+    // has something to display. Per the model: cards hold balance loaded from
+    // Accounts; each card has its own balance.
+    const localCcy = state.activeCcy || (state.residence === 'SG' ? 'SGD' : 'SGD');
+    setCardBalance(c.id, localCcy, 250.00);
+    if (localCcy !== 'SGD') setCardBalance(c.id, 'SGD', 80.00);
+    if (state.usdEnabled) setCardBalance(c.id, 'USD', 50.00);
+    state.txns.unshift({
+      merchant: 'Welcome bonus', meta: `Card · •••• ${c.last4} · today`,
+      amt: 250.00, ccy: localCcy, dir: 'in', ts: Date.now(), cat: 'card',
+    });
   }
   const card = state.cards[0];
   // Capture the PIN entered on screen 13 (apply-for-card) if a valid 6-digit
@@ -5991,13 +6057,9 @@ function initDashboard() {
     if (state.usdEnabled) {
       state.wallets['USD'] = { name: 'US Dollar', balance: 320.50, primary: false };
     }
-    state.cardBalance = { [localCcy]: 250.00 };
-    if (localCcy !== 'SGD') state.cardBalance['SGD'] = 80.00;
-    if (state.usdEnabled) state.cardBalance['USD'] = 50.00;
+    state.cardBalance = {}; // Per-card balances populated when cards are issued
     state.activeCcy = localCcy;
-    state.txns = [
-      { merchant: 'Welcome bonus', meta: 'Card · today', amt: 250.00, ccy: localCcy, dir: 'in', ts: Date.now(), cat: 'card' },
-    ];
+    state.txns = [];
     // Seed rewards: a starter balance so the rewards page is meaningful in demo
     state.points = 4500;
     state.rewardsHistory = [];
@@ -6007,6 +6069,9 @@ function initDashboard() {
   if (typeof state.points !== 'number') state.points = 0;
   if (!Array.isArray(state.rewardsHistory)) state.rewardsHistory = [];
   if (!Array.isArray(state.userVouchers)) state.userVouchers = [];
+
+  // Migrate legacy flat-shape card balance if it survived from older sessions
+  migrateCardBalanceShape();
 
   // Cards are intentionally not auto-created here.
   // The user may have skipped the card application from the Approved screen.
@@ -6095,6 +6160,64 @@ function makeCard(tier) {
 
 function getDefaultCard() {
   return state.cards.find(c => c.id === state.defaultCardId) || state.cards[0];
+}
+
+// ============ PER-CARD BALANCE MODEL ============
+// Each card holds its own multi-currency balance. The data lives at
+// state.cardBalance[cardId][ccy] = amount. The legacy shape was a flat
+// {ccy: amount} keyed by currency only — see migrateCardBalanceShape()
+// for the upgrade path that keeps existing demo state working.
+function getCardBalance(cardId, ccy) {
+  if (!cardId || !state.cardBalance || !state.cardBalance[cardId]) return 0;
+  return state.cardBalance[cardId][ccy] || 0;
+}
+
+function setCardBalance(cardId, ccy, amount) {
+  if (!cardId) return;
+  if (!state.cardBalance) state.cardBalance = {};
+  if (!state.cardBalance[cardId]) state.cardBalance[cardId] = {};
+  state.cardBalance[cardId][ccy] = amount;
+}
+
+function addCardBalance(cardId, ccy, delta) {
+  setCardBalance(cardId, ccy, getCardBalance(cardId, ccy) + delta);
+}
+
+function subCardBalance(cardId, ccy, delta) {
+  setCardBalance(cardId, ccy, Math.max(0, getCardBalance(cardId, ccy) - delta));
+}
+
+// True if state.cardBalance is in the legacy {ccy: amount} shape rather than
+// the new {cardId: {ccy: amount}} shape. Used by the migration shim.
+function isLegacyCardBalanceShape(cb) {
+  if (!cb || typeof cb !== 'object') return false;
+  // Legacy keys are 3-letter ccy codes (SGD, USD…). New keys are card ids
+  // like "c-abc1234". Detect by sniffing the first key.
+  const keys = Object.keys(cb);
+  if (keys.length === 0) return false;
+  const first = keys[0];
+  return typeof cb[first] === 'number';
+}
+
+// One-time migration: if state.cardBalance is in the old flat shape, move all
+// funds onto the user's default card so existing sessions don't lose money.
+function migrateCardBalanceShape() {
+  if (!isLegacyCardBalanceShape(state.cardBalance)) return;
+  const def = getDefaultCard();
+  if (!def) {
+    // No card yet — drop the legacy balance entirely (it was unattributable)
+    state.cardBalance = {};
+    return;
+  }
+  const legacy = state.cardBalance;
+  state.cardBalance = { [def.id]: { ...legacy } };
+}
+
+// Returns total across all currencies on a single card (in that card's own
+// currency units — used only for the "any balance loaded?" check).
+function getCardHasAnyBalance(cardId) {
+  if (!cardId || !state.cardBalance || !state.cardBalance[cardId]) return false;
+  return Object.values(state.cardBalance[cardId]).some(v => v > 0);
 }
 
 function tierLabel(t) {
@@ -6520,18 +6643,27 @@ function setActiveCcy(ccy) {
 function renderDashboard() {
   const ccy = state.activeCcy;
   document.getElementById('dashCcySymbol').textContent = ccy;
-  document.getElementById('dashCardBalance').textContent = formatMoney(state.cardBalance[ccy] || 0);
+  // The dashboard top-line balance is the visible card's balance for the
+  // currently-active currency tab. The visible card is the one currently
+  // shown in the carousel (defaults to the default card).
+  const visibleCard = state.cards.find(c => c.id === state.visibleCardId)
+    || getDefaultCard();
+  document.getElementById('dashCardBalance').textContent = formatMoney(
+    visibleCard ? getCardBalance(visibleCard.id, ccy) : 0
+  );
   const def = getDefaultCard();
   const dashCaptionEl = document.getElementById('dashCardCaption');
   const balanceLabelEl = document.querySelector('.dash-balance-label');
   if (def) {
-    dashCaptionEl.textContent = `Default · Fynco ${tierLabel(def.tier)} · •••• ${def.last4}`;
+    // Caption now reflects the visible card, not always the default
+    const cap = visibleCard || def;
+    const isDefault = cap.id === state.defaultCardId;
+    dashCaptionEl.textContent = `${isDefault ? 'Default · ' : ''}Fynco ${tierLabel(cap.tier)} · •••• ${cap.last4}`;
     if (balanceLabelEl) balanceLabelEl.textContent = 'Card balance';
   } else {
     // No card yet — orient the user toward applying
     dashCaptionEl.innerHTML = `<span style="color:var(--gold);">No card yet · tap the tile below to apply</span>`;
     if (balanceLabelEl) balanceLabelEl.textContent = 'Account balance';
-    // When there's no card, show the wallet's primary balance instead
     const w = state.wallets[ccy];
     document.getElementById('dashCardBalance').textContent = formatMoney(w?.balance || 0);
   }
@@ -6569,10 +6701,13 @@ function renderDashboard() {
     list.innerHTML = filtered.slice(0, 5).map(renderTxnRow).join('');
   }
 
-  // Update scan-pay sheet's available + last4
+  // Update scan-pay sheet's available + last4 with the currently selected
+  // scan-pay card (defaults to default card)
   if (def) {
-    document.getElementById('scanAvail').textContent = `${ccy} ${formatMoney(state.cardBalance[ccy] || 0)}`;
-    document.getElementById('scanCardLast4').textContent = def.last4;
+    const scanCardId = state._scanPayCardId || def.id;
+    const scanCard = state.cards.find(c => c.id === scanCardId) || def;
+    document.getElementById('scanAvail').textContent = `${ccy} ${formatMoney(getCardBalance(scanCard.id, ccy))}`;
+    document.getElementById('scanCardLast4').textContent = scanCard.last4;
   }
 }
 
@@ -6746,7 +6881,7 @@ function updateCardDetailMeta() {
   if (!c) return;
   const ccy = state.activeCcy || 'SGD';
   document.getElementById('cardDetailCcy').textContent = ccy;
-  document.getElementById('cardDetailBal').textContent = formatMoney(state.cardBalance[ccy] || 0);
+  document.getElementById('cardDetailBal').textContent = formatMoney(getCardBalance(c.id, ccy));
 
   // Freeze state
   const frozen = state.cardFrozen[c.id];
@@ -7885,7 +8020,6 @@ function provisionApplyAccountCcy() {
 
   // Add the new VA currency account
   state.wallets[ccy] = { name: getCurrencyName(ccy), balance: 0, primary: false };
-  state.cardBalance[ccy] = 0;
 
   // Approval txn
   state.txns.unshift({
@@ -7949,7 +8083,10 @@ function removeAccountCcy(ccy) {
     if (!confirm(`Close your ${getCurrencyName(ccy)} account?`)) return;
   }
   delete state.wallets[ccy];
-  delete state.cardBalance[ccy];
+  // Also remove this currency slot from every card's balance
+  Object.keys(state.cardBalance || {}).forEach(cardId => {
+    if (state.cardBalance[cardId]) delete state.cardBalance[cardId][ccy];
+  });
   if (state.activeCcy === ccy) state.activeCcy = getPrimaryCcy();
   showCopyToast(`${ccy} account closed`);
   initManageAccounts();
@@ -8495,10 +8632,22 @@ function closeSheet(silent) {
 // ============ TOP UP ============
 function resetTopup() {
   // Top-up "to" currency starts as the active dashboard currency
-  state.topup = { source: 'va', amount: '0', sourceCcy: state.activeCcy, targetCcy: state.activeCcy };
+  // Top-up "to" card defaults to the visible card on the dashboard, or the
+  // default card. With multiple cards, a picker is shown; with one card,
+  // the picker is hidden and the lone card is used silently.
+  const initialCardId = state.visibleCardId || state.defaultCardId
+    || (state.cards[0] && state.cards[0].id);
+  state.topup = {
+    source: 'va', amount: '0',
+    sourceCcy: state.activeCcy, targetCcy: state.activeCcy,
+    cardId: initialCardId,
+  };
   document.querySelectorAll('#sheet-topup .source-tab').forEach(t => t.classList.toggle('active', t.dataset.src === 'va'));
   document.getElementById('topupSourceVA').style.display = 'flex';
   document.getElementById('topupSourceCC').style.display = 'none';
+
+  // Render target card picker (only if 2+ cards)
+  renderTopupCardPicker();
 
   // Render target currency tabs
   const tabsEl = document.getElementById('topupTargetTabs');
@@ -8510,6 +8659,30 @@ function resetTopup() {
   document.getElementById('topupAmtVal').textContent = '0.00';
   document.getElementById('topupAmtDisplay').classList.add('empty');
   document.getElementById('topupConfirmBtn').disabled = true;
+}
+
+function renderTopupCardPicker() {
+  const wrap = document.getElementById('topupCardPickerWrap');
+  const list = document.getElementById('topupCardPicker');
+  if (!wrap || !list) return;
+  if (!state.cards || state.cards.length < 2) {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'block';
+  list.innerHTML = state.cards.map(c => {
+    const active = c.id === state.topup.cardId;
+    return `<button class="card-mini-pill ${active ? 'active' : ''}" onclick="setTopupCardId('${c.id}')" aria-pressed="${active}">
+      <span class="card-mini-tier">${tierLabel(c.tier)}</span>
+      <span class="card-mini-last4">•••• ${c.last4}</span>
+    </button>`;
+  }).join('');
+}
+
+function setTopupCardId(id) {
+  if (!state.cards.find(c => c.id === id)) return;
+  state.topup.cardId = id;
+  renderTopupCardPicker();
 }
 
 function setTopupTargetCcy(ccy) {
@@ -8573,6 +8746,15 @@ function confirmTopup() {
   const ccy = state.topup.targetCcy || state.activeCcy;
   const ref = 'TXN-' + Math.floor(100000 + Math.random() * 900000);
 
+  // Resolve target card (defaults to default card if user didn't pick)
+  const cardId = state.topup.cardId || state.defaultCardId
+    || (state.cards[0] && state.cards[0].id);
+  if (!cardId) {
+    alert('No card available to top up. Apply for a card first.');
+    return;
+  }
+  const card = state.cards.find(c => c.id === cardId);
+
   // Pre-validate before showing the processing state, so we don't fake a
   // long wait just to surface an error
   if (state.topup.source === 'va') {
@@ -8595,8 +8777,8 @@ function confirmTopup() {
   }
 
   setTimeout(() => {
-    // Apply effects
-    state.cardBalance[ccy] = (state.cardBalance[ccy] || 0) + amt;
+    // Credit the chosen card
+    addCardBalance(cardId, ccy, amt);
     let fromLabel = '';
     if (state.topup.source === 'va') {
       const srcCcy = state.topup.sourceCcy || ccy;
@@ -8606,21 +8788,24 @@ function confirmTopup() {
       fromLabel = 'Credit card';
     }
 
+    const cardLast4 = card ? ` · •••• ${card.last4}` : '';
     state.txns.unshift({
-      merchant: 'Card top up', meta: `From ${fromLabel} · just now`,
+      merchant: 'Card top up', meta: `From ${fromLabel}${cardLast4} · just now`,
       amt, ccy, dir: 'in', ts: Date.now(), cat: 'card'
     });
     if (state.topup.source === 'va') {
       state.txns.unshift({
-        merchant: 'Account to card transfer', meta: `Outgoing · just now`,
+        merchant: 'Account to card transfer', meta: `Outgoing${cardLast4} · just now`,
         amt, ccy: state.topup.sourceCcy, dir: 'out', ts: Date.now()
       });
     }
 
     state.activeCcy = ccy;
+    // Make the topped-up card the visible one so the dashboard reflects it
+    state.visibleCardId = cardId;
 
     document.getElementById('topupResultAmt').textContent = `${ccy} ${formatMoney(amt)}`;
-    document.getElementById('topupResultFrom').textContent = fromLabel;
+    document.getElementById('topupResultFrom').textContent = fromLabel + (card ? ` → •••• ${card.last4}` : '');
     document.getElementById('topupResultRef').textContent = ref;
 
     renderDashboard();
@@ -8702,6 +8887,10 @@ async function startScanner() {
 
       stopScannerCamera();
       document.getElementById('sheet-scan').classList.remove('open');
+      // Default scan-pay to default card; user can change before confirming
+      state._scanPayCardId = state.defaultCardId
+        || (state.cards[0] && state.cards[0].id);
+      renderScanPayCardPicker();
       setTimeout(() => {
         document.getElementById('sheet-scan-pay').classList.add('open');
       }, 200);
@@ -8729,12 +8918,59 @@ function stopScannerCamera() {
   if (v) v.srcObject = null;
 }
 
+function renderScanPayCardPicker() {
+  const wrap = document.getElementById('scanPayCardPickerWrap');
+  const list = document.getElementById('scanPayCardPicker');
+  if (!wrap || !list) return;
+  if (!state.cards || state.cards.length < 2) {
+    wrap.style.display = 'none';
+    refreshScanPayDetails();
+    return;
+  }
+  wrap.style.display = 'block';
+  list.innerHTML = state.cards.map(c => {
+    const active = c.id === state._scanPayCardId;
+    return `<button class="card-mini-pill ${active ? 'active' : ''}" onclick="setScanPayCardId('${c.id}')" aria-pressed="${active}">
+      <span class="card-mini-tier">${tierLabel(c.tier)}</span>
+      <span class="card-mini-last4">•••• ${c.last4}</span>
+    </button>`;
+  }).join('');
+  refreshScanPayDetails();
+}
+
+function setScanPayCardId(id) {
+  if (!state.cards.find(c => c.id === id)) return;
+  state._scanPayCardId = id;
+  renderScanPayCardPicker();
+}
+
+// Updates the "Card" and "Available" detail rows in the scan-pay sheet
+// to reflect the currently-selected card.
+function refreshScanPayDetails() {
+  const cardId = state._scanPayCardId || state.defaultCardId
+    || (state.cards[0] && state.cards[0].id);
+  const c = state.cards.find(x => x.id === cardId);
+  if (!c) return;
+  const ccy = state.activeCcy || 'SGD';
+  const last4El = document.getElementById('scanCardLast4');
+  const availEl = document.getElementById('scanAvail');
+  if (last4El) last4El.textContent = c.last4;
+  if (availEl) availEl.textContent = `${ccy} ${formatMoney(getCardBalance(c.id, ccy))}`;
+}
+
 function confirmScanPay() {
   const amt = window._scanAmt || 0;
   const merchant = window._scanMerchant || 'Merchant';
   const ccy = state.activeCcy;
-  if ((state.cardBalance[ccy] || 0) < amt) {
-    alert(`Insufficient card balance. Top up first.\n\nAvailable: ${ccy} ${formatMoney(state.cardBalance[ccy] || 0)}\nNeeded: ${ccy} ${formatMoney(amt)}`);
+  const cardId = state._scanPayCardId || state.defaultCardId
+    || (state.cards[0] && state.cards[0].id);
+  if (!cardId) {
+    alert('No card available. Apply for a card first.');
+    return;
+  }
+  const card = state.cards.find(c => c.id === cardId);
+  if (getCardBalance(cardId, ccy) < amt) {
+    alert(`Insufficient card balance on •••• ${card?.last4 || '----'}.\n\nAvailable: ${ccy} ${formatMoney(getCardBalance(cardId, ccy))}\nNeeded: ${ccy} ${formatMoney(amt)}\n\nTop up this card or pick a different one.`);
     return;
   }
   // Show processing state on the pay button so the action feels real
@@ -8745,11 +8981,11 @@ function confirmScanPay() {
     payBtn.innerHTML = `<span class="btn-spinner" aria-hidden="true"></span><span style="margin-left:8px;">Processing…</span>`;
   }
   setTimeout(() => {
-    state.cardBalance[ccy] -= amt;
+    subCardBalance(cardId, ccy, amt);
     const ref = 'PAY-' + Math.floor(100000 + Math.random() * 900000);
     const pts = earnPointsForSpend(amt, ccy);
     state.txns.unshift({
-      merchant, meta: `Card · just now · QR${pts ? ` · +${pts} pts` : ''}`,
+      merchant, meta: `Card · •••• ${card?.last4 || '----'} · QR${pts ? ` · +${pts} pts` : ''} · just now`,
       amt, ccy, dir: 'out', ts: Date.now()
     });
     document.getElementById('scanResultMerchant').textContent = merchant;
@@ -9406,6 +9642,9 @@ function initEsim() {
   // Reset voucher selection when opening fresh
   state._esimVoucherId = null;
   state._esimVoucherDays = 0;
+  // Default eSIM payment to the FIRST card (per user spec). User can switch
+  // via the card picker if they have multiple cards.
+  state._esimCardId = (state.cards[0] && state.cards[0].id) || null;
   // Reset to Buy tab
   switchEsimTab('buy');
   // Render selected region pill
@@ -9425,6 +9664,34 @@ function initEsim() {
     document.getElementById('esimCustomDayWrap').style.display = 'none';
   }
 
+  renderEsimCardPicker();
+  refreshEsimTotal();
+}
+
+// Renders the card picker for eSIM purchase if the user has 2+ cards.
+// With a single card, the picker is hidden — the lone card is used silently.
+function renderEsimCardPicker() {
+  const wrap = document.getElementById('esimCardPickerWrap');
+  const list = document.getElementById('esimCardPicker');
+  if (!wrap || !list) return;
+  if (!state.cards || state.cards.length < 2) {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'block';
+  list.innerHTML = state.cards.map(c => {
+    const active = c.id === state._esimCardId;
+    return `<button class="card-mini-pill ${active ? 'active' : ''}" onclick="setEsimCardId('${c.id}')" aria-pressed="${active}">
+      <span class="card-mini-tier">${tierLabel(c.tier)}</span>
+      <span class="card-mini-last4">•••• ${c.last4}</span>
+    </button>`;
+  }).join('');
+}
+
+function setEsimCardId(id) {
+  if (!state.cards.find(c => c.id === id)) return;
+  state._esimCardId = id;
+  renderEsimCardPicker();
   refreshEsimTotal();
 }
 
@@ -9685,13 +9952,24 @@ function refreshEsimTotal() {
 
   const sgdTotal = ESIM_DAILY_RATE_SGD * multiplier * billableDays;
 
-  // Display in primary account currency
-  const primaryCcy = getPrimaryCcy();
-  const fx = FX_FROM_SGD[primaryCcy] || 1;
+  // Choose billing currency from the selected card. Prefer the dashboard's
+  // active currency if the card has it; otherwise pick whichever currency on
+  // the card has any balance; otherwise default to SGD as the rate-card ccy.
+  const chosenCardId = state._esimCardId
+    || (state.cards[0] && state.cards[0].id);
+  const chosenCard = state.cards.find(c => c.id === chosenCardId);
+  const cardCcyMap = (state.cardBalance && state.cardBalance[chosenCardId]) || {};
+  let billCcy = state.activeCcy;
+  if (!cardCcyMap[billCcy]) {
+    const withFunds = Object.entries(cardCcyMap).find(([, v]) => v > 0);
+    billCcy = withFunds ? withFunds[0] : (Object.keys(cardCcyMap)[0] || 'SGD');
+  }
+  const fx = FX_FROM_SGD[billCcy] || 1;
   const localTotal = sgdTotal * fx;
   const dailyLocal = ESIM_DAILY_RATE_SGD * multiplier * fx;
+  const cardAvail = chosenCard ? getCardBalance(chosenCard.id, billCcy) : 0;
 
-  document.getElementById('esimTotalCcy').textContent = primaryCcy;
+  document.getElementById('esimTotalCcy').textContent = billCcy;
   document.getElementById('esimTotalAmt').textContent = formatMoney(localTotal);
   document.getElementById('esimDaysLabel').textContent = days;
 
@@ -9708,27 +9986,32 @@ function refreshEsimTotal() {
 
   // Rate note
   const rateNoteEl = document.getElementById('esimRateNote');
-  if (primaryCcy === 'SGD') {
-    rateNoteEl.textContent = `SGD ${formatMoney(dailyLocal)} / day · ${billableDays} day${billableDays === 1 ? '' : 's'} billable`;
-  } else {
-    rateNoteEl.textContent = `${primaryCcy} ${formatMoney(dailyLocal)} / day · ${billableDays} billable`;
-  }
+  rateNoteEl.textContent = `${billCcy} ${formatMoney(dailyLocal)} / day · ${billableDays} day${billableDays === 1 ? '' : 's'} billable`;
 
-  // Pay from line
+  // Pay from line — names the card and shows available balance on it
   const payFromEl = document.getElementById('esimPayFromLine');
   if (billableDays === 0 && voucherDays > 0) {
     payFromEl.innerHTML = `<span style="color:var(--success);">Fully covered by voucher · no charge</span>`;
+  } else if (chosenCard) {
+    const tier = tierLabel(chosenCard.tier);
+    const enough = cardAvail >= localTotal;
+    const availColor = enough ? 'var(--muted)' : 'var(--rust)';
+    payFromEl.innerHTML = `Charges to ${tier} card •••• ${chosenCard.last4} · <span style="color:${availColor};">${billCcy} ${formatMoney(cardAvail)} available</span>`;
   } else {
-    payFromEl.textContent = `Charges to your ${getCurrencyName(primaryCcy)} account`;
+    payFromEl.textContent = 'No card available — apply for one first';
   }
 
   // Buy button
   const btn = document.getElementById('esimBuyBtn');
-  btn.disabled = days < 1;
   if (billableDays === 0 && voucherDays > 0) {
+    btn.disabled = days < 1 || !chosenCard;
     btn.textContent = `Activate eSIM · free`;
+  } else if (chosenCard && cardAvail < localTotal) {
+    btn.disabled = true;
+    btn.textContent = `Top up •••• ${chosenCard.last4} first`;
   } else {
-    btn.textContent = `Buy eSIM · ${primaryCcy} ${formatMoney(localTotal)}`;
+    btn.disabled = days < 1 || !chosenCard;
+    btn.textContent = `Buy eSIM · ${billCcy} ${formatMoney(localTotal)}`;
   }
 }
 
@@ -9754,12 +10037,27 @@ function confirmEsim() {
   const billableDays = Math.max(0, days - voucherDays);
 
   const sgdTotal = ESIM_DAILY_RATE_SGD * multiplier * billableDays;
-  const primaryCcy = getPrimaryCcy();
-  const fx = FX_FROM_SGD[primaryCcy] || 1;
+
+  // Resolve the card to charge — same selection logic as refreshEsimTotal,
+  // so the user sees consistent values between the price card and the debit.
+  const chosenCardId = state._esimCardId
+    || (state.cards[0] && state.cards[0].id);
+  const chosenCard = state.cards.find(c => c.id === chosenCardId);
+  if (!chosenCard) {
+    alert('No card available. Apply for a card first to buy eSIM.');
+    return;
+  }
+  const cardCcyMap = (state.cardBalance && state.cardBalance[chosenCardId]) || {};
+  let billCcy = state.activeCcy;
+  if (!cardCcyMap[billCcy]) {
+    const withFunds = Object.entries(cardCcyMap).find(([, v]) => v > 0);
+    billCcy = withFunds ? withFunds[0] : (Object.keys(cardCcyMap)[0] || 'SGD');
+  }
+  const fx = FX_FROM_SGD[billCcy] || 1;
   const localTotal = sgdTotal * fx;
 
-  if (billableDays > 0 && (state.wallets[primaryCcy]?.balance || 0) < localTotal) {
-    alert(`Insufficient balance.\n\nNeeded: ${primaryCcy} ${formatMoney(localTotal)}\nAvailable: ${primaryCcy} ${formatMoney(state.wallets[primaryCcy]?.balance || 0)}`);
+  if (billableDays > 0 && getCardBalance(chosenCardId, billCcy) < localTotal) {
+    alert(`Insufficient balance on •••• ${chosenCard.last4}.\n\nNeeded: ${billCcy} ${formatMoney(localTotal)}\nAvailable: ${billCcy} ${formatMoney(getCardBalance(chosenCardId, billCcy))}\n\nTop up this card or pick a different one.`);
     return;
   }
 
@@ -9772,7 +10070,7 @@ function confirmEsim() {
 
   setTimeout(() => {
     if (billableDays > 0) {
-      state.wallets[primaryCcy].balance -= localTotal;
+      subCardBalance(chosenCardId, billCcy, localTotal);
     }
 
     // Consume voucher days
@@ -9785,21 +10083,22 @@ function confirmEsim() {
     const now = Date.now();
     const expiresAt = now + days * 86400000;
 
-    const pts = billableDays > 0 ? earnPointsForSpend(localTotal, primaryCcy) : 0;
-    let metaSuffix = `${days} day${days > 1 ? 's' : ''} unlimited · just now`;
+    const pts = billableDays > 0 ? earnPointsForSpend(localTotal, billCcy) : 0;
+    let metaSuffix = `${days} day${days > 1 ? 's' : ''} unlimited · •••• ${chosenCard.last4} · just now`;
     if (voucherDays > 0) metaSuffix += ` · ${voucherDays}d from voucher`;
     if (pts) metaSuffix += ` · +${pts} pts`;
 
     state.txns.unshift({
       merchant: `eSIM · ${regionName}`,
       meta: metaSuffix,
-      amt: localTotal, ccy: primaryCcy, dir: 'out', ts: now, cat: 'esim'
+      amt: localTotal, ccy: billCcy, dir: 'out', ts: now, cat: 'esim'
     });
 
     if (!state.esimHistory) state.esimHistory = [];
     state.esimHistory.push({
       ref, region, days, voucherDays,
-      amount: localTotal, payCcy: primaryCcy,
+      amount: localTotal, payCcy: billCcy,
+      cardId: chosenCardId, cardLast4: chosenCard.last4,
       purchasedAt: now, expiresAt,
     });
 
@@ -9810,8 +10109,8 @@ function confirmEsim() {
       ? `${regionName} · ${days} days unlimited (${voucherDays} from voucher)`
       : `${regionName} · ${days} days unlimited`;
     document.getElementById('esimResultAmt').textContent = billableDays === 0
-      ? `${primaryCcy} 0.00 · voucher applied`
-      : `${primaryCcy} ${formatMoney(localTotal)}`;
+      ? `${billCcy} 0.00 · voucher applied`
+      : `${billCcy} ${formatMoney(localTotal)} · •••• ${chosenCard.last4}`;
     document.getElementById('esimResultRef').textContent = ref;
     generateQR(ref);
     renderDashboard();
